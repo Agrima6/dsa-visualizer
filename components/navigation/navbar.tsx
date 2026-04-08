@@ -134,7 +134,7 @@ export const Navbar = () => {
           <ModeToggle />
 
           {isSignedIn ? (
-            <UserButton afterSignOutUrl="/" />
+            <UserButton />
           ) : (
             <SignInButton mode="modal">
               <Button variant="outline" size="sm" className="rounded-xl">
@@ -170,7 +170,7 @@ export const Navbar = () => {
 
                 <div className="mb-4 flex items-center gap-2">
                   {isSignedIn ? (
-                    <UserButton afterSignOutUrl="/" />
+                    <UserButton />
                   ) : (
                     <SignInButton mode="modal">
                       <Button className="rounded-xl w-full">Sign in</Button>
@@ -184,7 +184,8 @@ export const Navbar = () => {
                     What you can learn
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Explore core data structures and algorithms with interactive visuals.
+                    Explore core data structures and algorithms with interactive
+                    visuals.
                   </p>
                 </div>
 
@@ -278,7 +279,7 @@ export const Navbar = () => {
           <ModeToggle />
 
           {isSignedIn ? (
-            <UserButton afterSignOutUrl="/" />
+            <UserButton />
           ) : (
             <SignInButton mode="modal">
               <Button variant="outline" className="rounded-xl">
