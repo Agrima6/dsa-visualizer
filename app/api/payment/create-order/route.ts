@@ -34,10 +34,16 @@ export async function POST(req: Request) {
       key_secret: razorpayKeySecret,
     });
 
+    const shortUserId = userId.slice(-8);
+    const shortTopicSlug = topicSlug.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 12);
+    const shortTime = Date.now().toString().slice(-8);
+
+    const receipt = `rcpt_${shortUserId}_${shortTopicSlug}_${shortTime}`;
+
     const order = await razorpay.orders.create({
-      amount: 900, // ₹9 in paise
+      amount: 1900, // ₹19 in paise
       currency: "INR",
-      receipt: `${userId}_${topicSlug}_${Date.now()}`,
+      receipt,
       notes: {
         userId,
         topicSlug,
@@ -50,10 +56,16 @@ export async function POST(req: Request) {
       currency: order.currency,
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Create order error:", error);
+
+    const razorpayMessage =
+      error?.error?.description ||
+      error?.message ||
+      "Failed to create order.";
+
     return NextResponse.json(
-      { error: "Failed to create order." },
+      { error: razorpayMessage },
       { status: 500 }
     );
   }

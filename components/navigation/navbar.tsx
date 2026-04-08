@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { BrainCircuit, ChevronRight, Menu, Sparkles, Users } from "lucide-react";
+import { BrainCircuit, ChevronRight, Menu, Sparkles } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -22,6 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ModeToggle } from "@/components/global/mode-toggle";
+import { useUser, UserButton, SignInButton } from "@clerk/nextjs";
 
 interface RouteProps {
   href: string;
@@ -36,7 +37,7 @@ interface FeatureProps {
 
 const routeList: RouteProps[] = [
   {
-     href: "/dashboard",
+    href: "/dashboard",
     label: "Dashboard",
   },
   {
@@ -110,6 +111,7 @@ const featureList: FeatureProps[] = [
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const { isSignedIn } = useUser();
 
   return (
     <header className="sticky top-5 z-50 w-[92%] md:w-[78%] lg:w-[76%] lg:max-w-screen-xl mx-auto">
@@ -130,6 +132,17 @@ export const Navbar = () => {
 
         <div className="flex items-center lg:hidden gap-2">
           <ModeToggle />
+
+          {isSignedIn ? (
+            <UserButton afterSignOutUrl="/" />
+          ) : (
+            <SignInButton mode="modal">
+              <Button variant="outline" size="sm" className="rounded-xl">
+                Sign in
+              </Button>
+            </SignInButton>
+          )}
+
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <button className="nav-mobile-btn" aria-label="Open menu">
@@ -154,6 +167,16 @@ export const Navbar = () => {
                     </Link>
                   </SheetTitle>
                 </SheetHeader>
+
+                <div className="mb-4 flex items-center gap-2">
+                  {isSignedIn ? (
+                    <UserButton afterSignOutUrl="/" />
+                  ) : (
+                    <SignInButton mode="modal">
+                      <Button className="rounded-xl w-full">Sign in</Button>
+                    </SignInButton>
+                  )}
+                </div>
 
                 <div className="mb-5 rounded-2xl border border-border/60 bg-muted/40 px-4 py-3">
                   <div className="flex items-center gap-2 text-sm font-medium">
@@ -248,17 +271,21 @@ export const Navbar = () => {
                 </NavigationMenuLink>
               </NavigationMenuItem>
             ))}
-
-            <NavigationMenuItem>
-              <NavigationMenuLink asChild>
-               
-              </NavigationMenuLink>
-            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 
-        <div className="hidden lg:flex items-center gap-2">
+        <div className="hidden lg:flex items-center gap-3">
           <ModeToggle />
+
+          {isSignedIn ? (
+            <UserButton afterSignOutUrl="/" />
+          ) : (
+            <SignInButton mode="modal">
+              <Button variant="outline" className="rounded-xl">
+                Sign in
+              </Button>
+            </SignInButton>
+          )}
         </div>
       </div>
     </header>
