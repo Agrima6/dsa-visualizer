@@ -10,6 +10,12 @@ import {
   type Company,
 } from "./sorting-problems-data"
 
+declare global {
+  interface Window {
+    Razorpay: any
+  }
+}
+
 // ─────────────────────────────────────────────────────────────
 // Lock config
 // ─────────────────────────────────────────────────────────────
@@ -18,8 +24,6 @@ const LOCKED_IDS = new Set(
 )
 
 const LOCK_PRICE = 19
-const RAZORPAY_PAYMENT_LINK =
-  process.env.NEXT_PUBLIC_RAZORPAY_PAYMENT_LINK || "https://rzp.io/l/YOUR_RAZORPAY_LINK"
 
 // ─────────────────────────────────────────────────────────────
 // UI styles
@@ -56,8 +60,8 @@ function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ")
 }
 
-function isProblemLocked(problem: SortingProblem) {
-  return LOCKED_IDS.has(problem.slug)
+function isProblemLocked(problem: SortingProblem, unlockedTopics: string[]) {
+  return LOCKED_IDS.has(problem.slug) && !unlockedTopics.includes(problem.slug)
 }
 
 function CompanyLogoBadge({
@@ -108,14 +112,19 @@ function ProblemRow({
   onSelect,
   isSignedIn,
   onLockedClick,
+  unlockedTopics,
+  payingSlug,
 }: {
   problem: SortingProblem
   idx: number
   onSelect: (p: SortingProblem) => void
   isSignedIn: boolean
-  onLockedClick: () => void
+  onLockedClick: (slug: string) => void
+  unlockedTopics: string[]
+  payingSlug: string | null
 }) {
-  const locked = isProblemLocked(problem)
+  const locked = isProblemLocked(problem, unlockedTopics)
+  const isPayingThis = payingSlug === problem.slug
 
   const rowContent = (
     <div
@@ -163,7 +172,11 @@ function ProblemRow({
 
           {locked && (
             <p className="mt-2 text-[11px] text-amber-600/80 dark:text-amber-300/80">
-              {isSignedIn ? `Locked · Pay ₹${LOCK_PRICE} to view` : "Locked · Sign in required"}
+              {!isSignedIn
+                ? "Locked · Sign in required"
+                : isPayingThis
+                ? "Opening Razorpay..."
+                : `Locked · Pay ₹${LOCK_PRICE} to view`}
             </p>
           )}
         </div>
@@ -219,7 +232,15 @@ function ProblemRow({
 
   if (locked) {
     if (isSignedIn) {
-      return <button onClick={onLockedClick} className="w-full text-left">{rowContent}</button>
+      return (
+        <button
+          onClick={() => onLockedClick(problem.slug)}
+          className="w-full text-left"
+          disabled={isPayingThis}
+        >
+          {rowContent}
+        </button>
+      )
     }
 
     return (
@@ -246,6 +267,32 @@ export default function SortingCodeView() {
   const [selectedProblem, setSelectedProblem] = useState<SortingProblem | null>(null)
   const [filterDiff, setFilterDiff] = useState<Difficulty | "All">("All")
   const [search, setSearch] = useState("")
+  const [unlockedTopics, setUnlockedTopics] = useState<string[]>([])
+  const [payingSlug, setPayingSlug] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchUnlocked = async () => {
+      try {
+        if (!isSignedIn) {
+          setUnlockedTopics([])
+          return
+        }
+
+        const res = await fetch("/api/payment/unlocked", {
+          method: "GET",
+          cache: "no-store",
+        })
+
+        const data = await res.json()
+        setUnlockedTopics(Array.isArray(data.unlockedTopics) ? data.unlockedTopics : [])
+      } catch (error) {
+        console.error("Failed to fetch unlocked topics:", error)
+        setUnlockedTopics([])
+      }
+    }
+
+    fetchUnlocked()
+  }, [isSignedIn])
 
   const filtered = SORTING_PROBLEMS.filter((p) => {
     const matchDiff = filterDiff === "All" || p.difficulty === filterDiff
@@ -263,8 +310,118 @@ export default function SortingCodeView() {
     Hard: SORTING_PROBLEMS.filter((p) => p.difficulty === "Hard").length,
   }
 
-  const handleLockedClick = () => {
-    window.open(RAZORPAY_PAYMENT_LINK, "_blank", "noopener,noreferrer")
+  const loadRazorpayScript = () => {
+    return new Promise<boolean>((resolve) => {
+      if (typeof window !== "undefined" && window.Razorpay) {
+        resolve(true)
+        return
+      }
+
+      const existingScript = document.querySelector(
+        'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
+      )
+
+      if (existingScript) {
+        resolve(true)
+        return
+      }
+
+      const script = document.createElement("script")
+      script.src = "https://checkout.razorpay.com/v1/checkout.js"
+      script.async = true
+      script.onload = () => resolve(true)
+      script.onerror = () => resolve(false)
+      document.body.appendChild(script)
+    })
+  }
+
+  const handleLockedClick = async (topicSlug: string) => {
+    if (!isSignedIn) return
+
+    try {
+      setPayingSlug(topicSlug)
+
+      const loaded = await loadRazorpayScript()
+      if (!loaded) {
+        alert("Razorpay SDK failed to load.")
+        return
+      }
+
+      const createOrderRes = await fetch("/api/payment/create-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ topicSlug }),
+      })
+
+      const createOrderData = await createOrderRes.json()
+
+      if (!createOrderRes.ok) {
+        alert(createOrderData.error || "Failed to create order.")
+        return
+      }
+
+      const options = {
+        key: createOrderData.key,
+        amount: createOrderData.amount,
+        currency: createOrderData.currency || "INR",
+        name: "AlgoMaitri",
+        description: `Unlock ${topicSlug}`,
+        order_id: createOrderData.orderId,
+        handler: async function (response: any) {
+          const verifyRes = await fetch("/api/payment/verify", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              topicSlug,
+            }),
+          })
+
+          const verifyData = await verifyRes.json()
+
+          if (!verifyRes.ok) {
+            alert(verifyData.error || "Payment verification failed.")
+            return
+          }
+
+          setUnlockedTopics((prev) =>
+            prev.includes(topicSlug) ? prev : [...prev, topicSlug]
+          )
+
+          if (selectedProblem?.slug === topicSlug) {
+            setSelectedProblem({ ...selectedProblem })
+          }
+
+          alert("Payment successful. Problem unlocked.")
+        },
+        theme: {
+          color: "#7c3aed",
+        },
+        modal: {
+          ondismiss: function () {
+            setPayingSlug(null)
+          },
+        },
+        prefill: {},
+        notes: {
+          topicSlug,
+        },
+      }
+
+      const paymentObject = new window.Razorpay(options)
+      paymentObject.open()
+    } catch (error) {
+      console.error("Payment error:", error)
+      alert("Something went wrong while starting payment.")
+    } finally {
+      setPayingSlug(null)
+    }
   }
 
   if (selectedProblem) {
@@ -272,6 +429,9 @@ export default function SortingCodeView() {
       <ProblemDetail
         problem={selectedProblem}
         onBack={() => setSelectedProblem(null)}
+        onPay={handleLockedClick}
+        unlockedTopics={unlockedTopics}
+        payingSlug={payingSlug}
       />
     )
   }
@@ -286,7 +446,6 @@ export default function SortingCodeView() {
       `}</style>
 
       <div className="container mx-auto space-y-6">
-        {/* Header */}
         <div className={cn(PANEL, "relative overflow-hidden p-6 md:p-8")}>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.12),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.08),transparent_24%)]" />
           <div className="absolute -top-10 left-10 h-36 w-36 rounded-full bg-violet-500/8 blur-3xl" />
@@ -340,7 +499,6 @@ export default function SortingCodeView() {
           </div>
         </div>
 
-        {/* Filters */}
         <div className={cn(SOFT_PANEL, "p-4 md:p-5")}>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative w-full lg:max-w-md">
@@ -383,7 +541,6 @@ export default function SortingCodeView() {
           </div>
         </div>
 
-        {/* List */}
         <div className={cn(PANEL, "overflow-hidden")}>
           <div className="hidden xl:grid xl:grid-cols-[56px_1.6fr_220px_100px_96px] items-center gap-4 px-6 py-4 border-b border-violet-500/8 bg-violet-500/[0.03]">
             <span className="text-[11px] uppercase tracking-wider text-muted-foreground/55">#</span>
@@ -409,6 +566,8 @@ export default function SortingCodeView() {
                 onSelect={setSelectedProblem}
                 isSignedIn={!!isSignedIn}
                 onLockedClick={handleLockedClick}
+                unlockedTopics={unlockedTopics}
+                payingSlug={payingSlug}
               />
             ))
           )}
@@ -627,14 +786,20 @@ function VizLegend() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Detail page — LAYOUT: Visualization LEFT, Code RIGHT
+// Detail page
 // ─────────────────────────────────────────────────────────────
 function ProblemDetail({
   problem,
   onBack,
+  onPay,
+  unlockedTopics,
+  payingSlug,
 }: {
   problem: SortingProblem
   onBack: () => void
+  onPay: (slug: string) => void
+  unlockedTopics: string[]
+  payingSlug: string | null
 }) {
   const { isSignedIn } = useUser()
   const [steps] = useState(() => problem.generateSteps())
@@ -646,14 +811,16 @@ function ProblemDetail({
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const codeRef = useRef<HTMLDivElement>(null)
 
-  const locked = isProblemLocked(problem)
+  const locked = isProblemLocked(problem, unlockedTopics)
   const current = steps[currentStep]
   const codeLines = problem.code.split("\n")
   const progress = steps.length > 1 ? (currentStep / (steps.length - 1)) * 100 : 0
+  const isPayingThis = payingSlug === problem.slug
 
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current)
     if (!isPlaying) return
+
     intervalRef.current = setInterval(() => {
       setCurrentStep((s) => {
         if (s >= steps.length - 1) {
@@ -663,6 +830,7 @@ function ProblemDetail({
         return s + 1
       })
     }, speed)
+
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
@@ -702,10 +870,11 @@ function ProblemDetail({
           <div className="mt-6 flex items-center justify-center gap-3">
             {isSignedIn ? (
               <button
-                onClick={() => window.open(RAZORPAY_PAYMENT_LINK, "_blank", "noopener,noreferrer")}
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(139,92,246,0.24)] transition-all hover:shadow-[0_10px_28px_rgba(139,92,246,0.32)]"
+                onClick={() => onPay(problem.slug)}
+                disabled={isPayingThis}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(139,92,246,0.24)] transition-all hover:shadow-[0_10px_28px_rgba(139,92,246,0.32)] disabled:opacity-70"
               >
-                Pay ₹{LOCK_PRICE} on Razorpay
+                {isPayingThis ? "Opening Razorpay..." : `Pay ₹${LOCK_PRICE} on Razorpay`}
               </button>
             ) : (
               <SignInButton mode="modal">
@@ -737,7 +906,6 @@ function ProblemDetail({
       `}</style>
 
       <div className="container mx-auto space-y-5">
-        {/* Top bar */}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <button
@@ -764,7 +932,6 @@ function ProblemDetail({
             </div>
           </div>
 
-          {/* Viz mode toggle */}
           <div className="flex items-center gap-1 rounded-xl border border-violet-500/15 bg-white/70 p-1 dark:bg-white/[0.03]">
             {(["both", "boxes", "bars"] as const).map((m) => (
               <button
@@ -783,11 +950,8 @@ function ProblemDetail({
           </div>
         </div>
 
-        {/* ── MAIN LAYOUT: LEFT = Visualization + Controls, RIGHT = Code ── */}
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_1.1fr]">
-          {/* ── LEFT COLUMN ── */}
           <div className="space-y-5">
-            {/* Visualization Panel */}
             <div className={cn(PANEL, "overflow-hidden")}>
               <div className="border-b border-violet-500/10 px-5 py-4">
                 <div className="flex items-start justify-between gap-4">
@@ -857,7 +1021,6 @@ function ProblemDetail({
               </div>
             </div>
 
-            {/* Controls */}
             <div className={cn(PANEL, "p-5")}>
               <div className="mb-4">
                 <p className="text-sm leading-6 text-muted-foreground">
@@ -928,7 +1091,6 @@ function ProblemDetail({
               </div>
             </div>
 
-            {/* Complexity */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-[22px] border border-sky-400/15 bg-sky-500/[0.05] p-4">
                 <p className="mb-1 text-[10px] uppercase tracking-[0.18em] text-sky-400/70">Time Complexity</p>
@@ -941,7 +1103,6 @@ function ProblemDetail({
             </div>
           </div>
 
-          {/* ── RIGHT COLUMN: Code ── */}
           <div className="overflow-hidden rounded-[24px] border border-violet-500/12 bg-[#0c0d11] shadow-[0_24px_70px_rgba(0,0,0,0.35)] self-start sticky top-4">
             <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.03] px-4 py-3">
               <div className="flex gap-1.5">
@@ -996,7 +1157,6 @@ function ProblemDetail({
           </div>
         </div>
 
-        {/* ── BOTTOM SECTION: Description / Approaches / Pitfalls ── */}
         <div className={cn(PANEL, "overflow-hidden")}>
           <div className="flex border-b border-violet-500/10 px-2">
             {(["description", "approaches", "pitfalls"] as const).map((tab) => (
