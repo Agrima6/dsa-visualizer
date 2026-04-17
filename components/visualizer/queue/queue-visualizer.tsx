@@ -1,5 +1,9 @@
 "use client"
+// components/visualizer/queue/queue-visualizer.tsx
+// REPLACE your existing file with this one
 
+import { Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { QueueControls } from "@/components/visualizer/queue/queue-controls"
 import { QueueDisplay } from "@/components/visualizer/queue/queue-display"
 import { QueueOperations } from "@/components/visualizer/queue/queue-operations"
@@ -7,29 +11,44 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MarkdownContent } from "@/components/shared/markdown-content"
 import { useQueue } from "@/hooks/use-queue"
 import { Sparkles } from "lucide-react"
+import QueueCodeView from "./queue-code-view"
 
 interface QueueVisualizerProps {
   content: React.ReactNode
 }
 
-export function QueueVisualizer({ content }: QueueVisualizerProps) {
+// ── Router ────────────────────────────────────────────────────────
+function QueueVisualizerInner({ content }: QueueVisualizerProps) {
+  const searchParams = useSearchParams()
+  const mode = searchParams.get("mode")
+
+  if (mode === "code") return <QueueCodeView />
+  return <QueueVisualizerOriginal content={content} />
+}
+
+export function QueueVisualizer(props: QueueVisualizerProps) {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 rounded-full border-2 border-violet-500 border-t-transparent animate-spin" />
+      </div>
+    }>
+      <QueueVisualizerInner {...props} />
+    </Suspense>
+  )
+}
+
+// ── Original Visualizer (100% unchanged) ─────────────────────────
+function QueueVisualizerOriginal({ content }: QueueVisualizerProps) {
   const {
-    queue,
-    operations,
-    isAnimating,
-    highlightedIndex,
-    enqueue,
-    dequeue,
-    clear,
-    isFull,
-    isEmpty,
+    queue, operations, isAnimating, highlightedIndex,
+    enqueue, dequeue, clear, isFull, isEmpty,
   } = useQueue()
 
   return (
     <div className="container mx-auto space-y-8">
-      {/* HERO HEADER (matches homepage style) */}
+      {/* HERO HEADER */}
       <div className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
-
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_24%)]" />
         <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/40 to-transparent" />
         <div className="absolute -top-10 left-8 h-36 w-36 rounded-full bg-violet-500/10 blur-3xl" />
@@ -40,14 +59,11 @@ export function QueueVisualizer({ content }: QueueVisualizerProps) {
             <Sparkles className="h-3.5 w-3.5" />
             Data Structure
           </div>
-
           <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-gradient-to-r from-violet-700 via-fuchsia-500 to-blue-500 bg-clip-text text-transparent">
             Queue (FIFO)
           </h1>
-
           <p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">
-            A First-In-First-Out (FIFO) data structure where elements are added
-            at the rear and removed from the front.
+            A First-In-First-Out (FIFO) data structure where elements are added at the rear and removed from the front.
           </p>
         </div>
       </div>
@@ -61,7 +77,6 @@ export function QueueVisualizer({ content }: QueueVisualizerProps) {
           >
             Visualization
           </TabsTrigger>
-
           <TabsTrigger
             value="explanation"
             className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
@@ -73,31 +88,20 @@ export function QueueVisualizer({ content }: QueueVisualizerProps) {
         {/* VISUALIZATION */}
         <TabsContent value="visualization" className="space-y-6">
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            {/* LEFT PANEL */}
             <div className="xl:col-span-1 space-y-6">
               <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
                 <QueueControls
-                  onEnqueue={enqueue}
-                  onDequeue={dequeue}
-                  onClear={clear}
-                  isAnimating={isAnimating}
-                  isFull={isFull}
-                  isEmpty={isEmpty}
+                  onEnqueue={enqueue} onDequeue={dequeue} onClear={clear}
+                  isAnimating={isAnimating} isFull={isFull} isEmpty={isEmpty}
                 />
               </div>
-
               <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
                 <QueueOperations operations={operations} />
               </div>
             </div>
-
-            {/* RIGHT PANEL */}
             <div className="xl:col-span-2">
               <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
-                <QueueDisplay
-                  queue={queue}
-                  highlightedIndex={highlightedIndex}
-                />
+                <QueueDisplay queue={queue} highlightedIndex={highlightedIndex} />
               </div>
             </div>
           </div>

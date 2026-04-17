@@ -1,5 +1,7 @@
 "use client"
 
+import { Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MarkdownContent } from "@/components/shared/markdown-content"
 import { LinkedListDisplay } from "@/components/visualizer/linked-list/linked-list-display"
@@ -7,6 +9,7 @@ import { LinkedListControls } from "@/components/visualizer/linked-list/linked-l
 import { LinkedListOperations } from "@/components/visualizer/linked-list/linked-list-operations"
 import { useLinkedList } from "@/hooks/use-linked-list"
 import { ListType } from "./types"
+import LinkedListCodeView from "./linked-list-code-view"
 
 const LIST_TYPES: { value: ListType; label: string }[] = [
   { value: 'SLL', label: 'SLL' },
@@ -19,11 +22,19 @@ interface LinkedListVisualizerProps {
   content: React.ReactNode
 }
 
-export function LinkedListVisualizer({ content }: LinkedListVisualizerProps) {
+function LinkedListVisualizerInner({ content }: LinkedListVisualizerProps) {
+  const searchParams = useSearchParams()
+  const mode = searchParams.get("mode")
+
+  // ✅ If mode=code, render the problems/code view
+  if (mode === "code") {
+    return <LinkedListCodeView />
+  }
+
   return (
     <div className="container mx-auto space-y-8">
 
-      {/* 🔥 HERO TITLE CONTAINER (MATCHES STACK PAGE) */}
+      {/* HERO TITLE CONTAINER */}
       <div className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
         
         {/* glow effects */}
@@ -48,7 +59,7 @@ export function LinkedListVisualizer({ content }: LinkedListVisualizerProps) {
       {/* TABS */}
       <Tabs defaultValue="SLL" className="w-full space-y-6">
 
-        {/* 🔥 UPGRADED TAB STYLE */}
+        {/* TAB LIST */}
         <TabsList className="grid w-full grid-cols-5 rounded-2xl border border-violet-500/15 bg-white/60 backdrop-blur-xl dark:bg-white/[0.04] p-1">
           {LIST_TYPES.map(type => (
             <TabsTrigger
@@ -67,19 +78,28 @@ export function LinkedListVisualizer({ content }: LinkedListVisualizerProps) {
           </TabsTrigger>
         </TabsList>
 
-        {/* VISUALIZATION */}
+        {/* VISUALIZATION TABS */}
         {LIST_TYPES.map(type => (
           <TabsContent key={type.value} value={type.value} className="space-y-6">
             <LinkedListContent type={type.value} />
           </TabsContent>
         ))}
 
-        {/* EXPLANATION */}
+        {/* EXPLANATION TAB */}
         <TabsContent value="explanation" className="prose prose-invert max-w-none">
           <MarkdownContent content={content} />
         </TabsContent>
       </Tabs>
     </div>
+  )
+}
+
+// Wrap in Suspense because useSearchParams requires it in Next.js App Router
+export function LinkedListVisualizer({ content }: LinkedListVisualizerProps) {
+  return (
+    <Suspense fallback={<div className="container mx-auto py-8 text-muted-foreground">Loading...</div>}>
+      <LinkedListVisualizerInner content={content} />
+    </Suspense>
   )
 }
 

@@ -1,5 +1,7 @@
 "use client"
 
+import { Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { AVLTreeControls } from "@/components/visualizer/avl-tree/avl-tree-controls"
 import { AVLTreeDisplay } from "@/components/visualizer/avl-tree/avl-tree-display"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -7,12 +9,35 @@ import { MarkdownContent } from "@/components/shared/markdown-content"
 import { useAVLTree } from "@/hooks/use-avl-tree"
 import { AVLTreeAnalysis } from "./avl-tree-analysis"
 import { Sparkles } from "lucide-react"
+import AVLTreeCodeView from "./Avl tree code view"
 
 interface AVLTreeVisualizerProps {
   content: React.ReactNode
 }
 
+function AVLTreeVisualizerInner({ content }: AVLTreeVisualizerProps) {
+  const searchParams = useSearchParams()
+  const mode = searchParams.get("mode")
+
+  // ✅ If mode=code, render the problems/code view
+  if (mode === "code") {
+    return <AVLTreeCodeView />
+  }
+
+  return <AVLTreeVisualizerUI content={content} />
+}
+
+// Wrap in Suspense because useSearchParams requires it in Next.js App Router
 export function AVLTreeVisualizer({ content }: AVLTreeVisualizerProps) {
+  return (
+    <Suspense fallback={<div className="container mx-auto py-8 text-muted-foreground">Loading...</div>}>
+      <AVLTreeVisualizerInner content={content} />
+    </Suspense>
+  )
+}
+
+// ── Extracted original visualizer UI ──────────────────────────────────────────
+function AVLTreeVisualizerUI({ content }: AVLTreeVisualizerProps) {
   const {
     tree,
     highlightedNodes,

@@ -32,6 +32,10 @@ export default function RootLayout({
               <div className="flex-1">
                 {children}
               </div>
+
+              <footer className="text-center text-sm text-muted-foreground py-4">
+                © 2026 AlgoMaitri. All rights reserved.
+              </footer>
             </div>
 
             <Toaster />

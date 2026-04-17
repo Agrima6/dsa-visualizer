@@ -1,14 +1,16 @@
 "use client"
+// components/visualizer/linked-list/linked-list-code-view.tsx
 
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useUser, SignInButton } from "@clerk/nextjs"
 import {
-  SORTING_PROBLEMS,
-  type SortingProblem,
+  LINKED_LIST_PROBLEMS,
+  type LinkedListProblem,
   type Difficulty,
   type Company,
-} from "./sorting-problems-data"
+  type LinkedListVisStep,
+} from "./linked-list-problems-data"
 
 declare global {
   interface Window {
@@ -20,7 +22,7 @@ declare global {
 // Lock config
 // ─────────────────────────────────────────────────────────────
 const LOCKED_IDS = new Set(
-  SORTING_PROBLEMS.slice(-5).map((p) => p.slug)
+  LINKED_LIST_PROBLEMS.slice(-5).map((p) => p.slug)
 )
 
 const LOCK_PRICE = 19
@@ -29,9 +31,9 @@ const LOCK_PRICE = 19
 // UI styles
 // ─────────────────────────────────────────────────────────────
 const DIFF_STYLE: Record<Difficulty, string> = {
-  Easy: "text-emerald-500 bg-emerald-500/10 border border-emerald-500/20",
-  Medium: "text-amber-500 bg-amber-500/10 border border-amber-500/20",
-  Hard: "text-rose-500 bg-rose-500/10 border border-rose-500/20",
+  Easy:   "text-emerald-500 bg-emerald-500/10 border border-emerald-500/20",
+  Medium: "text-amber-500  bg-amber-500/10  border border-amber-500/20",
+  Hard:   "text-rose-500   bg-rose-500/10   border border-rose-500/20",
 }
 
 const TAG_STYLE =
@@ -44,52 +46,54 @@ const SOFT_PANEL =
   "rounded-[20px] border border-violet-500/10 bg-white/55 backdrop-blur-xl dark:bg-white/[0.025]"
 
 const COMPANY_LOGO_MAP: Record<Company, { src: string; label: string }> = {
-  Google: { src: "/company-logos/google.svg", label: "Google" },
-  Amazon: { src: "/company-logos/amazon.svg", label: "Amazon" },
-  Apple: { src: "/company-logos/apple.svg", label: "Apple" },
-  Meta: { src: "/company-logos/meta.svg", label: "Meta" },
-  Microsoft: { src: "/company-logos/microsoft.svg", label: "Microsoft" },
-  Netflix: { src: "/company-logos/netflix.svg", label: "Netflix" },
-  Adobe: { src: "/company-logos/adobe.svg", label: "Adobe" },
-  Uber: { src: "/company-logos/uber.svg", label: "Uber" },
-  LinkedIn: { src: "/company-logos/linkedin.svg", label: "LinkedIn" },
-  Twitter: { src: "/company-logos/twitter.svg", label: "Twitter" },
-  ServiceNow: { src: "/company-logos/servicenow.svg", label: "ServiceNow" },
-  Salesforce: { src: "/company-logos/salesforce.svg", label: "Salesforce" },
-  Oracle: { src: "/company-logos/oracle.svg", label: "Oracle" },
-  SAP: { src: "/company-logos/sap.svg", label: "SAP" },
-  Intuit: { src: "/company-logos/intuit.svg", label: "Intuit" },
-  PayPal: { src: "/company-logos/paypal.svg", label: "PayPal" },
-  Stripe: { src: "/company-logos/stripe.svg", label: "Stripe" },
-  Atlassian: { src: "/company-logos/atlassian.svg", label: "Atlassian" },
-  Airbnb: { src: "/company-logos/airbnb.svg", label: "Airbnb" },
-  Dropbox: { src: "/company-logos/dropbox.svg", label: "Dropbox" },
-  Pinterest: { src: "/company-logos/pinterest.svg", label: "Pinterest" },
-  Snap: { src: "/company-logos/snap.svg", label: "Snap" },
-  Spotify: { src: "/company-logos/spotify.svg", label: "Spotify" },
-  Walmart: { src: "/company-logos/walmart.svg", label: "Walmart" },
-  Cisco: { src: "/company-logos/cisco.svg", label: "Cisco" },
-  VMware: { src: "/company-logos/vmware.svg", label: "VMware" },
-  Nvidia: { src: "/company-logos/nvidia.svg", label: "Nvidia" },
+  Google:       { src: "/company-logos/google.svg",       label: "Google" },
+  Amazon:       { src: "/company-logos/amazon.svg",       label: "Amazon" },
+  Apple:        { src: "/company-logos/apple.svg",        label: "Apple" },
+  Meta:         { src: "/company-logos/meta.svg",         label: "Meta" },
+  Microsoft:    { src: "/company-logos/microsoft.svg",    label: "Microsoft" },
+  Netflix:      { src: "/company-logos/netflix.svg",      label: "Netflix" },
+  Adobe:        { src: "/company-logos/adobe.svg",        label: "Adobe" },
+  Uber:         { src: "/company-logos/uber.svg",         label: "Uber" },
+  LinkedIn:     { src: "/company-logos/linkedin.svg",     label: "LinkedIn" },
+  Twitter:      { src: "/company-logos/twitter.svg",      label: "Twitter" },
+  ServiceNow:   { src: "/company-logos/servicenow.svg",   label: "ServiceNow" },
+  Salesforce:   { src: "/company-logos/salesforce.svg",   label: "Salesforce" },
+  Oracle:       { src: "/company-logos/oracle.svg",       label: "Oracle" },
+  SAP:          { src: "/company-logos/sap.svg",          label: "SAP" },
+  Intuit:       { src: "/company-logos/intuit.svg",       label: "Intuit" },
+  PayPal:       { src: "/company-logos/paypal.svg",       label: "PayPal" },
+  Stripe:       { src: "/company-logos/stripe.svg",       label: "Stripe" },
+  Atlassian:    { src: "/company-logos/atlassian.svg",    label: "Atlassian" },
+  Airbnb:       { src: "/company-logos/airbnb.svg",       label: "Airbnb" },
+  Dropbox:      { src: "/company-logos/dropbox.svg",      label: "Dropbox" },
+  Pinterest:    { src: "/company-logos/pinterest.svg",    label: "Pinterest" },
+  Snap:         { src: "/company-logos/snap.svg",         label: "Snap" },
+  Spotify:      { src: "/company-logos/spotify.svg",      label: "Spotify" },
+  Walmart:      { src: "/company-logos/walmart.svg",      label: "Walmart" },
+  Cisco:        { src: "/company-logos/cisco.svg",        label: "Cisco" },
+  VMware:       { src: "/company-logos/vmware.svg",       label: "VMware" },
+  Nvidia:       { src: "/company-logos/nvidia.svg",       label: "Nvidia" },
   GoldmanSachs: { src: "/company-logos/goldmansachs.svg", label: "Goldman Sachs" },
-  MorganStanley: { src: "/company-logos/morganstanley.svg", label: "Morgan Stanley" },
-  Bloomberg: { src: "/company-logos/bloomberg.svg", label: "Bloomberg" },
-  Zomato: { src: "/company-logos/zomato.svg", label: "Zomato" },
-  Swiggy: { src: "/company-logos/swiggy.svg", label: "Swiggy" },
-  Flipkart: { src: "/company-logos/flipkart.svg", label: "Flipkart" },
-  Meesho: { src: "/company-logos/meesho.svg", label: "Meesho" },
-  PhonePe: { src: "/company-logos/phonepe.svg", label: "PhonePe" },
+  MorganStanley:{ src: "/company-logos/morganstanley.svg",label: "Morgan Stanley" },
+  Bloomberg:    { src: "/company-logos/bloomberg.svg",    label: "Bloomberg" },
+  Zomato:       { src: "/company-logos/zomato.svg",       label: "Zomato" },
+  Swiggy:       { src: "/company-logos/swiggy.svg",       label: "Swiggy" },
+  Flipkart:     { src: "/company-logos/flipkart.svg",     label: "Flipkart" },
+  Meesho:       { src: "/company-logos/meesho.svg",       label: "Meesho" },
+  PhonePe:      { src: "/company-logos/phonepe.svg",      label: "PhonePe" },
 }
-
 
 function cn(...classes: (string | false | null | undefined)[]) {
   return classes.filter(Boolean).join(" ")
 }
 
-function isProblemLocked(problem: SortingProblem, unlockedTopics: string[]) {
+function isProblemLocked(problem: LinkedListProblem, unlockedTopics: string[]) {
   return LOCKED_IDS.has(problem.slug) && !unlockedTopics.includes(problem.slug)
 }
 
+// ─────────────────────────────────────────────────────────────
+// Company Logo Badge
+// ─────────────────────────────────────────────────────────────
 function CompanyLogoBadge({
   company,
   compact = false,
@@ -132,6 +136,10 @@ function CompanyLogoBadge({
     </div>
   )
 }
+
+// ─────────────────────────────────────────────────────────────
+// Company Marquee
+// ─────────────────────────────────────────────────────────────
 function CompanyMarquee({
   companies,
   compact = false,
@@ -162,6 +170,10 @@ function CompanyMarquee({
     </div>
   )
 }
+
+// ─────────────────────────────────────────────────────────────
+// Lock Pill
+// ─────────────────────────────────────────────────────────────
 function LockPill() {
   return (
     <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-[10px] font-semibold text-amber-600 dark:text-amber-300">
@@ -174,7 +186,32 @@ function LockPill() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Problem row
+// Stat card
+// ─────────────────────────────────────────────────────────────
+function StatCard({
+  label,
+  value,
+  accent,
+}: {
+  label: string
+  value: string
+  accent: "default" | "easy" | "medium" | "hard"
+}) {
+  const accentClass =
+    accent === "easy"   ? "text-emerald-500" :
+    accent === "medium" ? "text-amber-500"   :
+    accent === "hard"   ? "text-rose-500"    : "text-foreground"
+
+  return (
+    <div className="rounded-2xl border border-violet-500/10 bg-white/65 px-4 py-4 dark:bg-white/[0.03]">
+      <div className={cn("text-2xl font-bold", accentClass)}>{value}</div>
+      <div className="mt-1 text-xs text-muted-foreground">{label}</div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// Problem Row
 // ─────────────────────────────────────────────────────────────
 function ProblemRow({
   problem,
@@ -185,9 +222,9 @@ function ProblemRow({
   unlockedTopics,
   payingSlug,
 }: {
-  problem: SortingProblem
+  problem: LinkedListProblem
   idx: number
-  onSelect: (p: SortingProblem) => void
+  onSelect: (p: LinkedListProblem) => void
   isSignedIn: boolean
   onLockedClick: (slug: string) => void
   unlockedTopics: string[]
@@ -209,7 +246,9 @@ function ProblemRow({
       )}
     >
       <div className="absolute inset-x-6 bottom-0 h-px bg-gradient-to-r from-transparent via-violet-500/10 to-transparent group-last:hidden" />
-<div className="grid grid-cols-1 gap-4 xl:grid-cols-[56px_minmax(260px,1.55fr)_minmax(220px,1.15fr)_100px_96px] xl:items-center">   <div className="hidden xl:block">
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[56px_minmax(260px,1.55fr)_minmax(220px,1.15fr)_100px_96px] xl:items-center">
+        <div className="hidden xl:block">
           <span className="text-xs font-mono text-muted-foreground/50">#{problem.id}</span>
         </div>
 
@@ -249,9 +288,10 @@ function ProblemRow({
             </p>
           )}
         </div>
-<div className="hidden xl:block min-w-0">
-  <CompanyMarquee companies={problem.companies} compact speed={18} />
-</div>
+
+        <div className="hidden xl:block min-w-0">
+          <CompanyMarquee companies={problem.companies} compact speed={18} />
+        </div>
 
         <div className="text-xs font-mono text-muted-foreground xl:text-right">
           {problem.timeComplexity}
@@ -308,7 +348,6 @@ function ProblemRow({
         </button>
       )
     }
-
     return (
       <SignInButton mode="modal">
         <button className="w-full text-left">{rowContent}</button>
@@ -324,13 +363,162 @@ function ProblemRow({
 }
 
 // ─────────────────────────────────────────────────────────────
+// Linked List Node Visualization
+// ─────────────────────────────────────────────────────────────
+function getNodeStyle(id: string, step: LinkedListVisStep) {
+  const isHighlighted = step.highlighted.includes(id)
+  const isSwapped     = step.swapped.includes(id)
+  const isDone        = step.done.includes(id)
+
+  if (isSwapped) return {
+    border:  "border-rose-400/60",
+    bg:      "bg-rose-500/15",
+    text:    "text-rose-600 dark:text-rose-300",
+    shadow:  "shadow-[0_0_14px_rgba(244,63,94,0.25)]",
+    pointer: "bg-rose-400/50",
+  }
+  if (isHighlighted) return {
+    border:  "border-violet-400/60",
+    bg:      "bg-gradient-to-r from-violet-600/20 to-blue-500/15",
+    text:    "text-violet-600 dark:text-violet-200",
+    shadow:  "shadow-[0_0_14px_rgba(139,92,246,0.28)]",
+    pointer: "bg-violet-400/50",
+  }
+  if (isDone) return {
+    border:  "border-emerald-400/60",
+    bg:      "bg-emerald-500/15",
+    text:    "text-emerald-600 dark:text-emerald-300",
+    shadow:  "shadow-[0_0_10px_rgba(52,211,153,0.2)]",
+    pointer: "bg-emerald-400/50",
+  }
+  return {
+    border:  "border-violet-500/20",
+    bg:      "bg-white/80 dark:bg-white/[0.06]",
+    text:    "text-foreground",
+    shadow:  "",
+    pointer: "bg-violet-400/50",
+  }
+}
+
+function LinkedListViz({
+  step,
+  currentStep,
+}: {
+  step: LinkedListVisStep
+  currentStep: number
+}) {
+  return (
+    <div className="px-4 py-5 space-y-4">
+      {/* Node chain */}
+      <div className="rounded-2xl border border-violet-500/8 bg-white/45 dark:bg-white/[0.02] p-5 overflow-x-auto">
+        {step.nodes.length === 0 ? (
+          <div className="flex items-center justify-center h-20 text-xs italic text-muted-foreground/50">
+            Empty list
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center gap-0">
+            {step.nodes.map((node, idx) => {
+              const s = getNodeStyle(node.id, step)
+              const pointer = step.pointers.find(p => p.nodeId === node.id)
+
+              return (
+                <div key={`${node.id}-${currentStep}`} className="flex items-center">
+                  <div className="flex flex-col items-center gap-1.5">
+                    {pointer && (
+                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full border border-fuchsia-400/25 bg-fuchsia-500/10 text-fuchsia-500 dark:text-fuchsia-300">
+                        {pointer.label}
+                      </span>
+                    )}
+                    <div
+                      style={{ animation: `nodeIn 0.25s ease forwards`, animationDelay: `${idx * 30}ms` }}
+                      className={cn(
+                        "flex items-center rounded-xl border-2 transition-all duration-300 overflow-hidden",
+                        s.border, s.shadow
+                      )}
+                    >
+                      <div className={cn("px-3 py-2.5 font-mono text-sm font-bold min-w-[40px] text-center", s.bg, s.text)}>
+                        {node.value}
+                      </div>
+                      <div className={cn(
+                        "px-2 py-2.5 flex items-center justify-center border-l-2",
+                        s.border,
+                        "bg-violet-500/[0.04] dark:bg-violet-500/10"
+                      )}>
+                        <div className={cn("h-2 w-2 rounded-full", s.pointer)} />
+                      </div>
+                    </div>
+                    <div className="flex gap-1">
+                      {node.isHead && (
+                        <span className="text-[9px] font-semibold text-violet-500 uppercase tracking-wider">HEAD</span>
+                      )}
+                      {node.isTail && (
+                        <span className="text-[9px] font-semibold text-blue-500 uppercase tracking-wider">TAIL</span>
+                      )}
+                      {node.label && (
+                        <span className="text-[9px] font-mono text-muted-foreground/60">{node.label}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {idx < step.nodes.length - 1 && (
+                    <div className="flex items-center px-1 pb-4">
+                      <div className="h-px w-5 bg-gradient-to-r from-violet-400/50 to-violet-400/30" />
+                      <svg className="h-3 w-3 text-violet-400/60 -ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5l8 7-8 7V5z" />
+                      </svg>
+                    </div>
+                  )}
+                  {idx === step.nodes.length - 1 && (
+                    <div className="flex items-center px-1 pb-4">
+                      <div className="h-px w-4 bg-violet-400/30" />
+                      <span className="text-[10px] font-mono text-muted-foreground/40 ml-1">null</span>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Auxiliary state */}
+      {step.auxiliary.length > 0 && (
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {step.auxiliary.map((a, i) => (
+            <div key={`${a.label}-${i}`} className="rounded-xl border border-emerald-500/15 bg-emerald-500/[0.06] px-3 py-2">
+              <div className="mb-0.5 text-[9px] uppercase tracking-[0.16em] text-emerald-600/75 dark:text-emerald-300/75">{a.label}</div>
+              <div className="break-all font-mono text-sm font-semibold text-emerald-600 dark:text-emerald-200">{a.value}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Legend */}
+      <div className="flex flex-wrap gap-3 border-t border-violet-500/10 pt-3">
+        {[
+          { cls: "border-violet-500/20 bg-white/80 dark:bg-white/[0.06]", label: "Default" },
+          { cls: "border-violet-400/60 bg-violet-600/20",                  label: "Active" },
+          { cls: "border-rose-400/60 bg-rose-500/15",                      label: "Moving" },
+          { cls: "border-emerald-400/60 bg-emerald-500/15",                label: "Done" },
+        ].map(({ cls, label }) => (
+          <div key={label} className="flex items-center gap-1.5">
+            <div className={cn("h-3 w-3 rounded-sm border", cls)} />
+            <span className="text-[11px] text-muted-foreground">{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
 // Main page
 // ─────────────────────────────────────────────────────────────
-export default function SortingCodeView() {
+export default function LinkedListCodeView() {
   const router = useRouter()
   const { isSignedIn } = useUser()
 
-  const [selectedProblem, setSelectedProblem] = useState<SortingProblem | null>(null)
+  const [selectedProblem, setSelectedProblem] = useState<LinkedListProblem | null>(null)
   const [filterDiff, setFilterDiff] = useState<Difficulty | "All">("All")
   const [search, setSearch] = useState("")
   const [unlockedTopics, setUnlockedTopics] = useState<string[]>([])
@@ -339,28 +527,18 @@ export default function SortingCodeView() {
   useEffect(() => {
     const fetchUnlocked = async () => {
       try {
-        if (!isSignedIn) {
-          setUnlockedTopics([])
-          return
-        }
-
-        const res = await fetch("/api/payment/unlocked", {
-          method: "GET",
-          cache: "no-store",
-        })
-
+        if (!isSignedIn) { setUnlockedTopics([]); return }
+        const res = await fetch("/api/payment/unlocked", { method: "GET", cache: "no-store" })
         const data = await res.json()
         setUnlockedTopics(Array.isArray(data.unlockedTopics) ? data.unlockedTopics : [])
-      } catch (error) {
-        console.error("Failed to fetch unlocked topics:", error)
+      } catch {
         setUnlockedTopics([])
       }
     }
-
     fetchUnlocked()
   }, [isSignedIn])
 
-  const filtered = SORTING_PROBLEMS.filter((p) => {
+  const filtered = LINKED_LIST_PROBLEMS.filter((p) => {
     const matchDiff = filterDiff === "All" || p.difficulty === filterDiff
     const q = search.toLowerCase()
     const matchSearch =
@@ -371,31 +549,20 @@ export default function SortingCodeView() {
   })
 
   const counts = {
-    Easy: SORTING_PROBLEMS.filter((p) => p.difficulty === "Easy").length,
-    Medium: SORTING_PROBLEMS.filter((p) => p.difficulty === "Medium").length,
-    Hard: SORTING_PROBLEMS.filter((p) => p.difficulty === "Hard").length,
+    Easy:   LINKED_LIST_PROBLEMS.filter((p) => p.difficulty === "Easy").length,
+    Medium: LINKED_LIST_PROBLEMS.filter((p) => p.difficulty === "Medium").length,
+    Hard:   LINKED_LIST_PROBLEMS.filter((p) => p.difficulty === "Hard").length,
   }
 
   const loadRazorpayScript = () => {
     return new Promise<boolean>((resolve) => {
-      if (typeof window !== "undefined" && window.Razorpay) {
-        resolve(true)
-        return
-      }
-
-      const existingScript = document.querySelector(
-        'script[src="https://checkout.razorpay.com/v1/checkout.js"]'
-      )
-
-      if (existingScript) {
-        resolve(true)
-        return
-      }
-
+      if (typeof window !== "undefined" && window.Razorpay) { resolve(true); return }
+      const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')
+      if (existingScript) { resolve(true); return }
       const script = document.createElement("script")
       script.src = "https://checkout.razorpay.com/v1/checkout.js"
       script.async = true
-      script.onload = () => resolve(true)
+      script.onload  = () => resolve(true)
       script.onerror = () => resolve(false)
       document.body.appendChild(script)
     })
@@ -403,30 +570,18 @@ export default function SortingCodeView() {
 
   const handleLockedClick = async (topicSlug: string) => {
     if (!isSignedIn) return
-
     try {
       setPayingSlug(topicSlug)
-
       const loaded = await loadRazorpayScript()
-      if (!loaded) {
-        alert("Razorpay SDK failed to load.")
-        return
-      }
+      if (!loaded) { alert("Razorpay SDK failed to load."); return }
 
       const createOrderRes = await fetch("/api/payment/create-order", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topicSlug }),
       })
-
       const createOrderData = await createOrderRes.json()
-
-      if (!createOrderRes.ok) {
-        alert(createOrderData.error || "Failed to create order.")
-        return
-      }
+      if (!createOrderRes.ok) { alert(createOrderData.error || "Failed to create order."); return }
 
       const options = {
         key: createOrderData.key,
@@ -438,52 +593,29 @@ export default function SortingCodeView() {
         handler: async function (response: any) {
           const verifyRes = await fetch("/api/payment/verify", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
+              razorpay_order_id:   response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
+              razorpay_signature:  response.razorpay_signature,
               topicSlug,
             }),
           })
-
           const verifyData = await verifyRes.json()
-
-          if (!verifyRes.ok) {
-            alert(verifyData.error || "Payment verification failed.")
-            return
-          }
-
-          setUnlockedTopics((prev) =>
-            prev.includes(topicSlug) ? prev : [...prev, topicSlug]
-          )
-
-          if (selectedProblem?.slug === topicSlug) {
-            setSelectedProblem({ ...selectedProblem })
-          }
-
+          if (!verifyRes.ok) { alert(verifyData.error || "Payment verification failed."); return }
+          setUnlockedTopics((prev) => prev.includes(topicSlug) ? prev : [...prev, topicSlug])
+          if (selectedProblem?.slug === topicSlug) setSelectedProblem({ ...selectedProblem })
           alert("Payment successful. Problem unlocked.")
         },
-        theme: {
-          color: "#7c3aed",
-        },
-        modal: {
-          ondismiss: function () {
-            setPayingSlug(null)
-          },
-        },
+        theme: { color: "#7c3aed" },
+        modal: { ondismiss: function () { setPayingSlug(null) } },
         prefill: {},
-        notes: {
-          topicSlug,
-        },
+        notes: { topicSlug },
       }
 
       const paymentObject = new window.Razorpay(options)
       paymentObject.open()
-    } catch (error) {
-      console.error("Payment error:", error)
+    } catch {
       alert("Something went wrong while starting payment.")
     } finally {
       setPayingSlug(null)
@@ -504,19 +636,20 @@ export default function SortingCodeView() {
 
   return (
     <>
- <style>{`
-  @keyframes fadeSlideIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes companyLoop {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-  }
-`}</style>
+      <style>{`
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes companyLoop {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
+      `}</style>
 
       <div className="container mx-auto space-y-6">
+
+        {/* Header */}
         <div className={cn(PANEL, "relative overflow-hidden p-6 md:p-8")}>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.12),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.08),transparent_24%)]" />
           <div className="absolute -top-10 left-10 h-36 w-36 rounded-full bg-violet-500/8 blur-3xl" />
@@ -527,7 +660,8 @@ export default function SortingCodeView() {
               <div className="mb-3 inline-flex items-center gap-3 rounded-full border border-violet-500/10 bg-white/70 px-3 py-2 dark:bg-white/[0.04]">
                 <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-blue-600 shadow-[0_6px_18px_rgba(139,92,246,0.25)]">
                   <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                   </svg>
                 </div>
                 <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-violet-500">
@@ -536,11 +670,11 @@ export default function SortingCodeView() {
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-violet-700 via-fuchsia-500 to-blue-500 bg-clip-text text-transparent">
-                Sorting Problems
+                Linked List Problems
               </h1>
 
               <p className="mt-3 max-w-xl text-sm md:text-[15px] leading-7 text-muted-foreground">
-                Curated sorting questions with cleaner walkthroughs, company tags, and visual step-by-step execution.
+                Curated linked list questions with animated node visualizations, company tags, and step-by-step code execution.
               </p>
 
               <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-xs font-medium text-amber-700 dark:text-amber-300">
@@ -552,7 +686,7 @@ export default function SortingCodeView() {
             </div>
 
             <button
-              onClick={() => router.push("/visualizer/sorting")}
+              onClick={() => router.push("/visualizer/linked-list")}
               className="inline-flex items-center gap-2 rounded-xl border border-violet-500/15 bg-white/75 px-4 py-2.5 text-sm text-muted-foreground transition-all hover:bg-violet-500/5 hover:text-violet-600 dark:bg-white/[0.035] dark:hover:text-violet-300"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -563,13 +697,14 @@ export default function SortingCodeView() {
           </div>
 
           <div className="relative mt-7 grid grid-cols-2 gap-3 border-t border-violet-500/10 pt-6 sm:grid-cols-4">
-            <StatCard label="Problems" value={SORTING_PROBLEMS.length.toString()} accent="default" />
-            <StatCard label="Easy" value={counts.Easy.toString()} accent="easy" />
-            <StatCard label="Medium" value={counts.Medium.toString()} accent="medium" />
-            <StatCard label="Hard" value={counts.Hard.toString()} accent="hard" />
+            <StatCard label="Problems" value={LINKED_LIST_PROBLEMS.length.toString()} accent="default" />
+            <StatCard label="Easy"     value={counts.Easy.toString()}                 accent="easy" />
+            <StatCard label="Medium"   value={counts.Medium.toString()}               accent="medium" />
+            <StatCard label="Hard"     value={counts.Hard.toString()}                 accent="hard" />
           </div>
         </div>
 
+        {/* Filters */}
         <div className={cn(SOFT_PANEL, "p-4 md:p-5")}>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="relative w-full lg:max-w-md">
@@ -612,8 +747,10 @@ export default function SortingCodeView() {
           </div>
         </div>
 
+        {/* Problem table */}
         <div className={cn(PANEL, "overflow-hidden")}>
-<div className="hidden xl:grid xl:grid-cols-[56px_minmax(260px,1.55fr)_minmax(220px,1.15fr)_100px_96px] items-center gap-4 px-6 py-4 border-b border-violet-500/8 bg-violet-500/[0.03]">          <span className="text-[11px] uppercase tracking-wider text-muted-foreground/55">#</span>
+          <div className="hidden xl:grid xl:grid-cols-[56px_minmax(260px,1.55fr)_minmax(220px,1.15fr)_100px_96px] items-center gap-4 px-6 py-4 border-b border-violet-500/8 bg-violet-500/[0.03]">
+            <span className="text-[11px] uppercase tracking-wider text-muted-foreground/55">#</span>
             <span className="text-[11px] uppercase tracking-wider text-muted-foreground/55">Problem</span>
             <span className="text-[11px] uppercase tracking-wider text-muted-foreground/55">Companies</span>
             <span className="text-[11px] uppercase tracking-wider text-muted-foreground/55 text-right">Complexity</span>
@@ -648,215 +785,7 @@ export default function SortingCodeView() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Stat card
-// ─────────────────────────────────────────────────────────────
-function StatCard({
-  label,
-  value,
-  accent,
-}: {
-  label: string
-  value: string
-  accent: "default" | "easy" | "medium" | "hard"
-}) {
-  const accentClass =
-    accent === "easy" ? "text-emerald-500" :
-    accent === "medium" ? "text-amber-500" :
-    accent === "hard" ? "text-rose-500" : "text-foreground"
-
-  return (
-    <div className="rounded-2xl border border-violet-500/10 bg-white/65 px-4 py-4 dark:bg-white/[0.03]">
-      <div className={cn("text-2xl font-bold", accentClass)}>{value}</div>
-      <div className="mt-1 text-xs text-muted-foreground">{label}</div>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// Color helpers for viz elements
-// ─────────────────────────────────────────────────────────────
-function getBarGradient(isPivot: boolean, isSorted: boolean, isSwapped: boolean, isHighlighted: boolean) {
-  if (isPivot) return "from-fuchsia-500 to-purple-400"
-  if (isSorted) return "from-emerald-500 to-green-400"
-  if (isSwapped) return "from-rose-500 to-red-400"
-  if (isHighlighted) return "from-amber-400 to-yellow-300"
-  return "from-violet-600 to-blue-500"
-}
-
-function getBoxStyle(isPivot: boolean, isSorted: boolean, isSwapped: boolean, isHighlighted: boolean) {
-  if (isPivot) return {
-    border: "border-fuchsia-400",
-    bg: "bg-fuchsia-500/15 dark:bg-fuchsia-500/20",
-    text: "text-fuchsia-500",
-    shadow: "shadow-[0_0_12px_rgba(217,70,239,0.3)]",
-    label: "text-fuchsia-400",
-  }
-  if (isSorted) return {
-    border: "border-emerald-400",
-    bg: "bg-emerald-500/15 dark:bg-emerald-500/20",
-    text: "text-emerald-500",
-    shadow: "shadow-[0_0_10px_rgba(52,211,153,0.25)]",
-    label: "text-emerald-400",
-  }
-  if (isSwapped) return {
-    border: "border-rose-400",
-    bg: "bg-rose-500/15 dark:bg-rose-500/20",
-    text: "text-rose-500",
-    shadow: "shadow-[0_0_10px_rgba(244,63,94,0.25)]",
-    label: "text-rose-400",
-  }
-  if (isHighlighted) return {
-    border: "border-amber-400",
-    bg: "bg-amber-400/15 dark:bg-amber-400/20",
-    text: "text-amber-500",
-    shadow: "shadow-[0_0_10px_rgba(251,191,36,0.25)]",
-    label: "text-amber-400",
-  }
-  return {
-    border: "border-violet-500/30",
-    bg: "bg-white/80 dark:bg-white/[0.06]",
-    text: "text-foreground",
-    shadow: "",
-    label: "text-muted-foreground/50",
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// Array Boxes Visualization (NeetCode style)
-// ─────────────────────────────────────────────────────────────
-function ArrayBoxesViz({
-  array,
-  highlighted,
-  swapped,
-  sorted,
-  pivot,
-  currentStep,
-}: {
-  array: number[]
-  highlighted: number[]
-  swapped: number[]
-  sorted: number[]
-  pivot?: number
-  currentStep: number
-}) {
-  return (
-    <div className="flex flex-wrap items-end justify-center gap-2 px-2 py-4 min-h-[120px]">
-      {array.map((val, idx) => {
-        const isHighlighted = highlighted.includes(idx)
-        const isSwapped = swapped.includes(idx)
-        const isSorted = sorted.includes(idx)
-        const isPivot = pivot === idx
-        const s = getBoxStyle(isPivot, isSorted, isSwapped, isHighlighted)
-
-        return (
-          <div
-            key={`box-${idx}-${currentStep}`}
-            className="flex flex-col items-center gap-1"
-            style={{
-              animation: `boxPop 0.25s ease forwards`,
-              animationDelay: `${idx * 20}ms`,
-            }}
-          >
-            <div
-              className={cn(
-                "flex items-center justify-center rounded-xl border-2 font-mono font-bold transition-all duration-300",
-                s.border, s.bg, s.text, s.shadow,
-                array.length <= 8 ? "w-14 h-14 text-lg" :
-                array.length <= 12 ? "w-11 h-11 text-sm" : "w-9 h-9 text-xs"
-              )}
-            >
-              {val}
-            </div>
-            <span className={cn("text-[10px] font-mono", s.label)}>{idx}</span>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// Bar Chart Visualization
-// ─────────────────────────────────────────────────────────────
-function BarChartViz({
-  array,
-  highlighted,
-  swapped,
-  sorted,
-  pivot,
-  currentStep,
-}: {
-  array: number[]
-  highlighted: number[]
-  swapped: number[]
-  sorted: number[]
-  pivot?: number
-  currentStep: number
-}) {
-  const maxVal = Math.max(...array, 1)
-
-  return (
-    <div className="flex h-[140px] items-end gap-1.5 overflow-x-auto px-2 pb-1">
-      {array.map((val, idx) => {
-        const isHighlighted = highlighted.includes(idx)
-        const isSwapped = swapped.includes(idx)
-        const isSorted = sorted.includes(idx)
-        const isPivot = pivot === idx
-        const gradient = getBarGradient(isPivot, isSorted, isSwapped, isHighlighted)
-        const heightPx = Math.max((val / maxVal) * 120, 10)
-
-        return (
-          <div
-            key={`bar-${idx}-${currentStep}`}
-            className="flex flex-1 min-w-[20px] max-w-[48px] flex-col items-center gap-1"
-          >
-            <span className="text-[9px] font-mono text-muted-foreground/60">{val}</span>
-            <div
-              className={cn(
-                "w-full rounded-t-[8px] bg-gradient-to-t transition-all duration-300",
-                gradient,
-                isPivot ? "shadow-[0_0_10px_rgba(217,70,239,0.4)]" :
-                isSorted ? "shadow-[0_0_8px_rgba(52,211,153,0.3)]" :
-                isSwapped ? "shadow-[0_0_8px_rgba(244,63,94,0.3)]" :
-                isHighlighted ? "shadow-[0_0_8px_rgba(251,191,36,0.25)]" : ""
-              )}
-              style={{
-                height: `${heightPx}px`,
-                animation: `barGrow 0.25s ease forwards`,
-              }}
-            />
-            <span className="text-[9px] font-mono text-muted-foreground/40">{idx}</span>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// Legend
-// ─────────────────────────────────────────────────────────────
-function VizLegend() {
-  return (
-    <div className="flex flex-wrap gap-3 pt-3 border-t border-violet-500/10">
-      {[
-        { gradient: "from-violet-600 to-blue-500", label: "Default" },
-        { gradient: "from-amber-400 to-yellow-300", label: "Comparing" },
-        { gradient: "from-rose-500 to-red-400", label: "Swapping" },
-        { gradient: "from-emerald-500 to-green-400", label: "Sorted" },
-        { gradient: "from-fuchsia-500 to-purple-400", label: "Pivot" },
-      ].map(({ gradient, label }) => (
-        <div key={label} className="flex items-center gap-1.5">
-          <div className={cn("h-3 w-3 rounded-sm bg-gradient-to-t", gradient)} />
-          <span className="text-[11px] text-muted-foreground">{label}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────
-// Detail page
+// Problem Detail
 // ─────────────────────────────────────────────────────────────
 function ProblemDetail({
   problem,
@@ -865,53 +794,48 @@ function ProblemDetail({
   unlockedTopics,
   payingSlug,
 }: {
-  problem: SortingProblem
+  problem: LinkedListProblem
   onBack: () => void
   onPay: (slug: string) => void
   unlockedTopics: string[]
   payingSlug: string | null
 }) {
   const { isSignedIn } = useUser()
-  const [steps] = useState(() => problem.generateSteps())
+  const [steps]       = useState<LinkedListVisStep[]>(() => problem.generateSteps())
   const [currentStep, setCurrentStep] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [speed, setSpeed] = useState(700)
-  const [activeTab, setActiveTab] = useState<"description" | "approaches" | "pitfalls">("description")
-  const [vizMode, setVizMode] = useState<"both" | "boxes" | "bars">("both")
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const codeRef = useRef<HTMLDivElement>(null)
+  const [isPlaying, setIsPlaying]     = useState(false)
+  const [speed, setSpeed]             = useState(700)
+  const [activeTab, setActiveTab]     = useState<"description" | "approaches" | "pitfalls">("description")
 
-  const locked = isProblemLocked(problem, unlockedTopics)
-  const current = steps[currentStep]
-  const codeLines = problem.code.split("\n")
-  const progress = steps.length > 1 ? (currentStep / (steps.length - 1)) * 100 : 0
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const codeRef     = useRef<HTMLDivElement>(null)
+
+  const locked       = isProblemLocked(problem, unlockedTopics)
+  const current      = steps[currentStep]
+  const codeLines    = problem.code.split("\n")
+  const progress     = steps.length > 1 ? (currentStep / (steps.length - 1)) * 100 : 0
   const isPayingThis = payingSlug === problem.slug
 
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current)
     if (!isPlaying) return
-
     intervalRef.current = setInterval(() => {
       setCurrentStep((s) => {
-        if (s >= steps.length - 1) {
-          setIsPlaying(false)
-          return s
-        }
+        if (s >= steps.length - 1) { setIsPlaying(false); return s }
         return s + 1
       })
     }, speed)
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
   }, [isPlaying, speed, steps.length])
 
   useEffect(() => {
     if (!codeRef.current || !current) return
-    const el = codeRef.current.querySelector(`[data-line="${current.codeLine}"]`)
-    el?.scrollIntoView({ block: "nearest", behavior: "smooth" })
+    codeRef.current
+      .querySelector(`[data-line="${current.codeLine}"]`)
+      ?.scrollIntoView({ block: "nearest", behavior: "smooth" })
   }, [currentStep, current])
 
+  // ── Locked gate ──
   if (locked) {
     return (
       <div className="container mx-auto space-y-5">
@@ -959,16 +883,17 @@ function ProblemDetail({
     )
   }
 
+  // ── Full detail ──
   return (
     <>
       <style>{`
-        @keyframes barGrow {
-          from { transform: scaleY(0); opacity: 0.3; }
-          to   { transform: scaleY(1); opacity: 1; }
+        @keyframes nodeIn {
+          from { opacity: 0; transform: scale(0.85) translateY(-6px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
         }
-        @keyframes boxPop {
-          from { transform: scale(0.85); opacity: 0.4; }
-          to   { transform: scale(1); opacity: 1; }
+        @keyframes companyLoop {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
         }
         .active-line {
           background: linear-gradient(90deg, rgba(139,92,246,0.18) 0%, rgba(139,92,246,0.05) 55%, transparent 100%);
@@ -976,6 +901,8 @@ function ProblemDetail({
       `}</style>
 
       <div className="container mx-auto space-y-5">
+
+        {/* Title row */}
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <button
@@ -987,6 +914,7 @@ function ProblemDetail({
               </svg>
               Problems
             </button>
+
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="truncate text-2xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-violet-700 via-fuchsia-500 to-blue-500 bg-clip-text text-transparent">
                 {problem.title}
@@ -995,30 +923,20 @@ function ProblemDetail({
                 {problem.difficulty}
               </span>
             </div>
-<div className="mt-4 min-w-0">
-  <CompanyMarquee companies={problem.companies} speed={22} />
-</div>         </div>
 
-          <div className="flex items-center gap-1 rounded-xl border border-violet-500/15 bg-white/70 p-1 dark:bg-white/[0.03]">
-            {(["both", "boxes", "bars"] as const).map((m) => (
-              <button
-                key={m}
-                onClick={() => setVizMode(m)}
-                className={cn(
-                  "rounded-lg px-3 py-1.5 text-xs font-semibold transition-all capitalize",
-                  vizMode === m
-                    ? "bg-gradient-to-r from-violet-600 to-blue-600 text-white shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {m === "both" ? "Both" : m === "boxes" ? "Cells" : "Bars"}
-              </button>
-            ))}
+            <div className="mt-4 min-w-0">
+              <CompanyMarquee companies={problem.companies} speed={22} />
+            </div>
           </div>
         </div>
 
+        {/* 2-col layout */}
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_1.1fr]">
+
+          {/* LEFT: Visualization + Controls */}
           <div className="space-y-5">
+
+            {/* Visualization card */}
             <div className={cn(PANEL, "overflow-hidden")}>
               <div className="border-b border-violet-500/10 px-5 py-4">
                 <div className="flex items-start justify-between gap-4">
@@ -1026,7 +944,7 @@ function ProblemDetail({
                     <h3 className="text-sm font-semibold bg-gradient-to-r from-violet-500 to-blue-500 bg-clip-text text-transparent">
                       Step-by-Step Visualization
                     </h3>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground min-h-[1.5rem]">
+                    <p className="mt-1 min-h-[1.5rem] text-sm leading-6 text-muted-foreground">
                       {current?.message ?? "Press Play to start"}
                     </p>
                   </div>
@@ -1036,49 +954,7 @@ function ProblemDetail({
                 </div>
               </div>
 
-              <div className="px-4 py-4 space-y-4">
-                {(vizMode === "both" || vizMode === "boxes") && current && (
-                  <div>
-                    {vizMode === "both" && (
-                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-violet-400">
-                        Array Cells
-                      </p>
-                    )}
-                    <div className="rounded-2xl border border-violet-500/8 bg-white/45 dark:bg-white/[0.02] overflow-x-auto">
-                      <ArrayBoxesViz
-                        array={current.array}
-                        highlighted={current.highlighted}
-                        swapped={current.swapped}
-                        sorted={current.sorted}
-                        pivot={current.pivot}
-                        currentStep={currentStep}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {(vizMode === "both" || vizMode === "bars") && current && (
-                  <div>
-                    {vizMode === "both" && (
-                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-400">
-                        Bar Chart
-                      </p>
-                    )}
-                    <div className="rounded-2xl border border-violet-500/8 bg-white/45 dark:bg-white/[0.02] px-3 pt-3 pb-2">
-                      <BarChartViz
-                        array={current.array}
-                        highlighted={current.highlighted}
-                        swapped={current.swapped}
-                        sorted={current.sorted}
-                        pivot={current.pivot}
-                        currentStep={currentStep}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <VizLegend />
-              </div>
+              {current && <LinkedListViz step={current} currentStep={currentStep} />}
 
               <div className="h-1 bg-violet-500/8">
                 <div
@@ -1088,6 +964,7 @@ function ProblemDetail({
               </div>
             </div>
 
+            {/* Controls */}
             <div className={cn(PANEL, "p-5")}>
               <div className="mb-4">
                 <p className="text-sm leading-6 text-muted-foreground">
@@ -1158,6 +1035,7 @@ function ProblemDetail({
               </div>
             </div>
 
+            {/* Complexity cards */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-[22px] border border-sky-400/15 bg-sky-500/[0.05] p-4">
                 <p className="mb-1 text-[10px] uppercase tracking-[0.18em] text-sky-400/70">Time Complexity</p>
@@ -1170,6 +1048,7 @@ function ProblemDetail({
             </div>
           </div>
 
+          {/* RIGHT: Code panel */}
           <div className="overflow-hidden rounded-[24px] border border-violet-500/12 bg-[#0c0d11] shadow-[0_24px_70px_rgba(0,0,0,0.35)] self-start sticky top-4">
             <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.03] px-4 py-3">
               <div className="flex gap-1.5">
@@ -1183,14 +1062,10 @@ function ProblemDetail({
               </span>
             </div>
 
-            <div
-              ref={codeRef}
-              className="max-h-[calc(100vh-160px)] overflow-y-auto font-mono text-sm leading-7"
-            >
+            <div ref={codeRef} className="max-h-[calc(100vh-160px)] overflow-y-auto font-mono text-sm leading-7">
               {codeLines.map((line, idx) => {
-                const lineNum = idx + 1
+                const lineNum  = idx + 1
                 const isActive = current?.codeLine === lineNum
-
                 return (
                   <div
                     key={lineNum}
@@ -1208,12 +1083,7 @@ function ProblemDetail({
                     >
                       {lineNum}
                     </span>
-                    <span
-                      className={cn(
-                        "whitespace-pre pr-4",
-                        isActive ? "text-white" : "text-neutral-400"
-                      )}
-                    >
+                    <span className={cn("whitespace-pre pr-4", isActive ? "text-white" : "text-neutral-400")}>
                       {line || " "}
                     </span>
                   </div>
@@ -1224,6 +1094,7 @@ function ProblemDetail({
           </div>
         </div>
 
+        {/* Info tabs */}
         <div className={cn(PANEL, "overflow-hidden")}>
           <div className="flex border-b border-violet-500/10 px-2">
             {(["description", "approaches", "pitfalls"] as const).map((tab) => (
@@ -1231,7 +1102,7 @@ function ProblemDetail({
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  "px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] transition-all",
+                  "px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] transition-all capitalize",
                   activeTab === tab
                     ? "text-violet-500 border-b-2 border-violet-500"
                     : "text-muted-foreground hover:text-foreground"

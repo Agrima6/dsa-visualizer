@@ -1,8 +1,42 @@
 // components/visualizer/sorting/sorting-problems-data.ts
 
 export type Difficulty = "Easy" | "Medium" | "Hard"
-export type Company = "Google" | "Amazon" | "Apple" | "Meta" | "Microsoft" | "Netflix" | "Adobe" | "Uber" | "LinkedIn" | "Twitter"
-
+export type Company =
+  | "Google"
+  | "Amazon"
+  | "Apple"
+  | "Meta"
+  | "Microsoft"
+  | "Netflix"
+  | "Adobe"
+  | "Uber"
+  | "LinkedIn"
+  | "Twitter"
+  | "ServiceNow"
+  | "Salesforce"
+  | "Oracle"
+  | "SAP"
+  | "Intuit"
+  | "PayPal"
+  | "Stripe"
+  | "Atlassian"
+  | "Airbnb"
+  | "Dropbox"
+  | "Pinterest"
+  | "Snap"
+  | "Spotify"
+  | "Walmart"
+  | "Cisco"
+  | "VMware"
+  | "Nvidia"
+  | "GoldmanSachs"
+  | "MorganStanley"
+  | "Bloomberg"
+  | "Zomato"
+  | "Swiggy"
+  | "Flipkart"
+  | "Meesho"
+  | "PhonePe"
 export interface Approach {
   name: string
   complexity: string
@@ -60,7 +94,7 @@ const sortAnArray: SortingProblem = {
   slug: "sort-an-array",
   title: "Sort an Array",
   difficulty: "Medium",
-  companies: ["Google", "Amazon", "Microsoft", "Meta"],
+  companies: ["Google", "Amazon", "Microsoft", "Meta", "Apple", "Adobe", "Nvidia", "ServiceNow"],
   tags: ["Sorting", "Divide & Conquer", "Heap"],
   timeComplexity: "O(n log n)",
   spaceComplexity: "O(log n)",
@@ -176,7 +210,7 @@ const sortColors: SortingProblem = {
   slug: "sort-colors",
   title: "Sort Colors",
   difficulty: "Medium",
-  companies: ["Meta", "Amazon", "Microsoft", "Google", "Adobe"],
+  companies: ["Meta", "Amazon", "Microsoft", "Google", "Adobe", "Uber", "Salesforce", "Flipkart"],
   tags: ["Two Pointers", "Sorting"],
   timeComplexity: "O(n)",
   spaceComplexity: "O(1)",
@@ -270,7 +304,7 @@ const topKFrequent: SortingProblem = {
   slug: "top-k-frequent-elements",
   title: "Top K Frequent Elements",
   difficulty: "Medium",
-  companies: ["Amazon", "Google", "Meta", "Microsoft", "LinkedIn", "Uber"],
+  companies: ["Amazon", "Google", "Meta", "Microsoft", "LinkedIn", "Uber", "Apple", "Spotify", "PayPal"],
   tags: ["Hash Map", "Heap", "Bucket Sort"],
   timeComplexity: "O(n)",
   spaceComplexity: "O(n)",
@@ -362,8 +396,7 @@ const longestConsecutive: SortingProblem = {
   slug: "longest-consecutive-sequence",
   title: "Longest Consecutive Sequence",
   difficulty: "Medium",
-  companies: ["Google", "Amazon", "Meta", "Microsoft", "Adobe", "Uber"],
-  tags: ["Hash Set", "Sorting"],
+companies: ["Google", "Amazon", "Meta", "Microsoft", "Adobe", "Uber", "Atlassian", "ServiceNow", "Nvidia"],  tags: ["Hash Set", "Sorting"],
   timeComplexity: "O(n)",
   spaceComplexity: "O(n)",
   description:
@@ -442,8 +475,7 @@ const kthLargest: SortingProblem = {
   slug: "kth-largest-element-in-an-array",
   title: "Kth Largest Element in an Array",
   difficulty: "Medium",
-  companies: ["Amazon", "Google", "Meta", "Microsoft", "Apple", "Uber", "LinkedIn"],
-  tags: ["Sorting", "Heap", "Quick Select", "Divide & Conquer"],
+companies: ["Amazon", "Google", "Meta", "Microsoft", "Apple", "Uber", "LinkedIn", "Bloomberg", "GoldmanSachs"],  tags: ["Sorting", "Heap", "Quick Select", "Divide & Conquer"],
   timeComplexity: "O(n) avg",
   spaceComplexity: "O(1)",
   description:
@@ -557,8 +589,7 @@ const mergeIntervals: SortingProblem = {
   slug: "merge-intervals",
   title: "Merge Intervals",
   difficulty: "Medium",
-  companies: ["Google", "Amazon", "Meta", "Microsoft", "Apple", "LinkedIn", "Twitter"],
-  tags: ["Sorting", "Arrays", "Intervals"],
+companies: ["Google", "Amazon", "Meta", "Microsoft", "Apple", "LinkedIn", "Twitter", "Oracle", "Salesforce"],  tags: ["Sorting", "Arrays", "Intervals"],
   timeComplexity: "O(n log n)",
   spaceComplexity: "O(n)",
   description:
@@ -631,8 +662,7 @@ const nonOverlappingIntervals: SortingProblem = {
   slug: "non-overlapping-intervals",
   title: "Non Overlapping Intervals",
   difficulty: "Medium",
-  companies: ["Google", "Amazon", "Microsoft"],
-  tags: ["Sorting", "Greedy", "Intervals"],
+companies: ["Google", "Amazon", "Microsoft", "Meta", "Adobe", "Atlassian", "ServiceNow"],  tags: ["Sorting", "Greedy", "Intervals"],
   timeComplexity: "O(n log n)",
   spaceComplexity: "O(1)",
   description:
@@ -702,8 +732,7 @@ const meetingRooms: SortingProblem = {
   slug: "meeting-rooms",
   title: "Meeting Rooms",
   difficulty: "Easy",
-  companies: ["Amazon", "Meta", "Microsoft", "Google"],
-  tags: ["Sorting", "Intervals"],
+companies: ["Amazon", "Meta", "Microsoft", "Google", "Uber", "LinkedIn", "Zomato", "Swiggy"],  tags: ["Sorting", "Intervals"],
   timeComplexity: "O(n log n)",
   spaceComplexity: "O(1)",
   description:
@@ -761,8 +790,7 @@ const meetingRoomsII: SortingProblem = {
   slug: "meeting-rooms-ii",
   title: "Meeting Rooms II",
   difficulty: "Medium",
-  companies: ["Google", "Amazon", "Meta", "Microsoft", "Apple", "Uber"],
-  tags: ["Sorting", "Heap", "Greedy", "Intervals"],
+companies: ["Google", "Amazon", "Meta", "Microsoft", "Apple", "Uber", "Salesforce", "Oracle", "Cisco"],  tags: ["Sorting", "Heap", "Greedy", "Intervals"],
   timeComplexity: "O(n log n)",
   spaceComplexity: "O(n)",
   description:
@@ -837,8 +865,7 @@ const insertInterval: SortingProblem = {
   slug: "insert-interval",
   title: "Insert Interval",
   difficulty: "Medium",
-  companies: ["Google", "LinkedIn", "Amazon", "Microsoft"],
-  tags: ["Sorting", "Intervals", "Arrays"],
+companies: ["Google", "LinkedIn", "Amazon", "Microsoft", "Meta", "Apple", "ServiceNow", "Flipkart"],  tags: ["Sorting", "Intervals", "Arrays"],
   timeComplexity: "O(n)",
   spaceComplexity: "O(n)",
   description:
