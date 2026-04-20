@@ -1,28 +1,13 @@
-// lib/tracker.ts
+const STORAGE_KEY = "dsa_tracker_data";
 
-export interface Solve {
-    id: number;
-    name: string;
-    topic: string;
-    difficulty: "easy" | "medium" | "hard";
-    correct: boolean;
-    ts: number;
-  }
-  
-  export interface TrackerData {
-    solves: Solve[];
-    visualized: number[];
-  }
-  
-  const STORAGE_KEY = "dsa_tracker_v1";
-  
-  export function loadData(): TrackerData {
-    if (typeof window === "undefined") return { solves: [], visualized: [] };
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) return JSON.parse(raw);
-    } catch {}
-    return { solves: [], visualized: [] };
+interface Solve {
+  id: number;
+  ts: number;
+  [key: string]: any; // Adjust properties as needed
+}
+
+function notifyUpdate() {
+    window.dispatchEvent(new Event("dsa_tracker_updated"));
   }
   
   export function logSolve(solve: Omit<Solve, "id" | "ts">) {
@@ -30,6 +15,7 @@ export interface Solve {
     data.solves.push({ ...solve, id: Date.now(), ts: Date.now() });
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      notifyUpdate(); // ← add this
     } catch {}
   }
   
@@ -38,5 +24,13 @@ export interface Solve {
     if (!data.visualized.includes(id)) {
       data.visualized.push(id);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      notifyUpdate(); // ← add this
     }
   }
+function loadData() {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) {
+        return JSON.parse(data);
+    }
+    return { solves: [], visualized: [] };
+}

@@ -1,4 +1,5 @@
 "use client";
+import { trackActivity } from "@/components/activity-tracker";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -233,6 +234,22 @@ const features = [
       "Connect graphs with route planning",
     ],
     useCases: ["Maps", "Network routing", "Path planning"],
+    previewType: "graph",
+  },
+  {
+    title: "Graphs",
+    description:
+      "Build graphs, run BFS and DFS animations, and solve real interview problems step by step.",
+    image: "/ds-graph.png",
+    url: "/visualizer/graph",
+    overview:
+      "A graph is a collection of nodes (vertices) connected by edges. Graphs model real-world relationships — social networks, maps, dependency trees, and more. BFS finds shortest paths; DFS explores all reachable nodes.",
+    learnPoints: [
+      "Understand BFS and DFS traversal order",
+      "Detect cycles and connected components visually",
+      "Apply graph algorithms to real interview problems",
+    ],
+    useCases: ["Maps & routing", "Social networks", "Dependency resolution"],
     previewType: "graph",
   },
 ] as const;
@@ -1142,84 +1159,54 @@ const quizMap: Record<SelectedFeature["previewType"], QuizQuestion[]> = {
   ],
   graph: [
     {
-      question: "Dijkstra's algorithm is used for:",
-      options: [
-        "Shortest paths",
-        "Compression",
-        "Stack operations",
-        "Expression conversion",
-      ],
-      answer: "Shortest paths",
+      question: "What does BFS stand for?",
+      options: ["Breadth First Search", "Best First Search", "Binary First Search", "Back First Search"],
+      answer: "Breadth First Search",
     },
     {
-      question: "Dijkstra works on:",
-      options: [
-        "Weighted graphs",
-        "Only arrays",
-        "Only linked lists",
-        "Only stacks",
-      ],
-      answer: "Weighted graphs",
+      question: "Which data structure does BFS use internally?",
+      options: ["Stack", "Queue", "Heap", "Tree"],
+      answer: "Queue",
     },
     {
-      question: "The algorithm starts from a:",
-      options: ["Source node", "Leaf node only", "Random edge", "Last node"],
-      answer: "Source node",
+      question: "Which data structure does DFS use internally (or implicitly)?",
+      options: ["Queue", "Stack (or recursion call stack)", "Heap", "HashMap"],
+      answer: "Stack (or recursion call stack)",
     },
     {
-      question: "What gets updated during the algorithm?",
-      options: [
-        "Distances",
-        "Only colors",
-        "Only frequencies",
-        "Only stack heights",
-      ],
-      answer: "Distances",
+      question: "BFS is optimal for finding:",
+      options: ["Shortest path in unweighted graph", "Minimum spanning tree", "Longest path", "Cycle detection only"],
+      answer: "Shortest path in unweighted graph",
     },
     {
-      question: "Which idea is central in Dijkstra?",
-      options: [
-        "Path relaxation",
-        "Tree rotation",
-        "Expression parsing",
-        "Node reversal",
-      ],
-      answer: "Path relaxation",
+      question: "Number of Islands is best solved with:",
+      options: ["DFS / BFS flood fill", "Binary search", "Sorting only", "Stack only"],
+      answer: "DFS / BFS flood fill",
     },
     {
-      question: "A common real-world use is:",
-      options: ["Maps", "Undo systems", "Symbolic multiplication", "Compression only"],
-      answer: "Maps",
+      question: "Cycle detection in a directed graph uses:",
+      options: ["3-state DFS (unvisited, in-path, done)", "2-state DFS only", "BFS only", "Sorting"],
+      answer: "3-state DFS (unvisited, in-path, done)",
     },
     {
-      question: "Network routing can use:",
-      options: ["Dijkstra's algorithm", "Only queues", "Only AVL trees", "Only sorting"],
-      answer: "Dijkstra's algorithm",
+      question: "Topological sort is only valid for:",
+      options: ["Directed Acyclic Graphs (DAGs)", "Undirected graphs", "Weighted graphs", "Any graph"],
+      answer: "Directed Acyclic Graphs (DAGs)",
     },
     {
-      question: "Dijkstra finds shortest paths from one source to:",
-      options: [
-        "All reachable nodes",
-        "Only one child",
-        "Only the root",
-        "Only the largest node",
-      ],
-      answer: "All reachable nodes",
+      question: "Which algorithm efficiently detects cycles and finds connected components?",
+      options: ["Union Find", "Binary Search", "Bubble Sort", "Sliding Window"],
+      answer: "Union Find",
     },
     {
-      question: "Weighted graph decisions depend on:",
-      options: ["Edge costs/weights", "Node colors", "Label length", "Stack depth"],
-      answer: "Edge costs/weights",
+      question: "In graph terminology, V refers to vertices and E refers to:",
+      options: ["Edges", "Elements", "Endpoints", "Entries"],
+      answer: "Edges",
     },
     {
-      question: "Visualizing Dijkstra helps understand:",
-      options: [
-        "How route costs improve step by step",
-        "How push/pop works",
-        "How compression codes shrink",
-        "How queues dequeue",
-      ],
-      answer: "How route costs improve step by step",
+      question: "Multi-source BFS (e.g., Rotting Oranges) starts BFS from:",
+      options: ["All source nodes simultaneously", "One random node", "The largest node only", "Leaf nodes only"],
+      answer: "All source nodes simultaneously",
     },
   ],
 
@@ -1845,24 +1832,46 @@ function HuffmanPreview() {
 }
 
 function GraphPreview() {
+  // Paste PreviewShell from your existing features.tsx context
+  const nodes = [
+    { x: "50%", y: "18%", label: "A", root: true },
+    { x: "28%", y: "50%", label: "B" },
+    { x: "72%", y: "50%", label: "C" },
+    { x: "18%", y: "82%", label: "D" },
+    { x: "42%", y: "82%", label: "E" },
+  ]
+  const edges = [
+    ["50%","18%","28%","50%"], ["50%","18%","72%","50%"],
+    ["28%","50%","18%","82%"], ["28%","50%","42%","82%"],
+  ]
+ 
   return (
-    <PreviewShell label="Shortest Path" rightLabel="Weighted Graph" footer="Choose the lightest total route">
-      <div className="relative mx-auto h-full max-w-[240px] pt-2">
-        <div className="absolute left-2 top-16 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-violet-600 to-blue-500 text-sm font-semibold text-white">A</div>
-        <div className="absolute left-24 top-4 flex h-10 w-10 items-center justify-center rounded-full border border-violet-500/20 bg-white/70 text-sm font-semibold dark:bg-white/[0.06]">B</div>
-        <div className="absolute left-24 top-28 flex h-10 w-10 items-center justify-center rounded-full border border-violet-500/20 bg-white/70 text-sm font-semibold dark:bg-white/[0.06]">C</div>
-        <div className="absolute right-2 top-16 flex h-10 w-10 items-center justify-center rounded-full border border-amber-400/25 bg-amber-400/15 text-sm font-semibold">D</div>
-        <div className="absolute left-[42px] top-[62px] h-[2px] w-16 -rotate-[28deg] bg-gradient-to-r from-violet-500 to-blue-500" />
-        <div className="absolute left-[42px] top-[82px] h-[2px] w-16 rotate-[28deg] bg-gradient-to-r from-violet-500 to-blue-500" />
-        <div className="absolute left-[120px] top-[22px] h-[2px] w-16 rotate-[28deg] bg-gradient-to-r from-violet-500 to-amber-500" />
-        <div className="absolute left-[120px] top-[100px] h-[2px] w-16 -rotate-[28deg] bg-gradient-to-r from-violet-500 to-amber-500" />
-        <div className="absolute left-[78px] top-[42px] rounded-full bg-white px-1.5 text-[10px] font-bold dark:bg-zinc-900">4</div>
-        <div className="absolute left-[78px] top-[95px] rounded-full bg-white px-1.5 text-[10px] font-bold dark:bg-zinc-900">2</div>
-        <div className="absolute left-[154px] top-[44px] rounded-full bg-white px-1.5 text-[10px] font-bold dark:bg-zinc-900">3</div>
-        <div className="absolute left-[154px] top-[91px] rounded-full bg-white px-1.5 text-[10px] font-bold dark:bg-zinc-900">6</div>
+    <PreviewShell label="Graph Traversal" rightLabel="BFS / DFS" footer="Explore nodes and edges step by step">
+      <div className="relative h-full w-full pt-2">
+        <svg className="absolute inset-0 w-full h-full" style={{top:0,left:0}}>
+          {edges.map(([x1,y1,x2,y2],i)=>(
+            <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
+              stroke="rgba(139,92,246,0.3)" strokeWidth="2" strokeLinecap="round"/>
+          ))}
+        </svg>
+        {nodes.map((n,i)=>(
+          <div key={i}
+            className={[
+              "absolute flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 text-sm font-bold font-mono transition-all duration-500",
+              n.root
+                ? "border-violet-500 bg-gradient-to-br from-violet-600/30 to-violet-500/10 text-violet-700 dark:text-violet-300 shadow-[0_0_14px_rgba(139,92,246,0.4)] group-hover:-translate-y-3"
+                : i===1||i===2
+                ? "border-amber-400/60 bg-amber-400/15 text-amber-700 dark:text-amber-300 group-hover:-translate-y-1"
+                : "border-violet-500/20 bg-white/70 dark:bg-white/[0.06] text-foreground",
+            ].join(" ")}
+            style={{ left: n.x, top: n.y }}
+          >
+            {n.label}
+          </div>
+        ))}
       </div>
     </PreviewShell>
-  );
+  )
 }
 function ArrayPreview() {
   const cells = [3, 7, 1, 9, 4, 6, 2];
@@ -1901,6 +1910,7 @@ function ArrayPreview() {
 
 const PreviewCard = ({ type }: { type: SelectedFeature["previewType"] }) => {
   switch (type) {
+    case "graph": return <GraphPreview />;
     case "array" : return <ArrayPreview />;
     case "sorting": return <SortingPreview />;
     case "stack": return <StackPreview />;
@@ -2125,8 +2135,8 @@ export const Features = () => {
                           before:[-webkit-mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)]
                           before:[-webkit-mask-composite:xor] before:[mask-composite:exclude]
                         "
-                      >
-                        <Link href={`${selectedFeature.url}?mode=code`} className="flex items-center gap-2">
+                      > 
+                       <Link href={`${selectedFeature.url}?mode=code`} className="flex items-center gap-2">
                           Try with Code <Code2 className="h-4 w-4" />
                         </Link>
                       </Button>
