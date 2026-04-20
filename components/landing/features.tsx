@@ -156,6 +156,22 @@ const features = [
     useCases: ["Scheduling", "Priority queues", "Top-k problems"],
     previewType: "heap",
   },
+    {
+    title: "Graphs",
+    description:
+      "Build graphs, run BFS and DFS animations, and solve real interview problems step by step.",
+    image: "/ds-graph.png",
+    url: "/visualizer/graph",
+    overview:
+      "A graph is a collection of nodes (vertices) connected by edges. Graphs model real-world relationships — social networks, maps, dependency trees, and more. BFS finds shortest paths; DFS explores all reachable nodes.",
+    learnPoints: [
+      "Understand BFS and DFS traversal order",
+      "Detect cycles and connected components visually",
+      "Apply graph algorithms to real interview problems",
+    ],
+    useCases: ["Maps & routing", "Social networks", "Dependency resolution"],
+    previewType: "graph",
+  },
   {
     title: "Infix to Postfix Conversion",
     description:
@@ -236,22 +252,7 @@ const features = [
     useCases: ["Maps", "Network routing", "Path planning"],
     previewType: "graph",
   },
-  {
-    title: "Graphs",
-    description:
-      "Build graphs, run BFS and DFS animations, and solve real interview problems step by step.",
-    image: "/ds-graph.png",
-    url: "/visualizer/graph",
-    overview:
-      "A graph is a collection of nodes (vertices) connected by edges. Graphs model real-world relationships — social networks, maps, dependency trees, and more. BFS finds shortest paths; DFS explores all reachable nodes.",
-    learnPoints: [
-      "Understand BFS and DFS traversal order",
-      "Detect cycles and connected components visually",
-      "Apply graph algorithms to real interview problems",
-    ],
-    useCases: ["Maps & routing", "Social networks", "Dependency resolution"],
-    previewType: "graph",
-  },
+
 ] as const;
 
 type SelectedFeature = (typeof features)[number];

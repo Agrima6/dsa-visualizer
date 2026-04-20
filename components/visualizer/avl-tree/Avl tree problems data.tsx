@@ -1,7 +1,6 @@
 // components/visualizer/avl-tree/avl-tree-problems-data.ts
 
 export type Difficulty = "Easy" | "Medium" | "Hard"
-
 export type Company =
   | "Google" | "Amazon" | "Apple" | "Meta" | "Microsoft"
   | "Netflix" | "Adobe" | "Uber" | "LinkedIn" | "Twitter"
@@ -10,7 +9,7 @@ export type Company =
   | "Pinterest" | "Snap" | "Spotify" | "Walmart" | "Cisco"
   | "VMware" | "Nvidia" | "GoldmanSachs" | "MorganStanley"
   | "Bloomberg" | "Zomato" | "Swiggy" | "Flipkart" | "Meesho"
-  | "PhonePe"
+  | "PhonePe" | "Wipro" | "TCS" | "Infosys"
 
 export interface AVLVisNode {
   id: string
