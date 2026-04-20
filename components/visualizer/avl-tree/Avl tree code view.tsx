@@ -81,6 +81,9 @@ const COMPANY_LOGO_MAP: Record<Company, { src: string; label: string }> = {
   Flipkart:     { src: "/company-logos/flipkart.svg",     label: "Flipkart" },
   Meesho:       { src: "/company-logos/meesho.svg",       label: "Meesho" },
   PhonePe:      { src: "/company-logos/phonepe.svg",      label: "PhonePe" },
+  Wipro: { src: "/company-logos/wipro.svg", label: "Wipro" },
+TCS: { src: "/company-logos/tcs.svg", label: "TCS" },
+Infosys: { src: "/company-logos/infosys.svg", label: "Infosys" },
 }
 
 function cn(...classes: (string | false | null | undefined)[]) {
