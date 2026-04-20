@@ -1,14 +1,7 @@
 // components/visualizer/heap/heap-problems-data.ts
 
 export type Difficulty = "Easy" | "Medium" | "Hard"
-export type Company =
-  | "Google" | "Amazon" | "Apple" | "Meta" | "Microsoft"
-  | "Netflix" | "Adobe" | "Uber" | "LinkedIn" | "Twitter"
-  | "ServiceNow" | "Salesforce" | "Oracle" | "SAP" | "Intuit"
-  | "PayPal" | "Stripe" | "Atlassian" | "Airbnb" | "Dropbox"
-  | "Pinterest" | "Snap" | "Spotify" | "Walmart" | "Cisco"
-  | "VMware" | "Nvidia" | "GoldmanSachs" | "MorganStanley"
-  | "Bloomberg" | "Zomato" | "Swiggy" | "Flipkart" | "Meesho" | "PhonePe"
+export type Company = string
 
 export interface Approach {
   name: string

@@ -41,7 +41,7 @@ const PANEL =
 const SOFT_PANEL =
   "rounded-[20px] border border-violet-500/10 bg-white/55 backdrop-blur-xl dark:bg-white/[0.025]"
 
-const COMPANY_LOGO_MAP: Record<Company, { src: string; label: string }> = {
+const COMPANY_LOGO_MAP: Record<string, { src: string; label: string }> = {
   Google:       { src: "/company-logos/google.svg",       label: "Google" },
   Amazon:       { src: "/company-logos/amazon.svg",       label: "Amazon" },
   Apple:        { src: "/company-logos/apple.svg",        label: "Apple" },
