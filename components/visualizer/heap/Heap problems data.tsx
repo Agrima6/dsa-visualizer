@@ -825,7 +825,7 @@ const carPooling: HeapProblem = {
   slug: "car-pooling",
   title: "Car Pooling",
   difficulty: "Medium",
-  companies: ["Uber", "Google", "Amazon", "Meta", "Airbnb", "Lyft"],
+  companies: ["Uber", "Google", "Amazon", "Meta", "Airbnb"],
   tags: ["Array", "Sorting", "Heap (Priority Queue)", "Simulation", "Prefix Sum"],
   timeComplexity: "O(n log n)",
   spaceComplexity: "O(n)",
