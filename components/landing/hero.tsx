@@ -124,9 +124,7 @@ export const Hero = () => {
                 ref={descRef}
                 className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-xl text-left"
               >
-                Interactive tool for learning and understanding data structures
-                through visual animations, guided operations, and intuitive
-                step-by-step exploration.
+                Master DSA problems asked at Google, Amazon, Microsoft & more - through visual, step-by-step animationsn.
               </p>
             </div>
 

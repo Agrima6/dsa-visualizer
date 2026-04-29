@@ -37,6 +37,10 @@ interface FeatureProps {
 
 const routeList: RouteProps[] = [
   {
+    href: "/company-questions",
+    label: "Company Questions",
+  },
+  {
     href: "/dashboard",
     label: "Dashboard",
   },
@@ -47,6 +51,11 @@ const routeList: RouteProps[] = [
 ];
 
 const featureList: FeatureProps[] = [
+  {
+    title: "Array",
+    description: "Learn Arrays through interactive visualizations.",
+    url: "/visualizer/array",
+  },
   {
     title: "Sorting",
     description: "Learn sorting through interactive visualizations.",
@@ -72,7 +81,6 @@ const featureList: FeatureProps[] = [
     description: "See insertions, traversals, and structure clearly.",
     url: "/visualizer/binary-tree",
   },
-
   {
     title: "Heaps",
     description: "Understand heap operations and ordering.",
@@ -262,7 +270,7 @@ export const Navbar = () => {
             {routeList.map(({ href, label }) => (
               <NavigationMenuItem key={href}>
                 <NavigationMenuLink asChild>
-                  <Link href={href} className="nav-link-pill">
+                  <Link href={href} className="nav-link-pill whitespace-nowrap">
                     {label}
                   </Link>
                 </NavigationMenuLink>

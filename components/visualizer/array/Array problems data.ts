@@ -213,7 +213,7 @@ const containsDuplicate: ArrayProblem = {
 // 3. Two Sum
 // ════════════════════════════════════════════════════════════════
 const twoSum: ArrayProblem = {
-  id: 4,
+  id: 1,
   slug: "two-sum",
   title: "Two Sum",
   difficulty: "Easy",
@@ -2387,9 +2387,9 @@ const maxSumCircularSubarray: ArrayProblem = {
 // ════════════════════════════════════════════════════════════════
 // Last 10 are LOCKED
 export const ARRAY_PROBLEMS: ArrayProblem[] = [
-  concatenationOfArray,      // #1   Easy   — free
+  twoSum,      // #1   Easy   — free
   containsDuplicate,         // #2   Easy   — free
-  twoSum,                    // #4   Easy   — free
+  concatenationOfArray,                    // #4   Easy   — free
   removeElement,             // #7   Easy   — free
   sortColors,                // #12  Medium — free
   bestTimeToBuy,             // #37  Easy   — free
