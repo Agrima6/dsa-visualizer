@@ -71,6 +71,7 @@ const COMPANY_LOGO_MAP: Record<Company, { src: string; label: string }> = {
   PhonePe: { src: "/company-logos/phonepe.svg", label: "PhonePe" },
 }
 const SPEED_OPTIONS = [
+  { label: "0.5x", interval: 1500 },
   { label: "1x", interval: 800 },
   { label: "1.5x", interval: 550 },
   { label: "2x", interval: 400 },

@@ -1,8 +1,7 @@
 "use client"
 // components/visualizer/sorting/sorting-visualizer.tsx
-// REPLACE your existing file with this one
 
-import { Suspense } from "react"
+import { Suspense, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -10,7 +9,16 @@ import { Input } from "@/components/ui/input"
 import { useSorting } from "@/hooks/use-sorting"
 import SortingCodeView from "./sorting-code-view"
 
-// ── Router: switches between normal visualizer and code-problems view ──
+const MAX_ELEMENTS = 10
+
+const speedOptions = [
+  { label: "0.5x", value: 1500 },
+  { label: "1x", value: 800 },
+  { label: "1.5x", value: 500 },
+  { label: "2x", value: 250 },
+]
+
+// ── Router ──
 function SortingVisualizerInner() {
   const searchParams = useSearchParams()
   const mode = searchParams.get("mode")
@@ -34,7 +42,7 @@ export default function SortingVisualizer() {
   )
 }
 
-// ── Original Visualizer (unchanged) ─────────────────────────────
+// ── Original Visualizer ──
 function SortingVisualizerOriginal() {
   const {
     input, setInput, algorithm, setAlgorithm, steps, currentStep,
@@ -42,10 +50,27 @@ function SortingVisualizerOriginal() {
     generateRandomArray, clear, startSorting, nextStep, prevStep, togglePlay,
   } = useSorting()
 
+  const [error, setError] = useState("")
+
   const maxValue = current.array.length > 0 ? Math.max(...current.array) : 1
+
+  // ✅ FIXED INPUT (max 10, commas allowed)
+  const handleInputChange = (value: string) => {
+    const parts = value.split(",")
+    const cleaned = parts.map(v => v.trim()).filter(v => v !== "")
+
+    if (cleaned.length > MAX_ELEMENTS) {
+      setError("Max 10 elements allowed")
+      return
+    }
+
+    setError("")
+    setInput(value)
+  }
 
   return (
     <div className="container mx-auto space-y-8">
+
       {/* TOP TITLE CONTAINER */}
       <div className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_24%)]" />
@@ -65,27 +90,37 @@ function SortingVisualizerOriginal() {
 
       {/* MAIN CONTENT */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-[340px_1fr]">
+        
         {/* LEFT PANEL */}
         <div className="space-y-6">
           <Card className="p-5 rounded-2xl border border-violet-500/15 bg-white/70 backdrop-blur-xl dark:bg-white/[0.04] shadow-[0_10px_40px_rgba(139,92,246,0.08)]">
+            
             <div className="mb-5">
               <h3 className="text-xl font-semibold bg-gradient-to-r from-violet-600 via-blue-500 to-indigo-500 bg-clip-text text-transparent">
                 Sorting Controls
               </h3>
-              <p className="text-xs text-muted-foreground mt-1">Configure input, algorithm and speed</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Configure input, algorithm and speed
+              </p>
             </div>
 
             <div className="space-y-4">
+              
+              {/* INPUT */}
               <div className="space-y-2">
                 <label className="text-sm">Enter numbers</label>
                 <Input
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={(e) => handleInputChange(e.target.value)}
                   placeholder="e.g. 5, 2, 9, 1, 7"
                   className="rounded-xl border-violet-500/20 focus:ring-violet-500"
                 />
+                {error && (
+                  <p className="text-xs text-red-500">{error}</p>
+                )}
               </div>
 
+              {/* ALGORITHM */}
               <div className="space-y-2">
                 <label className="text-sm">Algorithm</label>
                 <select
@@ -103,16 +138,30 @@ function SortingVisualizerOriginal() {
                 </select>
               </div>
 
+              {/* ✅ SPEED (only this block changed) */}
               <div className="space-y-2">
-                <label className="text-sm">Speed: {speed} ms</label>
-                <input
-                  type="range" min={150} max={1500} step={50}
-                  value={speed}
-                  onChange={(e) => setSpeed(Number(e.target.value))}
-                  className="w-full accent-violet-600"
-                />
+                <label className="text-sm">Animation Speed</label>
+                <div className="flex gap-2">
+                  {speedOptions.map((option) => {
+                    const active = speed === option.value
+                    return (
+                      <button
+                        key={option.label}
+                        onClick={() => setSpeed(option.value)}
+                        className={`px-3 py-1.5 text-sm rounded-lg border transition-all
+                          ${active
+                            ? "bg-violet-600 text-white border-violet-600"
+                            : "bg-transparent text-muted-foreground border-violet-500/20 hover:bg-violet-500/10"
+                          }`}
+                      >
+                        {option.label}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
 
+              {/* BUTTONS */}
               <div className="grid grid-cols-2 gap-2">
                 <Button onClick={loadInputArray} className="rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white">
                   Set Array
@@ -143,8 +192,12 @@ function SortingVisualizerOriginal() {
           {/* STEP INFO */}
           <Card className="p-5 rounded-2xl border border-violet-500/15 bg-white/70 backdrop-blur-xl dark:bg-white/[0.04]">
             <div className="mb-5">
-              <h3 className="text-xl font-semibold bg-gradient-to-r from-violet-600 via-blue-500 to-indigo-500 bg-clip-text text-transparent">Step Info</h3>
-              <p className="text-xs text-muted-foreground mt-1">Live algorithm execution details</p>
+              <h3 className="text-xl font-semibold bg-gradient-to-r from-violet-600 via-blue-500 to-indigo-500 bg-clip-text text-transparent">
+                Step Info
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                Live algorithm execution details
+              </p>
             </div>
             <div className="space-y-2 text-sm">
               <div><strong>Step:</strong> {steps.length > 0 ? currentStep + 1 : 0} / {steps.length}</div>
@@ -156,14 +209,16 @@ function SortingVisualizerOriginal() {
           </Card>
         </div>
 
-        {/* RIGHT VISUALIZATION */}
+        {/* RIGHT VISUALIZATION (UNCHANGED) */}
         <Card className="p-5 rounded-2xl border border-violet-500/15 bg-white/70 backdrop-blur-xl dark:bg-white/[0.04] shadow-[0_10px_40px_rgba(139,92,246,0.08)]">
           <div className="flex items-center justify-between mb-5">
             <div>
               <h3 className="text-xl font-semibold bg-gradient-to-r from-violet-600 via-blue-500 to-indigo-500 bg-clip-text text-transparent">
                 Sorting Visualization
               </h3>
-              <p className="text-xs text-muted-foreground mt-1">Visual step-by-step execution of sorting algorithm</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Visual step-by-step execution of sorting algorithm
+              </p>
             </div>
             <div className="text-xs px-3 py-1 rounded-full bg-violet-500/10 text-violet-600 dark:text-violet-300 border border-violet-500/20">
               {algorithm.toUpperCase()}

@@ -1169,6 +1169,8 @@ function ProblemDetail({
               </div>
             </div>
           </div>
+          
+          
 
           <div className="overflow-hidden rounded-[24px] border border-violet-500/12 bg-[#0c0d11] shadow-[0_24px_70px_rgba(0,0,0,0.35)] self-start sticky top-4">
             <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.03] px-4 py-3">
