@@ -72,11 +72,7 @@ const featureList: FeatureProps[] = [
     description: "See insertions, traversals, and structure clearly.",
     url: "/visualizer/binary-tree",
   },
-  {
-    title: "AVL Trees",
-    description: "Learn balancing and rotations visually.",
-    url: "/visualizer/avl-tree",
-  },
+
   {
     title: "Heaps",
     description: "Understand heap operations and ordering.",

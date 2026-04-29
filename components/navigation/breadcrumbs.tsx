@@ -55,10 +55,7 @@ const routes = {
     name: "Binary Tree",
     path: "/visualizer/binary-tree",
   },
-  "/visualizer/avl-tree": {
-    name: "AVL Tree",
-    path: "/visualizer/avl-tree",
-  },
+  
   "/visualizer/heap": {
     name: "Heap",
     path: "/visualizer/heap",

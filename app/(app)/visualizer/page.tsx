@@ -34,12 +34,7 @@ const sections = {
       href: "/visualizer/binary-tree",
       icon: Binary,
     },
-    {
-      name: "AVL Tree",
-      description: "Self-balancing BST that maintains height balance. Visualize rotations and balancing.",
-      href: "/visualizer/avl-tree",
-      icon: TreePine,
-    },
+  
     {
       name: "Heap",
       description: "Complete binary tree with heap property. Switch between min and max heaps.",

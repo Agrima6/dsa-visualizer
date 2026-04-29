@@ -126,21 +126,7 @@ const features = [
     useCases: ["Fast lookup", "Ordered storage", "Hierarchical data"],
     previewType: "bst",
   },
-  {
-    title: "AVL Trees",
-    description: "Explore balancing rotations in a self-balancing BST.",
-    image: "/ds-avl.png",
-    url: "/visualizer/avl-tree",
-    overview:
-      "AVL trees are self-balancing binary search trees. They rotate nodes whenever the structure becomes too unbalanced, keeping operations efficient.",
-    learnPoints: [
-      "Understand balance factors",
-      "Learn left and right rotations",
-      "See why balancing improves performance",
-    ],
-    useCases: ["Database indexing", "Fast updates", "Balanced search"],
-    previewType: "avl",
-  },
+  
   {
     title: "Heaps",
     description: "Visualize heap shape and priority-based ordering.",
@@ -715,78 +701,7 @@ const quizMap: Record<SelectedFeature["previewType"], QuizQuestion[]> = {
       answer: "Fast lookup",
     },
   ],
-  avl: [
-    {
-      question: "AVL tree is a:",
-      options: [
-        "Self-balancing BST",
-        "Queue structure",
-        "Linear array",
-        "Compression table",
-      ],
-      answer: "Self-balancing BST",
-    },
-    {
-      question: "AVL trees maintain efficiency by using:",
-      options: ["Rotations", "Compression", "Hashing", "Scanning only"],
-      answer: "Rotations",
-    },
-    {
-      question: "When does an AVL tree rebalance?",
-      options: [
-        "When it becomes unbalanced",
-        "Every second",
-        "After every search only",
-        "Never",
-      ],
-      answer: "When it becomes unbalanced",
-    },
-    {
-      question: "What is commonly checked in AVL trees?",
-      options: ["Balance factor", "Frequency table", "Postfix output", "Queue length only"],
-      answer: "Balance factor",
-    },
-    {
-      question: "Which rotation may happen in AVL trees?",
-      options: ["Left rotation", "Color rotation", "Text rotation", "Scan rotation"],
-      answer: "Left rotation",
-    },
-    {
-      question: "AVL trees are useful where:",
-      options: [
-        "Balanced search is important",
-        "Only stack pop is needed",
-        "Only postfix conversion is needed",
-        "Only compression is needed",
-      ],
-      answer: "Balanced search is important",
-    },
-    {
-      question: "AVL is based on which base structure?",
-      options: ["BST", "Queue", "Array only", "Hash table only"],
-      answer: "BST",
-    },
-    {
-      question: "Why are AVL trees preferred over skewed BSTs?",
-      options: [
-        "They keep operations efficient",
-        "They use less color",
-        "They avoid all comparisons",
-        "They never insert nodes",
-      ],
-      answer: "They keep operations efficient",
-    },
-    {
-      question: "Which operation improves AVL performance?",
-      options: ["Rebalancing", "Random deletion", "Encryption", "Tokenization"],
-      answer: "Rebalancing",
-    },
-    {
-      question: "AVL trees are often used in:",
-      options: ["Database indexing", "Undo history", "Ticket lines", "Audio mixing"],
-      answer: "Database indexing",
-    },
-  ],
+
   heap: [
     {
       question: "A heap is commonly used to implement:",
@@ -1728,35 +1643,7 @@ function BSTPreview() {
   );
 }
 
-function AVLPreview() {
-  return (
-    <PreviewShell label="Balanced Tree" rightLabel="AVL Rotations" footer="Rebalance with smart rotations">
-      <div className="flex h-full items-center justify-center">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 pt-2">
-          <div className="rounded-2xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-center">
-            <div className="text-xs font-medium text-muted-foreground">Before</div>
-            <div className="mt-2 space-y-2 text-sm font-semibold">
-              <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-violet-500/20">30</div>
-              <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-violet-500/20">20</div>
-              <div className="mx-auto flex h-9 w-9 items-center justify-center rounded-full bg-amber-400/25">10</div>
-            </div>
-          </div>
-          <div className="rounded-full border border-violet-500/15 bg-white/70 p-2 dark:bg-white/[0.05]">
-            <ArrowRight className="h-5 w-5 text-violet-600 dark:text-violet-300" />
-          </div>
-          <div className="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-center">
-            <div className="text-xs font-medium text-muted-foreground">After</div>
-            <div className="mt-2 flex items-center justify-center gap-2 text-sm font-semibold">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-violet-600 text-white">20</div>
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-violet-500/20">10</div>
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-400/25">30</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </PreviewShell>
-  );
-}
+
 
 function HeapPreview() {
   return (
@@ -1917,7 +1804,6 @@ const PreviewCard = ({ type }: { type: SelectedFeature["previewType"] }) => {
     case "queue": return <QueuePreview />;
     case "linked-list": return <LinkedListPreview />;
     case "bst": return <BSTPreview />;
-    case "avl": return <AVLPreview />;
     case "heap": return <HeapPreview />;
     case "expression": return <ExpressionPreview />;
     case "message-queue": return <QueuePreview message />;

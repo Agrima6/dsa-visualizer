@@ -12,7 +12,6 @@ const topics = [
   "Stacks",
   "Queues",
   "Trees",
-  "AVL Trees",
   "Heaps",
   "Sorting",
   "Graphs",

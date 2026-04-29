@@ -56,12 +56,7 @@ const dataStructures = [
     icon: Binary,
     description: "Basic binary tree with BST properties",
   },
-  {
-    name: "AVL Tree",
-    url: "/visualizer/avl-tree",
-    icon: TreePine,
-    description: "Self-balancing binary search tree",
-  },
+  
   {
     name: "Heap",
     url: "/visualizer/heap",
