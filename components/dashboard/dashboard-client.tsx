@@ -4,12 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const USER = {
-  name: "Agrima Agarwal",
-  initials: "A",
-  email: "agrima@algomaitri.com",
-  isPro: true,
-};
+
 
 const STATS = [
   { label: "Problems Solved", value: "147", meta: "+12 this week", icon: "⚡" },
@@ -101,9 +96,7 @@ function Sidebar() {
         })}
       </nav>
 
-      <div className="am-user">
-        <div className="am-user-avatar">{USER.initials}</div>
-      </div>
+    
     </aside>
   );
 }
@@ -738,9 +731,9 @@ export default function DashboardClient() {
             <div className="am-pill">⚡ Learning Dashboard</div>
 
             <h1>
-              {greeting}, <span className="am-gradient-text">{USER.name.split(" ")[0]}</span>
+              {greeting}, 
               <br />
-              keep building.
+              Keep building.
             </h1>
 
             <p>
