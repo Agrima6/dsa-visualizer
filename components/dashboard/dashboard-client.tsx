@@ -4,133 +4,194 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-
-
+// ── Static data ───────────────────────────────────────────────
 const STATS = [
-  { label: "Problems Solved", value: "147", meta: "+12 this week", icon: "⚡" },
-  { label: "Current Streak", value: "14", meta: "days in a row", icon: "🔥" },
-  { label: "XP Points", value: "3,480", meta: "+240 this week", icon: "⭐" },
-  { label: "Global Rank", value: "#248", meta: "↑ 31 positions", icon: "🏆" },
+  { label: "Problems Solved", value: "147",   meta: "+12 this week",  icon: "⚡", color: "violet" },
+  { label: "Current Streak",  value: "14",    meta: "days in a row",  icon: "🔥", color: "rose"   },
+  { label: "XP Points",       value: "3,480", meta: "+240 this week", icon: "⭐", color: "amber"  },
+  { label: "Global Rank",     value: "#248",  meta: "↑ 31 positions", icon: "🏆", color: "blue"   },
 ];
 
 const TOPICS = [
-  { name: "Arrays", pct: 85 },
-  { name: "Trees", pct: 70 },
-  { name: "Graphs", pct: 45 },
-  { name: "Heaps", pct: 60 },
+  { name: "Arrays",  pct: 85 },
+  { name: "Trees",   pct: 70 },
+  { name: "Graphs",  pct: 45 },
+  { name: "Heaps",   pct: 60 },
   { name: "Sorting", pct: 92 },
-  { name: "DP", pct: 30 },
+  { name: "DP",      pct: 30 },
 ];
 
 const COURSES = [
-  {
-    id: "dsa",
-    title: "DSA Masterclass",
-    done: 42,
-    total: 60,
-    tags: "Arrays · Trees · Graphs",
-    href: "/company-questions",
-  },
-  {
-    id: "visual",
-    title: "Visualizer Practice",
-    done: 18,
-    total: 30,
-    tags: "Stack · Queue · Linked List",
-    href: "/visualizer",
-  },
+  { id: "dsa",    title: "DSA Masterclass",     done: 42, total: 60, tags: "Arrays · Trees · Graphs",      href: "/company-questions" },
+  { id: "visual", title: "Visualizer Practice", done: 18, total: 30, tags: "Stack · Queue · Linked List",  href: "/visualizer"        },
 ];
 
 const LEADERBOARD = [
-  { rank: 1, initials: "RK", name: "Rahul K.", xp: "4,920" },
-  { rank: 2, initials: "PS", name: "Priya S.", xp: "4,310" },
-  { rank: 3, initials: "MV", name: "Manav V.", xp: "4,100" },
-  { rank: 12, initials: "A", name: "You", xp: "3,480", isMe: true },
+  { rank: 1,  initials: "RK", name: "Rahul K.",  xp: "4,920", isMe: false },
+  { rank: 2,  initials: "PS", name: "Priya S.",  xp: "4,310", isMe: false },
+  { rank: 3,  initials: "MV", name: "Manav V.",  xp: "4,100", isMe: false },
+  { rank: 12, initials: "A",  name: "You",       xp: "3,480", isMe: true  },
 ];
 
-const NAV = [
-  { label: "Home", icon: "⌂", href: "/" },
-  { label: "Data Structures", icon: "◉", href: "/company-questions" },
-  { label: "Stack", icon: "↳", href: "/visualizer/stack" },
-  { label: "Queue", icon: "▱", href: "/visualizer/queue" },
-  { label: "Sorting", icon: "⇅", href: "/visualizer/sorting" },
-  { label: "Linked List", icon: "☷", href: "/visualizer/linked-list" },
-  { label: "Binary Search Tree", icon: "⌘", href: "/visualizer/tree" },
-  { label: "Heap", icon: "▰", href: "/visualizer/heap" },
+const NAV_GROUPS = [
+  {
+    label: "Navigation",
+    items: [
+      { label: "Home",          icon: "⌂", href: "/"                    },
+      { label: "Dashboard",     icon: "◈", href: "/dashboard"            },
+      { label: "Data Structures", icon: "◉", href: "/company-questions" },
+    ],
+  },
+  {
+    label: "Data Structures",
+    items: [
+      { label: "Stack",              icon: "↳", href: "/visualizer/stack"       },
+      { label: "Queue",              icon: "▱", href: "/visualizer/queue"       },
+      { label: "Sorting",            icon: "⇅", href: "/visualizer/sorting"     },
+      { label: "Linked List",        icon: "☷", href: "/visualizer/linked-list" },
+      { label: "Binary Search Tree", icon: "⌘", href: "/visualizer/tree"        },
+      { label: "Heap",               icon: "▰", href: "/visualizer/heap"        },
+    ],
+  },
 ];
 
 const ACTIVITY = [
-  0, 1, 2, 1, 3, 4, 1, 0, 2, 3, 4, 2,
-  1, 3, 4, 4, 2, 1, 0, 1, 2, 3, 4, 3,
-  2, 1, 3, 4, 2, 0, 1, 2, 4, 3, 2, 1,
-  0, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 0,
-  2, 4, 3, 2, 1, 0, 1, 3, 4, 2, 1, 0,
+  0,1,2,1,3,4,1,0,2,3,4,2,
+  1,3,4,4,2,1,0,1,2,3,4,3,
+  2,1,3,4,2,0,1,2,4,3,2,1,
+  0,2,3,4,4,3,2,1,1,2,3,0,
+  2,4,3,2,1,0,1,3,4,2,1,0,
 ];
 
-function Sidebar() {
+const WEEK_DAYS = ["S","M","T","W","T","F","S"];
+
+// ── Helpers ───────────────────────────────────────────────────
+function cn(...c: (string | false | null | undefined)[]) {
+  return c.filter(Boolean).join(" ");
+}
+
+// ── Sidebar ───────────────────────────────────────────────────
+function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const pathname = usePathname();
 
   return (
-    <aside className="am-sidebar">
-      <div className="am-logo">
-        <div className="am-logo-mark">☊</div>
-        <span>AlgoMaitri</span>
-      </div>
+    <>
+      {open && (
+        <div
+          className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
+          onClick={onClose}
+        />
+      )}
+      <aside className={cn(
+        "fixed left-0 top-0 z-40 flex h-full w-[260px] flex-col border-r border-white/[0.07] bg-[rgba(10,10,16,0.97)] backdrop-blur-2xl transition-transform duration-300 lg:static lg:translate-x-0",
+        open ? "translate-x-0" : "-translate-x-full"
+      )}>
 
-      <div className="am-nav-label">Navigation</div>
+        {/* Logo */}
+        <div className="flex items-center gap-3 border-b border-white/[0.06] px-5 py-5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-blue-600 text-base font-bold text-white shadow-[0_0_24px_rgba(139,92,246,0.4)]">
+            ☊
+          </div>
+          <span className="text-[15px] font-extrabold tracking-tight text-white">AlgoMaitri</span>
+        </div>
 
-      <nav className="am-nav">
-        {NAV.map((item) => {
-          const active = pathname === item.href;
+        {/* Nav groups */}
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+          {NAV_GROUPS.map(group => (
+            <div key={group.label}>
+              <p className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-[0.20em] text-white/25">
+                {group.label}
+              </p>
+              <div className="space-y-0.5">
+                {group.items.map(item => {
+                  const active = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold transition-all duration-150",
+                        active
+                          ? "bg-gradient-to-r from-violet-600/25 to-blue-600/15 text-white shadow-[inset_0_0_0_1px_rgba(139,92,246,0.30)]"
+                          : "text-white/45 hover:bg-white/[0.05] hover:text-white/80"
+                      )}
+                    >
+                      <span className="w-4 shrink-0 text-center text-sm opacity-60">{item.icon}</span>
+                      {item.label}
+                      {active && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-violet-400" />}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`am-nav-item ${active ? "active" : ""}`}
-            >
-              <span>{item.icon}</span>
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-    
-    </aside>
+        {/* User footer */}
+        <div className="border-t border-white/[0.07] px-4 py-4">
+          <div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.03] px-3 py-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-sm font-bold text-white">A</div>
+            <div className="min-w-0">
+              <p className="truncate text-[13px] font-semibold text-white">You</p>
+              <p className="text-[11px] text-white/35">Rank #248 · 3,480 XP</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }
 
+// ── Stat card ──────────────────────────────────────────────────
 function StatCard({ s }: { s: typeof STATS[number] }) {
+  const styles: Record<string, { glow: string; iconBg: string; val: string; border: string }> = {
+    violet: { glow: "shadow-[0_0_35px_rgba(139,92,246,0.10)]", iconBg: "bg-violet-500/15 text-violet-300", val: "text-violet-300", border: "border-violet-500/15" },
+    rose:   { glow: "shadow-[0_0_35px_rgba(244,63,94,0.08)]",  iconBg: "bg-rose-500/15 text-rose-300",     val: "text-rose-300",   border: "border-rose-500/15"   },
+    amber:  { glow: "shadow-[0_0_35px_rgba(251,191,36,0.08)]", iconBg: "bg-amber-400/15 text-amber-300",   val: "text-amber-300",  border: "border-amber-400/15"  },
+    blue:   { glow: "shadow-[0_0_35px_rgba(59,130,246,0.08)]", iconBg: "bg-blue-500/15 text-blue-300",     val: "text-blue-300",   border: "border-blue-500/15"   },
+  };
+  const st = styles[s.color];
   return (
-    <div className="am-stat-card">
-      <div className="am-stat-icon">{s.icon}</div>
-      <div>
-        <p>{s.label}</p>
-        <h3>{s.value}</h3>
-        <span>{s.meta}</span>
+    <div className={cn(
+      "relative overflow-hidden rounded-[24px] border bg-[rgba(14,14,20,0.85)] p-5 backdrop-blur-xl",
+      st.border, st.glow
+    )}>
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/30">{s.label}</p>
+          <div className={cn("mt-3 font-mono text-3xl font-black tracking-tight", st.val)}>{s.value}</div>
+          <p className="mt-1 text-[11px] text-white/30">{s.meta}</p>
+        </div>
+        <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl text-xl", st.iconBg)}>
+          {s.icon}
+        </div>
       </div>
     </div>
   );
 }
 
+// ── Topic progress ─────────────────────────────────────────────
 function TopicProgress() {
   return (
-    <section className="am-card">
-      <div className="am-card-head">
-        <h2>Topic Progress</h2>
-        <Link href="/company-questions">View all</Link>
+    <section className="relative overflow-hidden rounded-[24px] border border-white/[0.08] bg-[rgba(14,14,20,0.85)] p-6 backdrop-blur-xl h-full">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/30 to-transparent" />
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-[15px] font-bold bg-gradient-to-r from-violet-300 to-blue-300 bg-clip-text text-transparent">Topic Progress</h2>
+        <Link href="/company-questions" className="text-[12px] font-semibold text-violet-400 hover:text-violet-300 transition-colors">View all →</Link>
       </div>
-
-      <div className="am-topic-list">
-        {TOPICS.map((t) => (
-          <div className="am-topic" key={t.name}>
-            <div className="am-topic-top">
-              <span>{t.name}</span>
-              <strong>{t.pct}%</strong>
+      <div className="space-y-4">
+        {TOPICS.map(t => (
+          <div key={t.name}>
+            <div className="mb-1.5 flex items-center justify-between">
+              <span className="text-[13px] font-medium text-white/65">{t.name}</span>
+              <span className="font-mono text-[12px] font-bold text-violet-400">{t.pct}%</span>
             </div>
-            <div className="am-progress">
-              <div style={{ width: `${t.pct}%` }} />
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-violet-600 to-blue-500 transition-all duration-700"
+                style={{ width: `${t.pct}%` }}
+              />
             </div>
           </div>
         ))}
@@ -139,79 +200,149 @@ function TopicProgress() {
   );
 }
 
+// ── Streak card ────────────────────────────────────────────────
 function StreakCard() {
+  const today = new Date().getDay();
   return (
-    <section className="am-card am-streak-card">
-      <div className="am-card-head">
-        <h2>Daily Streak</h2>
+    <section className="relative overflow-hidden rounded-[24px] border border-white/[0.08] bg-[rgba(14,14,20,0.85)] p-6 backdrop-blur-xl text-center h-full">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-rose-400/30 to-transparent" />
+      <div className="absolute -top-10 left-1/2 -translate-x-1/2 h-28 w-28 rounded-full bg-rose-500/8 blur-3xl" />
+      <div className="relative mb-5 flex items-center justify-between">
+        <h2 className="text-[15px] font-bold bg-gradient-to-r from-rose-300 to-orange-300 bg-clip-text text-transparent">Daily Streak</h2>
+        <span className="rounded-full border border-rose-500/25 bg-rose-500/10 px-2.5 py-1 text-[10px] font-bold text-rose-400">🔥 Active</span>
       </div>
+      <div className="relative my-2 font-mono text-[64px] font-black leading-none tracking-tighter bg-gradient-to-br from-rose-300 to-orange-300 bg-clip-text text-transparent">
+        14
+      </div>
+      <p className="mb-5 text-[12px] font-semibold text-white/35">days in a row</p>
+      <div className="grid grid-cols-7 gap-1.5">
+        {WEEK_DAYS.map((d, i) => {
+          const done = i <= today;
+          return (
+            <div key={i} className="flex flex-col items-center gap-1.5">
+              <div className={cn(
+                "flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold",
+                done
+                  ? "bg-gradient-to-br from-rose-500 to-orange-500 text-white shadow-[0_0_12px_rgba(244,63,94,0.35)]"
+                  : "bg-white/[0.04] text-white/15 border border-white/[0.06]"
+              )}>
+                {done ? "✓" : ""}
+              </div>
+              <span className="text-[9px] text-white/25">{d}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-4 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2.5 text-[12px] text-white/30">
+        🏆 Best streak: <span className="font-bold text-white/50">21 days</span>
+      </div>
+    </section>
+  );
+}
 
-      <div className="am-streak-number">14</div>
-      <p>day streak 🔥</p>
-
-      <div className="am-week">
-        {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
-          <div key={i} className={i <= new Date().getDay() ? "done" : ""}>
-            <span>{i <= new Date().getDay() ? "✓" : ""}</span>
-            <small>{d}</small>
+// ── Activity heatmap ───────────────────────────────────────────
+function ActivityHeatmap() {
+  const heatCls = [
+    "bg-white/[0.04]",
+    "bg-violet-500/22",
+    "bg-violet-500/42",
+    "bg-violet-500/65",
+    "bg-violet-600 shadow-[0_0_5px_rgba(139,92,246,0.45)]",
+  ];
+  return (
+    <section className="relative overflow-hidden rounded-[24px] border border-white/[0.08] bg-[rgba(14,14,20,0.85)] p-6 backdrop-blur-xl h-full">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/30 to-transparent" />
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-[15px] font-bold bg-gradient-to-r from-blue-300 to-violet-300 bg-clip-text text-transparent">Activity</h2>
+        <div className="flex items-center gap-1 text-[10px] text-white/20">
+          <span>Less</span>
+          {[0,1,2,3,4].map(v => <div key={v} className={cn("h-2.5 w-2.5 rounded-sm", heatCls[v])} />)}
+          <span>More</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-12 gap-[5px]">
+        {ACTIVITY.map((lvl, i) => (
+          <div
+            key={i}
+            className={cn("aspect-square rounded-[4px] cursor-default transition-transform hover:scale-110", heatCls[lvl])}
+            title={`Level ${lvl}`}
+          />
+        ))}
+      </div>
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        {[{ label: "Active days", value: "18" }, { label: "Problems solved", value: "47" }].map(s => (
+          <div key={s.label} className="rounded-xl border border-white/[0.05] bg-white/[0.03] px-3 py-3 text-center">
+            <div className="font-mono text-xl font-black text-violet-300">{s.value}</div>
+            <div className="mt-0.5 text-[11px] text-white/30">{s.label}</div>
           </div>
         ))}
       </div>
-
-      <div className="am-mini-note">Best streak: 21 days</div>
     </section>
   );
 }
 
-function ActivityHeatmap() {
+// ── XP level bar ───────────────────────────────────────────────
+function XPCard() {
+  const xp = 3480, next = 4000;
+  const pct = Math.round((xp / next) * 100);
   return (
-    <section className="am-card">
-      <div className="am-card-head">
-        <h2>Activity</h2>
-      </div>
-
-      <div className="am-heatmap">
-        {ACTIVITY.map((lvl, i) => (
-          <span key={i} className={`lvl-${lvl}`} />
-        ))}
-      </div>
-
-      <div className="am-activity-stats">
-        <div>
-          <strong>18</strong>
-          <span>Active days</span>
+    <div className="relative overflow-hidden rounded-[24px] border border-amber-400/18 bg-[linear-gradient(130deg,rgba(251,191,36,0.07),rgba(139,92,246,0.05))] p-5 backdrop-blur-xl">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/35 to-transparent" />
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3 mb-2.5">
+            <span className="text-[10px] font-bold uppercase tracking-[0.20em] text-amber-400/55">Level Progress</span>
+            <span className="rounded-full bg-amber-400/12 border border-amber-400/20 px-2 py-0.5 text-[10px] font-bold text-amber-300">Lv. 7</span>
+          </div>
+          <div className="mb-2 flex items-baseline gap-2">
+            <span className="font-mono text-2xl font-black text-amber-300">{xp.toLocaleString()}</span>
+            <span className="text-[12px] text-white/25">/ {next.toLocaleString()} XP to Lv. 8</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-white/[0.05]">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-700"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <p className="mt-1 text-right text-[11px] font-mono text-amber-400/45">{pct}%</p>
         </div>
-        <div>
-          <strong>47</strong>
-          <span>Problems</span>
-        </div>
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-400/12 border border-amber-400/18 text-3xl">⭐</div>
       </div>
-    </section>
+    </div>
   );
 }
 
+// ── Courses card ───────────────────────────────────────────────
 function CoursesCard() {
   return (
-    <section className="am-card">
-      <div className="am-card-head">
-        <h2>Continue Learning</h2>
-        <Link href="/company-questions">Browse</Link>
+    <section className="relative overflow-hidden rounded-[24px] border border-white/[0.08] bg-[rgba(14,14,20,0.85)] p-6 backdrop-blur-xl">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/30 to-transparent" />
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-[15px] font-bold bg-gradient-to-r from-violet-300 to-blue-300 bg-clip-text text-transparent">Continue Learning</h2>
+        <Link href="/company-questions" className="text-[12px] font-semibold text-violet-400 hover:text-violet-300 transition-colors">Browse →</Link>
       </div>
-
-      <div className="am-course-list">
-        {COURSES.map((c) => {
+      <div className="space-y-3">
+        {COURSES.map(c => {
           const pct = Math.round((c.done / c.total) * 100);
-
           return (
-            <Link href={c.href} key={c.id} className="am-course">
-              <div>
-                <h3>{c.title}</h3>
-                <p>{c.done} / {c.total} lessons · {c.tags}</p>
-                <div className="am-progress">
-                  <div style={{ width: `${pct}%` }} />
+            <Link
+              href={c.href}
+              key={c.id}
+              className="group flex items-center gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4 transition-all hover:border-violet-500/25 hover:bg-violet-500/[0.06]"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <h3 className="truncate text-[14px] font-semibold text-white/80 group-hover:text-white transition-colors">{c.title}</h3>
+                  <span className="shrink-0 font-mono text-[20px] font-black text-violet-400">{pct}%</span>
+                </div>
+                <p className="mb-2.5 text-[12px] text-white/30">{c.done}/{c.total} lessons · {c.tags}</p>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-violet-600 to-blue-500 transition-all duration-700"
+                    style={{ width: `${pct}%` }}
+                  />
                 </div>
               </div>
-              <strong>{pct}%</strong>
             </Link>
           );
         })}
@@ -220,21 +351,45 @@ function CoursesCard() {
   );
 }
 
+// ── Leaderboard ────────────────────────────────────────────────
 function LeaderboardCard() {
-  return (
-    <section className="am-card">
-      <div className="am-card-head">
-        <h2>Leaderboard</h2>
-        <span>Weekly</span>
-      </div>
+  const rankStyle = (r: number) =>
+    r === 1 ? "bg-amber-400/18 text-amber-300 border-amber-400/28" :
+    r === 2 ? "bg-white/[0.06] text-white/45 border-white/10" :
+    r === 3 ? "bg-orange-500/14 text-orange-300 border-orange-500/22" :
+              "bg-violet-500/10 text-violet-300 border-violet-500/22";
 
-      <div className="am-leader-list">
-        {LEADERBOARD.map((u) => (
-          <div key={u.rank} className={`am-leader ${u.isMe ? "me" : ""}`}>
-            <span className="rank">#{u.rank}</span>
-            <div className="avatar">{u.initials}</div>
-            <p>{u.name}</p>
-            <strong>{u.xp} xp</strong>
+  return (
+    <section className="relative overflow-hidden rounded-[24px] border border-white/[0.08] bg-[rgba(14,14,20,0.85)] p-6 backdrop-blur-xl">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-[15px] font-bold bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">Leaderboard</h2>
+        <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2.5 py-1 text-[10px] font-bold text-amber-400">Weekly</span>
+      </div>
+      <div className="space-y-2">
+        {LEADERBOARD.map(u => (
+          <div
+            key={u.rank}
+            className={cn(
+              "flex items-center gap-3 rounded-2xl border px-4 py-3 transition-all",
+              u.isMe
+                ? "border-violet-500/28 bg-violet-500/[0.09] shadow-[0_0_18px_rgba(139,92,246,0.07)]"
+                : "border-white/[0.05] bg-white/[0.025]"
+            )}
+          >
+            <span className={cn("flex h-7 w-8 shrink-0 items-center justify-center rounded-lg border text-[10px] font-black", rankStyle(u.rank))}>
+              #{u.rank}
+            </span>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-[11px] font-black text-white">
+              {u.initials}
+            </div>
+            <p className={cn("flex-1 text-[13px] font-semibold", u.isMe ? "text-violet-200" : "text-white/60")}>
+              {u.name}
+              {u.isMe && <span className="ml-1.5 text-[10px] text-violet-400/60 font-normal">(you)</span>}
+            </p>
+            <span className={cn("font-mono text-[12px] font-bold", u.isMe ? "text-violet-300" : "text-white/30")}>
+              {u.xp} xp
+            </span>
           </div>
         ))}
       </div>
@@ -242,524 +397,111 @@ function LeaderboardCard() {
   );
 }
 
+// ── Root dashboard ─────────────────────────────────────────────
 export default function DashboardClient() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const hour = new Date().getHours();
-  const greeting =
-    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   return (
-    <>
-      <style>{`
-        .am-root {
-          min-height: 100vh;
-          display: grid;
-          grid-template-columns: 265px 1fr;
-          background:
-            radial-gradient(circle at 20% 0%, rgba(124, 92, 255, 0.18), transparent 35%),
-            radial-gradient(circle at 85% 15%, rgba(79, 140, 255, 0.16), transparent 38%),
-            #08080c;
-          color: #f7f7fb;
-          font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        }
-
-        .am-sidebar {
-          height: 100vh;
-          position: sticky;
-          top: 0;
-          background: rgba(20, 20, 27, 0.92);
-          border-right: 1px solid rgba(255,255,255,0.08);
-          padding: 24px 16px;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .am-logo {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          font-size: 16px;
-          font-weight: 800;
-          padding: 10px 12px 28px;
-        }
-
-        .am-logo-mark {
-          width: 30px;
-          height: 30px;
-          border-radius: 10px;
-          display: grid;
-          place-items: center;
-          background: linear-gradient(135deg, #c084fc, #60a5fa);
-          color: white;
-          box-shadow: 0 0 30px rgba(168,85,247,0.35);
-        }
-
-        .am-nav-label {
-          color: #a1a1aa;
-          font-size: 13px;
-          margin: 8px 0 10px;
-        }
-
-        .am-nav {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-          flex: 1;
-        }
-
-        .am-nav-item {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          color: #e5e7eb;
-          text-decoration: none;
-          padding: 10px 12px;
-          border-radius: 12px;
-          font-size: 15px;
-          font-weight: 600;
-          transition: 0.2s ease;
-        }
-
-        .am-nav-item span {
-          width: 18px;
-          opacity: 0.9;
-        }
-
-        .am-nav-item:hover,
-        .am-nav-item.active {
-          background: rgba(124, 92, 255, 0.18);
-          color: #ffffff;
-        }
-
-        .am-user {
-          border-top: 1px solid rgba(255,255,255,0.08);
-          padding-top: 18px;
-        }
-
-        .am-user-avatar {
-          width: 38px;
-          height: 38px;
-          border-radius: 999px;
-          background: #050507;
-          border: 1px solid rgba(255,255,255,0.14);
-          display: grid;
-          place-items: center;
-          font-weight: 800;
-        }
-
-        .am-main {
-          padding: 34px 42px 48px;
-        }
-
-        .am-topbar {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          color: #a1a1aa;
-          font-size: 15px;
-          margin-bottom: 22px;
-        }
-
-        .am-hero {
-          max-width: 850px;
-          margin-bottom: 28px;
-        }
-
-        .am-pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 7px 17px;
-          border-radius: 999px;
-          border: 1px solid rgba(168,85,247,0.45);
-          background: rgba(124, 58, 237, 0.16);
-          color: #c4b5fd;
-          font-size: 12px;
-          font-weight: 800;
-          letter-spacing: 3px;
-          text-transform: uppercase;
-          margin-bottom: 22px;
-        }
-
-        .am-hero h1 {
-          font-size: clamp(42px, 5vw, 72px);
-          line-height: 0.95;
-          letter-spacing: -0.06em;
-          margin: 0;
-          font-weight: 900;
-        }
-
-        .am-gradient-text {
-          background: linear-gradient(90deg, #d8b4fe, #60a5fa);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-
-        .am-hero p {
-          max-width: 650px;
-          color: #b6b6c3;
-          font-size: 18px;
-          line-height: 1.6;
-          margin-top: 20px;
-        }
-
-        .am-stats-grid {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 16px;
-          margin: 30px 0;
-        }
-
-        .am-stat-card {
-          background: rgba(255,255,255,0.035);
-          border: 1px solid rgba(255,255,255,0.09);
-          border-radius: 22px;
-          padding: 20px;
-          display: flex;
-          gap: 16px;
-          align-items: flex-start;
-          box-shadow: 0 18px 60px rgba(0,0,0,0.25);
-        }
-
-        .am-stat-icon {
-          width: 42px;
-          height: 42px;
-          border-radius: 15px;
-          background: rgba(124, 92, 255, 0.18);
-          display: grid;
-          place-items: center;
-        }
-
-        .am-stat-card p {
-          margin: 0 0 8px;
-          color: #a1a1aa;
-          font-size: 13px;
-        }
-
-        .am-stat-card h3 {
-          margin: 0;
-          font-size: 28px;
-          letter-spacing: -0.04em;
-        }
-
-        .am-stat-card span {
-          color: #8b8b98;
-          font-size: 12px;
-        }
-
-        .am-grid {
-          display: grid;
-          grid-template-columns: 1.1fr 0.9fr 0.9fr;
-          gap: 18px;
-          margin-bottom: 18px;
-        }
-
-        .am-bottom-grid {
-          display: grid;
-          grid-template-columns: 1.5fr 1fr;
-          gap: 18px;
-        }
-
-        .am-card {
-          background: rgba(15,15,22,0.78);
-          border: 1px solid rgba(255,255,255,0.09);
-          border-radius: 24px;
-          padding: 22px;
-          box-shadow: 0 24px 80px rgba(0,0,0,0.28);
-          backdrop-filter: blur(18px);
-        }
-
-        .am-card-head {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 18px;
-        }
-
-        .am-card-head h2 {
-          margin: 0;
-          font-size: 18px;
-          letter-spacing: -0.03em;
-        }
-
-        .am-card-head a,
-        .am-card-head span {
-          color: #a78bfa;
-          text-decoration: none;
-          font-size: 13px;
-          font-weight: 700;
-        }
-
-        .am-topic-list {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-
-        .am-topic-top {
-          display: flex;
-          justify-content: space-between;
-          font-size: 14px;
-          margin-bottom: 7px;
-        }
-
-        .am-topic-top strong {
-          color: #a78bfa;
-        }
-
-        .am-progress {
-          height: 8px;
-          background: rgba(255,255,255,0.07);
-          border-radius: 999px;
-          overflow: hidden;
-        }
-
-        .am-progress div {
-          height: 100%;
-          border-radius: 999px;
-          background: linear-gradient(90deg, #a78bfa, #60a5fa);
-        }
-
-        .am-streak-card {
-          text-align: center;
-        }
-
-        .am-streak-number {
-          font-size: 70px;
-          line-height: 1;
-          font-weight: 900;
-          letter-spacing: -0.08em;
-          background: linear-gradient(90deg, #c084fc, #60a5fa);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-
-        .am-streak-card p {
-          margin: 8px 0 20px;
-          color: #a1a1aa;
-          font-weight: 700;
-        }
-
-        .am-week {
-          display: grid;
-          grid-template-columns: repeat(7, 1fr);
-          gap: 6px;
-        }
-
-        .am-week div {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 6px;
-          color: #71717a;
-          font-size: 11px;
-        }
-
-        .am-week span {
-          width: 28px;
-          height: 28px;
-          border-radius: 999px;
-          background: rgba(255,255,255,0.07);
-          display: grid;
-          place-items: center;
-          color: white;
-        }
-
-        .am-week .done span {
-          background: linear-gradient(135deg, #a78bfa, #60a5fa);
-          box-shadow: 0 0 20px rgba(124,92,255,0.35);
-        }
-
-        .am-mini-note {
-          margin-top: 18px;
-          color: #a1a1aa;
-          font-size: 13px;
-        }
-
-        .am-heatmap {
-          display: grid;
-          grid-template-columns: repeat(10, 1fr);
-          gap: 5px;
-        }
-
-        .am-heatmap span {
-          aspect-ratio: 1;
-          border-radius: 5px;
-          background: rgba(255,255,255,0.06);
-        }
-
-        .am-heatmap .lvl-1 { background: rgba(124,92,255,0.22); }
-        .am-heatmap .lvl-2 { background: rgba(124,92,255,0.42); }
-        .am-heatmap .lvl-3 { background: rgba(124,92,255,0.68); }
-        .am-heatmap .lvl-4 { background: #8b5cf6; }
-
-        .am-activity-stats {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 10px;
-          margin-top: 20px;
-        }
-
-        .am-activity-stats div {
-          background: rgba(255,255,255,0.045);
-          border-radius: 16px;
-          padding: 14px;
-          text-align: center;
-        }
-
-        .am-activity-stats strong {
-          display: block;
-          font-size: 24px;
-        }
-
-        .am-activity-stats span {
-          color: #a1a1aa;
-          font-size: 12px;
-        }
-
-        .am-course-list,
-        .am-leader-list {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .am-course {
-          text-decoration: none;
-          color: white;
-          display: flex;
-          justify-content: space-between;
-          gap: 20px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 18px;
-          padding: 18px;
-        }
-
-        .am-course h3 {
-          margin: 0 0 6px;
-          font-size: 17px;
-        }
-
-        .am-course p {
-          color: #a1a1aa;
-          margin: 0 0 12px;
-          font-size: 13px;
-        }
-
-        .am-course strong {
-          color: #a78bfa;
-          font-size: 22px;
-        }
-
-        .am-leader {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 12px;
-          border-radius: 16px;
-          background: rgba(255,255,255,0.04);
-        }
-
-        .am-leader.me {
-          background: rgba(124,92,255,0.16);
-          border: 1px solid rgba(168,85,247,0.32);
-        }
-
-        .rank {
-          width: 38px;
-          color: #a78bfa;
-          font-weight: 800;
-        }
-
-        .avatar {
-          width: 36px;
-          height: 36px;
-          border-radius: 999px;
-          display: grid;
-          place-items: center;
-          background: linear-gradient(135deg, #a78bfa, #60a5fa);
-          font-weight: 800;
-        }
-
-        .am-leader p {
-          flex: 1;
-          margin: 0;
-          font-weight: 700;
-        }
-
-        .am-leader strong {
-          color: #a1a1aa;
-          font-size: 13px;
-        }
-
-        @media (max-width: 1100px) {
-          .am-root {
-            grid-template-columns: 1fr;
-          }
-
-          .am-sidebar {
-            display: none;
-          }
-
-          .am-main {
-            padding: 24px;
-          }
-
-          .am-stats-grid,
-          .am-grid,
-          .am-bottom-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .am-hero h1 {
-            font-size: 44px;
-          }
-        }
-      `}</style>
-
-      <div className="am-root">
-        <Sidebar />
-
-        <main className="am-main">
-          <div className="am-topbar">
+    <div
+      className="flex min-h-screen"
+      style={{
+        background: `
+          radial-gradient(circle at 18% 0%,  rgba(124,58,237,0.18) 0%,  transparent 36%),
+          radial-gradient(circle at 82% 12%, rgba(59,130,246,0.14)  0%,  transparent 34%),
+          radial-gradient(circle at 50% 90%, rgba(139,92,246,0.06)  0%,  transparent 40%),
+          #08080c
+        `,
+        fontFamily: `Inter, ui-sans-serif, system-ui, -apple-system, sans-serif`,
+      }}
+    >
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      <main className="flex-1 min-w-0 overflow-x-hidden px-5 py-6 md:px-8 md:py-8 lg:px-10">
+
+        {/* Topbar */}
+        <div className="mb-6 flex items-center gap-3">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.04] text-white/40 hover:text-white transition-colors lg:hidden"
+          >
+            ☰
+          </button>
+          <nav className="flex items-center gap-2 text-[12px] text-white/25">
             <span>▣</span>
             <span>/</span>
-            <span>Dashboard</span>
+            <span className="text-white/50 font-medium">Dashboard</span>
+          </nav>
+        </div>
+
+        {/* ── Hero ── */}
+        <section className="relative mb-7 overflow-hidden rounded-[32px] border border-white/[0.08] bg-[rgba(12,12,18,0.88)] p-6 backdrop-blur-2xl md:p-8">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.14),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.09),transparent_28%)]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/30 to-transparent" />
+          <div className="absolute -top-14 left-8 h-44 w-44 rounded-full bg-violet-600/7 blur-3xl" />
+          <div className="absolute -bottom-8 right-8 h-32 w-32 rounded-full bg-blue-500/8 blur-3xl" />
+
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-500/22 bg-violet-500/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.20em] text-violet-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-violet-400 animate-pulse" />
+                ⚡ Learning Dashboard
+              </div>
+              <h1
+                className="text-[clamp(36px,5vw,58px)] font-black text-white"
+                style={{ letterSpacing: "-0.05em", lineHeight: "1.04" }}
+              >
+                {greeting},
+                <br />
+                <span className="bg-gradient-to-r from-violet-300 via-fuchsia-300 to-blue-300 bg-clip-text text-transparent">
+                  Keep building.
+                </span>
+              </h1>
+              <p className="mt-4 max-w-lg text-[15px] leading-[1.7] text-white/35">
+                Track your DSA progress, continue visual lessons, monitor your streak,
+                and stay consistent with AlgoMaitri practice.
+              </p>
+            </div>
+
+            <div className="flex shrink-0 flex-col gap-2.5 sm:flex-row lg:flex-col">
+              <Link
+                href="/visualizer"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-violet-600 to-blue-600 px-6 py-3 text-[14px] font-bold text-white shadow-[0_8px_24px_rgba(139,92,246,0.28)] transition-all hover:shadow-[0_12px_32px_rgba(139,92,246,0.38)] hover:-translate-y-0.5"
+              >
+                Continue Practice →
+              </Link>
+              <Link
+                href="/company-questions"
+                className="inline-flex items-center justify-center rounded-2xl border border-white/[0.09] bg-white/[0.04] px-6 py-3 text-[14px] font-bold text-white/60 transition-all hover:bg-white/[0.07] hover:text-white"
+              >
+                Browse Problems
+              </Link>
+            </div>
           </div>
+        </section>
 
-          <section className="am-hero">
-            <div className="am-pill">⚡ Learning Dashboard</div>
+        {/* ── Stat cards ── */}
+        <div className="mb-5 grid grid-cols-2 gap-4 xl:grid-cols-4">
+          {STATS.map(s => <StatCard key={s.label} s={s} />)}
+        </div>
 
-            <h1>
-              {greeting}, 
-              <br />
-              Keep building.
-            </h1>
+        {/* ── XP bar ── */}
+        <div className="mb-5"><XPCard /></div>
 
-            <p>
-              Track your DSA progress, continue your visual lessons, monitor your streak,
-              and stay consistent with AlgoMaitri practice.
-            </p>
-          </section>
+        {/* ── Main 3-col grid ── */}
+        <div className="mb-5 grid grid-cols-1 gap-5 lg:grid-cols-3">
+          <TopicProgress />
+          <StreakCard />
+          <ActivityHeatmap />
+        </div>
 
-          <section className="am-stats-grid">
-            {STATS.map((s) => (
-              <StatCard s={s} key={s.label} />
-            ))}
-          </section>
-
-          <section className="am-grid">
-            <TopicProgress />
-            <StreakCard />
-            <ActivityHeatmap />
-          </section>
-
-          <section className="am-bottom-grid">
-            <CoursesCard />
-            <LeaderboardCard />
-          </section>
-        </main>
-      </div>
-    </>
+        {/* ── Bottom 2-col ── */}
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.4fr_1fr]">
+          <CoursesCard />
+          <LeaderboardCard />
+        </div>
+      </main>
+    </div>
   );
 }
