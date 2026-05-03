@@ -13,7 +13,14 @@ import { MarkdownContent } from "@/components/shared/markdown-content"
 import { useAlgorithmFeedback } from "@/hooks/use-algorithm-feedback"
 import { Sparkles } from "lucide-react"
 
-const EXAMPLE_EXPRESSION = "K+L-M*N+(O^P)*W/U/V*T+Q"
+const EXAMPLE_EXPRESSION = "A+B*C-D"
+const MAX_LENGTH = 10
+
+// ── Only these characters are allowed in an infix expression ─────────────────
+// Operands : A-Z  a-z  0-9
+// Operators : + - * / ^
+// Grouping  : ( )
+const VALID_CHAR_REGEX = /^[A-Za-z0-9+\-*/^()]*$/
 
 interface InfixPostfixVisualizerProps {
   content: React.ReactNode
@@ -21,6 +28,9 @@ interface InfixPostfixVisualizerProps {
 
 export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps) {
   const [expression, setExpression] = useState("")
+  const [invalidChar, setInvalidChar] = useState<string | null>(null)
+  const invalidTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   const { steps, isConverting, result, convert } = useInfixConversion()
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
   const wasConvertingRef = useRef(false)
@@ -36,17 +46,55 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
     }
   }, [isConverting, steps.length, stepSound, endSound, showEndMessage])
 
+  // Clear invalid-char warning after 2 s
+  const flashInvalid = (char: string) => {
+    setInvalidChar(char)
+    if (invalidTimerRef.current) clearTimeout(invalidTimerRef.current)
+    invalidTimerRef.current = setTimeout(() => setInvalidChar(null), 2000)
+  }
+
+  const handleExpressionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value
+
+    // Find any character that is NOT allowed
+    const badChar = raw.split("").find((ch) => !VALID_CHAR_REGEX.test(ch))
+    if (badChar !== undefined) {
+      flashInvalid(badChar === " " ? "space" : `"${badChar}"`)
+      // Strip all invalid chars and still apply the result (up to MAX_LENGTH)
+      const cleaned = raw
+        .split("")
+        .filter((ch) => VALID_CHAR_REGEX.test(ch))
+        .join("")
+        .slice(0, MAX_LENGTH)
+      setExpression(cleaned)
+      return
+    }
+
+    // Valid chars — just enforce length
+    if (raw.length <= MAX_LENGTH) {
+      setExpression(raw)
+    }
+    // If already at limit, do nothing (no state update = no glow / re-render)
+  }
+
+  const handleUseExample = () => {
+    setExpression(EXAMPLE_EXPRESSION.slice(0, MAX_LENGTH))
+    setInvalidChar(null)
+  }
+
   const handleConvert = () => {
     if (!expression.trim() || isConverting) return
     convert(expression)
   }
 
-  const formatResult = (tokens: Token[]) => {
-    return tokens.map((t) => t.value).join(" ")
-  }
+  const formatResult = (tokens: Token[]) => tokens.map((t) => t.value).join(" ")
+
+  const isAtLimit = expression.length >= MAX_LENGTH
 
   return (
     <div className="container mx-auto space-y-8">
+
+      {/* ── Hero ── */}
       <div className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_24%)]" />
         <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/40 to-transparent" />
@@ -70,6 +118,7 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
         </div>
       </div>
 
+      {/* ── Tabs ── */}
       <Tabs defaultValue="conversion" className="w-full space-y-6">
         <TabsList className="grid w-full grid-cols-3 rounded-2xl border border-violet-500/12 bg-white/65 p-1 backdrop-blur-lg dark:bg-white/[0.04]">
           <TabsTrigger
@@ -78,14 +127,12 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
           >
             Conversion
           </TabsTrigger>
-
           <TabsTrigger
             value="evaluation"
             className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
           >
             Evaluation
           </TabsTrigger>
-
           <TabsTrigger
             value="explanation"
             className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
@@ -94,8 +141,11 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
           </TabsTrigger>
         </TabsList>
 
+        {/* ── Conversion tab ── */}
         <TabsContent value="conversion" className="space-y-6">
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+
+            {/* Left panel */}
             <div className="xl:col-span-1 space-y-6">
               <Card className="rounded-[28px] border border-violet-500/15 bg-white/70 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
                 <CardHeader>
@@ -105,14 +155,55 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
                 </CardHeader>
 
                 <CardContent className="space-y-4">
-                  <Input
-                    value={expression}
-                    onChange={(e) => setExpression(e.target.value)}
-                    placeholder="Enter infix expression (e.g., 3+4*2)"
-                    onKeyDown={(e) => e.key === "Enter" && handleConvert()}
-                    disabled={isConverting}
-                    className="rounded-xl border-violet-500/20 focus-visible:ring-violet-500"
-                  />
+                  <div className="space-y-1.5">
+                    {/* Input — no ring/outline changes; border stays violet */}
+                    <Input
+                      value={expression}
+                      onChange={handleExpressionChange}
+                      placeholder="e.g. A+B*C-D"
+                      onKeyDown={(e) => e.key === "Enter" && handleConvert()}
+                      disabled={isConverting}
+                      maxLength={MAX_LENGTH}
+                      className="rounded-xl border-violet-500/20 focus-visible:ring-violet-500"
+                    />
+
+                    {/* Row: allowed chars hint (left) + counter (right) */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">
+                        Allowed: <span className="font-mono">A-Z 0-9 + - * / ^ ( )</span>
+                      </span>
+                      {expression.length > 0 && (
+                        <span
+                          className={`text-xs tabular-nums ${
+                            isAtLimit
+                              ? "text-rose-500 font-semibold"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {expression.length}/{MAX_LENGTH}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Invalid character warning */}
+                    {invalidChar && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400 text-center rounded-xl border border-amber-500/20 bg-amber-500/5 px-3 py-2">
+                        {invalidChar === "space" ? "Spaces are" : (
+                          <><span className="font-mono font-semibold">{invalidChar}</span> is</>
+                        )}{" "}
+                        not allowed in an infix expression
+                      </p>
+                    )}
+
+                    {/* At-limit warning — only shows, no glow on input */}
+                    {isAtLimit && !invalidChar && (
+                      <p className="text-xs text-rose-500 text-center rounded-xl border border-rose-500/15 bg-rose-500/5 px-3 py-2">
+                        Maximum of{" "}
+                        <span className="font-semibold">{MAX_LENGTH}</span>{" "}
+                        characters reached
+                      </p>
+                    )}
+                  </div>
 
                   <div className="flex gap-2">
                     <Button
@@ -125,7 +216,7 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
 
                     <Button
                       variant="outline"
-                      onClick={() => setExpression(EXAMPLE_EXPRESSION)}
+                      onClick={handleUseExample}
                       disabled={isConverting}
                       className="rounded-xl border-violet-500/20 hover:bg-violet-500/5"
                     >
@@ -142,7 +233,6 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
                       Result
                     </CardTitle>
                   </CardHeader>
-
                   <CardContent>
                     <div className="rounded-2xl border border-violet-500/10 bg-white/70 p-4 font-mono break-all dark:bg-white/[0.03]">
                       {formatResult(result)}
@@ -152,6 +242,7 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
               )}
             </div>
 
+            {/* Right panel */}
             <div className="xl:col-span-2">
               <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
                 <ConversionSteps steps={steps} currentExpression={expression} />
@@ -160,6 +251,7 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
           </div>
         </TabsContent>
 
+        {/* ── Evaluation tab ── */}
         <TabsContent value="evaluation" className="space-y-6">
           {result.length > 0 ? (
             <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
@@ -174,6 +266,7 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
           )}
         </TabsContent>
 
+        {/* ── Explanation tab ── */}
         <TabsContent value="explanation">
           <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-6 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
             <MarkdownContent content={content} />

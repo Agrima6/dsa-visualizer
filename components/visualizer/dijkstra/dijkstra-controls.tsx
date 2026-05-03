@@ -55,14 +55,57 @@ export function DijkstraControls({
   const [sourceNode, setSourceNode] = useState("")
   const [targetNode, setTargetNode] = useState("")
   const [weight, setWeight] = useState("")
+  const [weightError, setWeightError] = useState<string | null>(null)
+
+  // ── Weight input handler — blocks negative values and non-numeric input ────
+  const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value
+
+    // Allow empty string so user can clear the field
+    if (raw === "" || raw === "-") {
+      // If they type a minus sign, immediately warn and reject
+      if (raw === "-") {
+        setWeightError("Negative weights are not supported by Dijkstra's algorithm")
+        return
+      }
+      setWeight("")
+      setWeightError(null)
+      return
+    }
+
+    const num = Number(raw)
+
+    // Block negative numbers
+    if (num < 0) {
+      setWeightError("Negative weights are not supported by Dijkstra's algorithm")
+      // Keep the field at the last valid value (don't update state)
+      return
+    }
+
+    // Block NaN (non-numeric like "abc")
+    if (isNaN(num)) {
+      setWeightError("Please enter a valid number")
+      return
+    }
+
+    setWeight(raw)
+    setWeightError(null)
+  }
 
   const handleAddEdge = () => {
     const weightNum = Number(weight)
-    if (sourceNode && targetNode && !isNaN(weightNum)) {
+    if (
+      sourceNode &&
+      targetNode &&
+      weight !== "" &&
+      !isNaN(weightNum) &&
+      weightNum >= 0
+    ) {
       onAddEdge(sourceNode, targetNode, weightNum)
       setSourceNode("")
       setTargetNode("")
       setWeight("")
+      setWeightError(null)
     }
   }
 
@@ -71,6 +114,14 @@ export function DijkstraControls({
     const lastNode = path[path.length - 1]
     return distances.get(lastNode)
   }
+
+  // Add Edge button is valid only when all fields are filled and weight ≥ 0
+  const canAddEdge =
+    sourceNode.trim() !== "" &&
+    targetNode.trim() !== "" &&
+    weight !== "" &&
+    !isNaN(Number(weight)) &&
+    Number(weight) >= 0
 
   return (
     <Card className="w-full h-[800px] overflow-y-auto">
@@ -85,8 +136,11 @@ export function DijkstraControls({
             <TabsTrigger value="algorithm">Algorithm</TabsTrigger>
           </TabsList>
 
+          {/* ── Build tab ── */}
           <TabsContent value="build" className="space-y-4">
             <div className="space-y-4">
+
+              {/* Example graphs */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-sm">Example Graphs</CardTitle>
@@ -113,22 +167,25 @@ export function DijkstraControls({
                 </CardContent>
               </Card>
 
+              {/* Manual build */}
               <Card>
                 <CardHeader>
                   <CardTitle className="text-sm">Manual Build</CardTitle>
                   <CardDescription>Add nodes and edges</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <Button 
-                      onClick={() => onAddNode(Math.random() * 500, Math.random() * 300)}
-                      className="w-full"
-                    >
-                      Add Random Node
-                    </Button>
-                  </div>
+
+                  <Button
+                    onClick={() =>
+                      onAddNode(Math.random() * 500, Math.random() * 300)
+                    }
+                    className="w-full"
+                  >
+                    Add Random Node
+                  </Button>
 
                   <div className="space-y-2">
+                    {/* Source / Target */}
                     <div className="grid grid-cols-2 gap-2">
                       <Input
                         value={sourceNode}
@@ -141,15 +198,47 @@ export function DijkstraControls({
                         placeholder="Target node ID"
                       />
                     </div>
-                    <div className="flex gap-2">
-                      <Input
-                        value={weight}
-                        onChange={(e) => setWeight(e.target.value)}
-                        placeholder="Edge weight"
-                        type="number"
-                        className="flex-1"
-                      />
-                      <Button onClick={handleAddEdge}>Add Edge</Button>
+
+                    {/* Weight + Add Edge */}
+                    <div className="space-y-1.5">
+                      <div className="flex gap-2">
+                        <Input
+                          value={weight}
+                          onChange={handleWeightChange}
+                          placeholder="Edge weight (≥ 0)"
+                          type="number"
+                          min={0}
+                          step="any"
+                          className={`flex-1 ${
+                            weightError
+                              ? "border-rose-500 focus-visible:ring-rose-500"
+                              : ""
+                          }`}
+                        />
+                        <Button
+                          onClick={handleAddEdge}
+                          disabled={!canAddEdge}
+                        >
+                          Add Edge
+                        </Button>
+                      </div>
+
+                      {/* Weight error message */}
+                      {weightError && (
+                        <p className="text-xs text-rose-500 flex items-start gap-1.5">
+                          <span className="mt-0.5 inline-flex h-3.5 w-3.5 flex-shrink-0 items-center justify-center rounded-full bg-rose-500/15 text-rose-500 font-bold text-[10px]">
+                            !
+                          </span>
+                          {weightError}
+                        </p>
+                      )}
+
+                      {/* Hint when no error */}
+                      {!weightError && (
+                        <p className="text-xs text-muted-foreground">
+                          Dijkstra's algorithm requires non-negative edge weights
+                        </p>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -157,6 +246,7 @@ export function DijkstraControls({
             </div>
           </TabsContent>
 
+          {/* ── Algorithm tab ── */}
           <TabsContent value="algorithm" className="space-y-4">
             <Card>
               <CardHeader>
@@ -166,7 +256,9 @@ export function DijkstraControls({
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Start Node</label>
+                    <label className="text-sm font-medium mb-2 block">
+                      Start Node
+                    </label>
                     <Input
                       key="start-node"
                       defaultValue={startNodeId ?? ""}
@@ -175,7 +267,9 @@ export function DijkstraControls({
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium mb-2 block">End Node</label>
+                    <label className="text-sm font-medium mb-2 block">
+                      End Node
+                    </label>
                     <Input
                       key="end-node"
                       defaultValue={endNodeId ?? ""}
@@ -208,7 +302,11 @@ export function DijkstraControls({
                       disabled={currentStep >= totalSteps - 1}
                       variant="outline"
                     >
-                      {isAutoPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                      {isAutoPlaying ? (
+                        <Pause className="w-4 h-4" />
+                      ) : (
+                        <Play className="w-4 h-4" />
+                      )}
                     </Button>
                     <Button
                       onClick={onNext}
@@ -222,6 +320,7 @@ export function DijkstraControls({
               </CardContent>
             </Card>
 
+            {/* Current path */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-sm">Current Path</CardTitle>
@@ -238,17 +337,20 @@ export function DijkstraControls({
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">Total Distance:</span>
+                        <span className="text-sm font-medium">
+                          Total Distance:
+                        </span>
                         <span className="font-mono text-sm">
-                          {getTotalDistance() === Infinity ? "∞" : getTotalDistance()}
+                          {getTotalDistance() === Infinity
+                            ? "∞"
+                            : getTotalDistance()}
                         </span>
                       </div>
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {path.length === 1 
-                        ? "Click 'Find Shortest Path' to start" 
-                        : `Found path with ${path.length - 1} edges`
-                      }
+                      {path.length === 1
+                        ? "Click 'Find Shortest Path' to start"
+                        : `Found path with ${path.length - 1} edges`}
                     </div>
                   </>
                 ) : (
@@ -263,8 +365,8 @@ export function DijkstraControls({
 
         <Separator className="my-4" />
 
-        <Button 
-          variant="destructive" 
+        <Button
+          variant="destructive"
           onClick={onClear}
           className="w-full"
         >
@@ -279,4 +381,4 @@ export function DijkstraControls({
       </CardContent>
     </Card>
   )
-} 
+}

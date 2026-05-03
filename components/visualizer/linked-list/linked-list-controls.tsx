@@ -15,6 +15,7 @@ interface LinkedListControlsProps {
   onReverse: () => void
   isAnimating: boolean
   isEmpty: boolean
+  isFull: boolean
 }
 
 export function LinkedListControls({
@@ -25,13 +26,14 @@ export function LinkedListControls({
   onReverse,
   isAnimating,
   isEmpty,
+  isFull,
 }: LinkedListControlsProps) {
   const [value, setValue] = useState("")
   const [insertAtFront, setInsertAtFront] = useState(true)
 
   const handleInsert = () => {
     const num = Number(value)
-    if (!isNaN(num)) {
+    if (!isNaN(num) && value.trim() !== "") {
       if (insertAtFront) {
         onInsertFront(num)
       } else {
@@ -64,29 +66,36 @@ export function LinkedListControls({
               value={value}
               onChange={(e) => setValue(e.target.value)}
               placeholder="Enter value"
-              onKeyDown={(e) => e.key === 'Enter' && handleInsert()}
-              disabled={isAnimating}
+              onKeyDown={(e) => e.key === "Enter" && handleInsert()}
+              disabled={isAnimating || isFull}
               className="flex-1"
             />
-            <Button 
+            <Button
               onClick={handleInsert}
-              disabled={isAnimating || !value.trim()}
+              disabled={isAnimating || !value.trim() || isFull}
             >
               Insert
             </Button>
           </div>
+
+          {/* Full warning */}
+          {isFull && (
+            <p className="text-xs text-muted-foreground text-center rounded-xl border border-violet-500/15 bg-white/60 dark:bg-white/[0.04] px-3 py-2">
+              Maximum size of <span className="font-semibold text-violet-500">5</span> nodes reached
+            </p>
+          )}
         </div>
 
         {/* Delete Controls */}
         <div className="grid grid-cols-2 gap-2">
-          <Button 
+          <Button
             onClick={onDeleteFront}
             disabled={isAnimating || isEmpty}
             variant="secondary"
           >
             Delete Front
           </Button>
-          <Button 
+          <Button
             onClick={onDeleteBack}
             disabled={isAnimating || isEmpty}
             variant="secondary"
@@ -96,7 +105,7 @@ export function LinkedListControls({
         </div>
 
         {/* Reverse Control */}
-        <Button 
+        <Button
           onClick={onReverse}
           disabled={isAnimating || isEmpty}
           className="w-full"
@@ -107,4 +116,4 @@ export function LinkedListControls({
       </CardContent>
     </Card>
   )
-} 
+}

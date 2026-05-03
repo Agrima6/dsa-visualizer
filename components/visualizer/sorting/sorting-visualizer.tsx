@@ -85,6 +85,7 @@ function SortingVisualizerOriginal() {
           <p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">
             Understand how sorting algorithms compare, swap, and arrange values step by step through animated visual execution.
           </p>
+          
         </div>
       </div>
 

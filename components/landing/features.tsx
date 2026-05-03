@@ -46,9 +46,7 @@ const features = [
     useCases: ["Caching", "Lookup tables", "Algorithm foundations"],
     previewType: "array",
   },
-
   {
-
     title: "Sorting",
     description:
       "Watch values reorder step by step with clean animated comparisons.",
@@ -126,7 +124,22 @@ const features = [
     useCases: ["Fast lookup", "Ordered storage", "Hierarchical data"],
     previewType: "bst",
   },
-  
+  {
+    title: "Graphs",
+    description:
+      "Build graphs, run BFS and DFS animations, and solve real interview problems step by step.",
+    image: "/ds-graph.png",
+    url: "/visualizer/graph",
+    overview:
+      "A graph is a collection of nodes (vertices) connected by edges. Graphs model real-world relationships — social networks, maps, dependency trees, and more. BFS finds shortest paths; DFS explores all reachable nodes.",
+    learnPoints: [
+      "Understand BFS and DFS traversal order",
+      "Detect cycles and connected components visually",
+      "Apply graph algorithms to real interview problems",
+    ],
+    useCases: ["Maps & routing", "Social networks", "Dependency resolution"],
+    previewType: "graph",
+  },
   {
     title: "Heaps",
     description: "Visualize heap shape and priority-based ordering.",
@@ -148,6 +161,7 @@ const features = [
       "Convert expressions visually using precedence and stacks.",
     image: "/ds-infix-to-postfix.png",
     url: "/visualizer/stack-applications",
+    showCodeButton: false,
     overview:
       "This topic shows how an infix expression is converted into postfix notation so it becomes easier for systems to evaluate using stack logic.",
     learnPoints: [
@@ -163,6 +177,7 @@ const features = [
     description:
       "Visualize producer-consumer flow with queue-backed messaging.",
     image: "/ds-mq.png",
+    showCodeButton: false,
     url: "/visualizer/queue-applications",
     overview:
       "A message queue allows producers and consumers to work independently while preserving ordered delivery of messages or jobs.",
@@ -179,6 +194,7 @@ const features = [
     description:
       "Follow symbolic multiplication through structured term flow.",
     image: "/ds-polynomial-multiplication.png",
+    showCodeButton: false,
     url: "/visualizer/polynomial",
     overview:
       "This topic demonstrates how polynomial terms can be represented and multiplied step by step using structured logic and linked representation.",
@@ -195,6 +211,8 @@ const features = [
     description:
       "Explore compression logic using frequencies and binary trees.",
     image: "/ds-huffman.png",
+    // ✅ This flag hides the "Try with Code" button for Huffman
+    showCodeButton: false,
     url: "/visualizer/huffman",
     overview:
       "Huffman coding compresses data by assigning shorter codes to frequent characters and longer codes to rare ones using a binary tree strategy.",
@@ -211,6 +229,7 @@ const features = [
     description:
       "Understand shortest paths with weighted graph decisions.",
     image: "/ds-dijkstra.png",
+    showCodeButton: false,
     url: "/visualizer/dijkstra",
     overview:
       "Dijkstra's algorithm finds the shortest path from one source node to all reachable nodes in a weighted graph.",
@@ -220,22 +239,6 @@ const features = [
       "Connect graphs with route planning",
     ],
     useCases: ["Maps", "Network routing", "Path planning"],
-    previewType: "graph",
-  },
-  {
-    title: "Graphs",
-    description:
-      "Build graphs, run BFS and DFS animations, and solve real interview problems step by step.",
-    image: "/ds-graph.png",
-    url: "/visualizer/graph",
-    overview:
-      "A graph is a collection of nodes (vertices) connected by edges. Graphs model real-world relationships — social networks, maps, dependency trees, and more. BFS finds shortest paths; DFS explores all reachable nodes.",
-    learnPoints: [
-      "Understand BFS and DFS traversal order",
-      "Detect cycles and connected components visually",
-      "Apply graph algorithms to real interview problems",
-    ],
-    useCases: ["Maps & routing", "Social networks", "Dependency resolution"],
     previewType: "graph",
   },
 ] as const;
@@ -249,7 +252,7 @@ type QuizQuestion = {
 };
 
 const quizMap: Record<SelectedFeature["previewType"], QuizQuestion[]> = {
-   array: [
+  array: [
     {
       question: "What is the time complexity of accessing an element by index in an array?",
       options: ["O(n)", "O(log n)", "O(1)", "O(n²)"],
@@ -701,7 +704,6 @@ const quizMap: Record<SelectedFeature["previewType"], QuizQuestion[]> = {
       answer: "Fast lookup",
     },
   ],
-
   heap: [
     {
       question: "A heap is commonly used to implement:",
@@ -1124,7 +1126,6 @@ const quizMap: Record<SelectedFeature["previewType"], QuizQuestion[]> = {
       answer: "All source nodes simultaneously",
     },
   ],
-
 };
 
 function getExplanation(
@@ -1139,7 +1140,7 @@ function getExplanation(
   return `${feature.title}: ${point}. Correct answer: ${question.answer}.`;
 }
 
-// ─── FLASHCARD PANEL ────────────────────────────────────────────────────────
+// ─── FLASHCARD PANEL ─────────────────────────────────────────────────────────
 
 function FlashcardPanel({
   feature,
@@ -1243,7 +1244,7 @@ function FlashcardPanel({
             </span>
           </div>
 
-          {/* ── FLASHCARD ── */}
+          {/* Flashcard */}
           <div
             className="relative w-full cursor-pointer select-none"
             style={{ perspective: "1200px" }}
@@ -1259,13 +1260,10 @@ function FlashcardPanel({
                   : "transform 0.5s cubic-bezier(0.34,1.56,0.64,1)",
               }}
             >
-              {/* ── FRONT (Question) ── */}
+              {/* Front */}
               <div
                 className="w-full rounded-3xl border border-violet-500/15 bg-background/90 shadow-[0_8px_32px_rgba(139,92,246,0.10)]"
-                style={{
-  backfaceVisibility: "hidden",
-  minHeight: "160px",
-}}
+                style={{ backfaceVisibility: "hidden", minHeight: "160px" }}
               >
                 <div className="flex flex-col items-center justify-center gap-4 p-7 md:p-9 text-center min-h-[160px]">
                   <div className="inline-flex items-center gap-1.5 rounded-full border border-violet-500/10 bg-violet-500/5 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-widest text-violet-500">
@@ -1280,14 +1278,14 @@ function FlashcardPanel({
                 </div>
               </div>
 
-              {/* ── BACK (Answer) ── */}
+              {/* Back */}
               <div
                 className="absolute inset-0 w-full rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-background to-blue-500/10 shadow-[0_8px_32px_rgba(16,185,129,0.10)]"
-style={{
-  backfaceVisibility: "hidden",
-  transform: "rotateY(180deg)",
-  minHeight: "160px",
-}}
+                style={{
+                  backfaceVisibility: "hidden",
+                  transform: "rotateY(180deg)",
+                  minHeight: "160px",
+                }}
               >
                 <div className="flex flex-col items-start gap-3 p-6 md:p-8">
                   <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-widest text-emerald-600 dark:text-emerald-300">
@@ -1301,57 +1299,51 @@ style={{
                       {getExplanation(feature, current, currentIndex)}
                     </p>
                   </div>
-
-                  {/* All options */}
-                  
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ── MARK BUTTONS — rendered BELOW the card, outside the flip container ── */}
+          {/* Mark buttons */}
           {isFlipped && (
-  <div className="mt-4 flex flex-col gap-3">
-    {/* Options grid */}
-    <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2">
-      {current.options.map((opt) => (
-        <div
-          key={opt}
-          className={`rounded-xl border px-3 py-2 text-sm font-medium ${
-            opt === current.answer
-              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-              : "border-violet-500/10 text-muted-foreground"
-          }`}
-        >
-          {opt === current.answer && (
-            <CheckCircle2 className="inline h-3.5 w-3.5 mr-1.5 mb-0.5" />
+            <div className="mt-4 flex flex-col gap-3">
+              <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {current.options.map((opt) => (
+                  <div
+                    key={opt}
+                    className={`rounded-xl border px-3 py-2 text-sm font-medium ${
+                      opt === current.answer
+                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+                        : "border-violet-500/10 text-muted-foreground"
+                    }`}
+                  >
+                    {opt === current.answer && (
+                      <CheckCircle2 className="inline h-3.5 w-3.5 mr-1.5 mb-0.5" />
+                    )}
+                    {opt}
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => markCard("review")}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-2xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-400/20 transition-all duration-200"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Still Learning
+                </button>
+                <button
+                  onClick={() => markCard("known")}
+                  className="flex-1 flex items-center justify-center gap-2 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 transition-all duration-200"
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+                  Got It!
+                </button>
+              </div>
+            </div>
           )}
-          {opt}
-        </div>
-      ))}
-    </div>
 
-    {/* Mark buttons */}
-    <div className="flex gap-3">
-      <button
-        onClick={() => markCard("review")}
-        className="flex-1 flex items-center justify-center gap-2 rounded-2xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-400/20 transition-all duration-200"
-      >
-        <RotateCcw className="h-4 w-4" />
-        Still Learning
-      </button>
-      <button
-        onClick={() => markCard("known")}
-        className="flex-1 flex items-center justify-center gap-2 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/20 transition-all duration-200"
-      >
-        <CheckCircle2 className="h-4 w-4" />
-        Got It!
-      </button>
-    </div>
-  </div>
-)}
-
-          {/* ── NAV ROW ── */}
+          {/* Nav row */}
           <div className="flex items-center justify-between gap-3 mt-4">
             <Button
               variant="outline"
@@ -1364,7 +1356,6 @@ style={{
               Prev
             </Button>
 
-            {/* Dot indicators */}
             <div className="flex items-center gap-1.5 overflow-hidden max-w-[200px]">
               {questions.map((_, i) => {
                 const status = marked[i];
@@ -1405,7 +1396,7 @@ style={{
           </div>
         </>
       ) : (
-        /* ── SUMMARY SCREEN ── */
+        /* Summary */
         <div>
           <div className="flex items-center justify-between mb-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/15 bg-violet-500/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-violet-600 dark:text-violet-300">
@@ -1499,7 +1490,7 @@ style={{
   );
 }
 
-// ─── PREVIEW SHELLS & CARDS (unchanged) ──────────────────────────────────────
+// ─── PREVIEW SHELLS ───────────────────────────────────────────────────────────
 
 const surfaceClass =
   "relative overflow-hidden rounded-[28px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.98),rgba(245,243,255,0.98)_34%,rgba(255,248,235,0.96)_100%)] shadow-[0_10px_35px_rgba(91,33,182,0.06)] dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)]";
@@ -1643,8 +1634,6 @@ function BSTPreview() {
   );
 }
 
-
-
 function HeapPreview() {
   return (
     <PreviewShell label="Priority Heap" rightLabel="Max Heap" footer="Highest priority stays on top">
@@ -1719,35 +1708,37 @@ function HuffmanPreview() {
 }
 
 function GraphPreview() {
-  // Paste PreviewShell from your existing features.tsx context
   const nodes = [
     { x: "50%", y: "18%", label: "A", root: true },
     { x: "28%", y: "50%", label: "B" },
     { x: "72%", y: "50%", label: "C" },
     { x: "18%", y: "82%", label: "D" },
     { x: "42%", y: "82%", label: "E" },
-  ]
+  ];
   const edges = [
-    ["50%","18%","28%","50%"], ["50%","18%","72%","50%"],
-    ["28%","50%","18%","82%"], ["28%","50%","42%","82%"],
-  ]
- 
+    ["50%", "18%", "28%", "50%"],
+    ["50%", "18%", "72%", "50%"],
+    ["28%", "50%", "18%", "82%"],
+    ["28%", "50%", "42%", "82%"],
+  ];
+
   return (
     <PreviewShell label="Graph Traversal" rightLabel="BFS / DFS" footer="Explore nodes and edges step by step">
       <div className="relative h-full w-full pt-2">
-        <svg className="absolute inset-0 w-full h-full" style={{top:0,left:0}}>
-          {edges.map(([x1,y1,x2,y2],i)=>(
+        <svg className="absolute inset-0 w-full h-full" style={{ top: 0, left: 0 }}>
+          {edges.map(([x1, y1, x2, y2], i) => (
             <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
-              stroke="rgba(139,92,246,0.3)" strokeWidth="2" strokeLinecap="round"/>
+              stroke="rgba(139,92,246,0.3)" strokeWidth="2" strokeLinecap="round" />
           ))}
         </svg>
-        {nodes.map((n,i)=>(
-          <div key={i}
+        {nodes.map((n, i) => (
+          <div
+            key={i}
             className={[
               "absolute flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 text-sm font-bold font-mono transition-all duration-500",
               n.root
                 ? "border-violet-500 bg-gradient-to-br from-violet-600/30 to-violet-500/10 text-violet-700 dark:text-violet-300 shadow-[0_0_14px_rgba(139,92,246,0.4)] group-hover:-translate-y-3"
-                : i===1||i===2
+                : i === 1 || i === 2
                 ? "border-amber-400/60 bg-amber-400/15 text-amber-700 dark:text-amber-300 group-hover:-translate-y-1"
                 : "border-violet-500/20 bg-white/70 dark:bg-white/[0.06] text-foreground",
             ].join(" ")}
@@ -1758,8 +1749,9 @@ function GraphPreview() {
         ))}
       </div>
     </PreviewShell>
-  )
+  );
 }
+
 function ArrayPreview() {
   const cells = [3, 7, 1, 9, 4, 6, 2];
   return (
@@ -1798,7 +1790,7 @@ function ArrayPreview() {
 const PreviewCard = ({ type }: { type: SelectedFeature["previewType"] }) => {
   switch (type) {
     case "graph": return <GraphPreview />;
-    case "array" : return <ArrayPreview />;
+    case "array": return <ArrayPreview />;
     case "sorting": return <SortingPreview />;
     case "stack": return <StackPreview />;
     case "queue": return <QueuePreview />;
@@ -1809,16 +1801,21 @@ const PreviewCard = ({ type }: { type: SelectedFeature["previewType"] }) => {
     case "message-queue": return <QueuePreview message />;
     case "polynomial": return <PolynomialPreview />;
     case "huffman": return <HuffmanPreview />;
-    case "graph": return <GraphPreview />;
     default: return <SortingPreview />;
   }
 };
 
-// ─── MAIN FEATURES SECTION ───────────────────────────────────────────────────
+// ─── MAIN FEATURES SECTION ────────────────────────────────────────────────────
 
 export const Features = () => {
   const [selectedFeature, setSelectedFeature] = useState<SelectedFeature | null>(null);
   const [showQuiz, setShowQuiz] = useState(false);
+
+  // ✅ Derive whether to show the "Try with Code" button from the feature data itself
+  // showCodeButton defaults to true if not explicitly set to false
+  const shouldShowCodeButton = (feature: SelectedFeature): boolean => {
+    return (feature as any).showCodeButton !== false;
+  };
 
   return (
     <section id="features" className="relative w-full overflow-hidden py-16 lg:py-24">
@@ -2003,29 +2000,37 @@ export const Features = () => {
                       >
                         Study Flashcards
                       </Button>
-                      <Button
-                        asChild
-                        variant="outline"
-                        className="
-                          relative overflow-hidden rounded-xl
-                          bg-white text-black
-                          border border-black/20
-                          px-6 py-2
-                          transition-all duration-300
-                          hover:bg-white hover:text-black hover:border-transparent hover:scale-[1.02]
-                          hover:shadow-[0_0_20px_rgba(245,158,11,0.7)]
-                          before:absolute before:inset-0 before:rounded-xl before:p-[3px]
-                          before:bg-gradient-to-r before:from-yellow-500 before:via-amber-400 before:to-orange-400
-                          before:opacity-0 before:transition-all before:duration-300
-                          hover:before:opacity-100
-                          before:[-webkit-mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)]
-                          before:[-webkit-mask-composite:xor] before:[mask-composite:exclude]
-                        "
-                      > 
-                       <Link href={`${selectedFeature.url}?mode=code`} className="flex items-center gap-2">
-                          Try with Code <Code2 className="h-4 w-4" />
-                        </Link>
-                      </Button>
+
+                      {/* ✅ Only render "Try with Code" if showCodeButton is not false */}
+                      {shouldShowCodeButton(selectedFeature) && (
+                        <Button
+                          asChild
+                          variant="outline"
+                          className="
+                            relative overflow-hidden rounded-xl
+                            bg-white text-black
+                            border border-black/20
+                            px-6 py-2
+                            transition-all duration-300
+                            hover:bg-white hover:text-black hover:border-transparent hover:scale-[1.02]
+                            hover:shadow-[0_0_20px_rgba(245,158,11,0.7)]
+                            before:absolute before:inset-0 before:rounded-xl before:p-[3px]
+                            before:bg-gradient-to-r before:from-yellow-500 before:via-amber-400 before:to-orange-400
+                            before:opacity-0 before:transition-all before:duration-300
+                            hover:before:opacity-100
+                            before:[-webkit-mask:linear-gradient(#000_0_0)_content-box,linear-gradient(#000_0_0)]
+                            before:[-webkit-mask-composite:xor] before:[mask-composite:exclude]
+                          "
+                        >
+                          <Link
+                            href={`${selectedFeature.url}?mode=code`}
+                            className="flex items-center gap-2"
+                          >
+                            Try with Code <Code2 className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      )}
+
                       <Button
                         asChild
                         className="rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:opacity-95 shadow-[0_10px_30px_rgba(139,92,246,0.22)]"

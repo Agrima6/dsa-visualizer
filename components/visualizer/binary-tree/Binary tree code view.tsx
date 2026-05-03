@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { useUser, SignInButton } from "@clerk/nextjs"
+import { Zap } from "lucide-react"
 import {
   BINARY_TREE_PROBLEMS,
   type BinaryTreeProblem,
@@ -13,64 +14,66 @@ import {
   type Company,
 } from "./Binary tree problems data"
 
-declare global {
-  interface Window { Razorpay: any }
-}
+declare global { interface Window { Razorpay: any } }
 
-// ─────────────────────────────────────────────────────────────
-// Lock config
-// ─────────────────────────────────────────────────────────────
+// ─── Lock config ──────────────────────────────────────────────
 const LOCKED_IDS = new Set(BINARY_TREE_PROBLEMS.slice(-5).map(p => p.slug))
 const LOCK_PRICE = 19
 
-// ─────────────────────────────────────────────────────────────
-// UI constants
-// ─────────────────────────────────────────────────────────────
+// ─── Speed options (pill style, same as array / linked-list) ──
+const SPEED_OPTIONS: { label: string; ms: number }[] = [
+  { label: "0.5×", ms: 900 },
+  { label: "1×",   ms: 500 },
+  { label: "1.5×", ms: 320 },
+  { label: "2×",   ms: 180 },
+]
+
+// ─── UI constants ─────────────────────────────────────────────
 const DIFF_STYLE: Record<Difficulty, string> = {
   Easy:   "text-emerald-500 bg-emerald-500/10 border border-emerald-500/20",
   Medium: "text-amber-500  bg-amber-500/10  border border-amber-500/20",
   Hard:   "text-rose-500   bg-rose-500/10   border border-rose-500/20",
 }
-const TAG_STYLE = "text-[10px] font-medium px-2.5 py-1 rounded-full bg-violet-500/8 text-violet-500/80 border border-violet-500/10 dark:text-violet-300 dark:bg-violet-500/10 dark:border-violet-400/10"
-const PANEL     = "rounded-[24px] border border-violet-500/12 bg-white/75 shadow-[0_10px_35px_rgba(139,92,246,0.06)] backdrop-blur-xl dark:bg-white/[0.035] dark:shadow-[0_18px_45px_rgba(0,0,0,0.24)]"
-const SOFT_PANEL= "rounded-[20px] border border-violet-500/10 bg-white/55 backdrop-blur-xl dark:bg-white/[0.025]"
+const TAG_STYLE  = "text-[10px] font-medium px-2.5 py-1 rounded-full bg-violet-500/8 text-violet-500/80 border border-violet-500/10 dark:text-violet-300 dark:bg-violet-500/10 dark:border-violet-400/10"
+const PANEL      = "rounded-[24px] border border-violet-500/12 bg-white/75 shadow-[0_10px_35px_rgba(139,92,246,0.06)] backdrop-blur-xl dark:bg-white/[0.035] dark:shadow-[0_18px_45px_rgba(0,0,0,0.24)]"
+const SOFT_PANEL = "rounded-[20px] border border-violet-500/10 bg-white/55 backdrop-blur-xl dark:bg-white/[0.025]"
 
 const COMPANY_LOGO_MAP: Record<Company, { src: string; label: string }> = {
-  Google:       { src: "/company-logos/google.svg",       label: "Google" },
-  Amazon:       { src: "/company-logos/amazon.svg",       label: "Amazon" },
-  Apple:        { src: "/company-logos/apple.svg",        label: "Apple" },
-  Meta:         { src: "/company-logos/meta.svg",         label: "Meta" },
-  Microsoft:    { src: "/company-logos/microsoft.svg",    label: "Microsoft" },
-  Netflix:      { src: "/company-logos/netflix.svg",      label: "Netflix" },
-  Adobe:        { src: "/company-logos/adobe.svg",        label: "Adobe" },
-  Uber:         { src: "/company-logos/uber.svg",         label: "Uber" },
-  LinkedIn:     { src: "/company-logos/linkedin.svg",     label: "LinkedIn" },
-  Twitter:      { src: "/company-logos/twitter.svg",      label: "Twitter" },
-  ServiceNow:   { src: "/company-logos/servicenow.svg",   label: "ServiceNow" },
-  Salesforce:   { src: "/company-logos/salesforce.svg",   label: "Salesforce" },
-  Oracle:       { src: "/company-logos/oracle.svg",       label: "Oracle" },
-  SAP:          { src: "/company-logos/sap.svg",          label: "SAP" },
-  Intuit:       { src: "/company-logos/intuit.svg",       label: "Intuit" },
-  PayPal:       { src: "/company-logos/paypal.svg",       label: "PayPal" },
-  Stripe:       { src: "/company-logos/stripe.svg",       label: "Stripe" },
-  Atlassian:    { src: "/company-logos/atlassian.svg",    label: "Atlassian" },
-  Airbnb:       { src: "/company-logos/airbnb.svg",       label: "Airbnb" },
-  Dropbox:      { src: "/company-logos/dropbox.svg",      label: "Dropbox" },
-  Pinterest:    { src: "/company-logos/pinterest.svg",    label: "Pinterest" },
-  Snap:         { src: "/company-logos/snap.svg",         label: "Snap" },
-  Spotify:      { src: "/company-logos/spotify.svg",      label: "Spotify" },
-  Walmart:      { src: "/company-logos/walmart.svg",      label: "Walmart" },
-  Cisco:        { src: "/company-logos/cisco.svg",        label: "Cisco" },
-  VMware:       { src: "/company-logos/vmware.svg",       label: "VMware" },
-  Nvidia:       { src: "/company-logos/nvidia.svg",       label: "Nvidia" },
-  GoldmanSachs: { src: "/company-logos/goldmansachs.svg", label: "Goldman Sachs" },
-  MorganStanley:{ src: "/company-logos/morganstanley.svg",label: "Morgan Stanley" },
-  Bloomberg:    { src: "/company-logos/bloomberg.svg",    label: "Bloomberg" },
-  Zomato:       { src: "/company-logos/zomato.svg",       label: "Zomato" },
-  Swiggy:       { src: "/company-logos/swiggy.svg",       label: "Swiggy" },
-  Flipkart:     { src: "/company-logos/flipkart.svg",     label: "Flipkart" },
-  Meesho:       { src: "/company-logos/meesho.svg",       label: "Meesho" },
-  PhonePe:      { src: "/company-logos/phonepe.svg",      label: "PhonePe" },
+  Google:       { src: "/company-logos/google.svg",        label: "Google" },
+  Amazon:       { src: "/company-logos/amazon.svg",        label: "Amazon" },
+  Apple:        { src: "/company-logos/apple.svg",         label: "Apple" },
+  Meta:         { src: "/company-logos/meta.svg",          label: "Meta" },
+  Microsoft:    { src: "/company-logos/microsoft.svg",     label: "Microsoft" },
+  Netflix:      { src: "/company-logos/netflix.svg",       label: "Netflix" },
+  Adobe:        { src: "/company-logos/adobe.svg",         label: "Adobe" },
+  Uber:         { src: "/company-logos/uber.svg",          label: "Uber" },
+  LinkedIn:     { src: "/company-logos/linkedin.svg",      label: "LinkedIn" },
+  Twitter:      { src: "/company-logos/twitter.svg",       label: "Twitter" },
+  ServiceNow:   { src: "/company-logos/servicenow.svg",    label: "ServiceNow" },
+  Salesforce:   { src: "/company-logos/salesforce.svg",    label: "Salesforce" },
+  Oracle:       { src: "/company-logos/oracle.svg",        label: "Oracle" },
+  SAP:          { src: "/company-logos/sap.svg",           label: "SAP" },
+  Intuit:       { src: "/company-logos/intuit.svg",        label: "Intuit" },
+  PayPal:       { src: "/company-logos/paypal.svg",        label: "PayPal" },
+  Stripe:       { src: "/company-logos/stripe.svg",        label: "Stripe" },
+  Atlassian:    { src: "/company-logos/atlassian.svg",     label: "Atlassian" },
+  Airbnb:       { src: "/company-logos/airbnb.svg",        label: "Airbnb" },
+  Dropbox:      { src: "/company-logos/dropbox.svg",       label: "Dropbox" },
+  Pinterest:    { src: "/company-logos/pinterest.svg",     label: "Pinterest" },
+  Snap:         { src: "/company-logos/snap.svg",          label: "Snap" },
+  Spotify:      { src: "/company-logos/spotify.svg",       label: "Spotify" },
+  Walmart:      { src: "/company-logos/walmart.svg",       label: "Walmart" },
+  Cisco:        { src: "/company-logos/cisco.svg",         label: "Cisco" },
+  VMware:       { src: "/company-logos/vmware.svg",        label: "VMware" },
+  Nvidia:       { src: "/company-logos/nvidia.svg",        label: "Nvidia" },
+  GoldmanSachs: { src: "/company-logos/goldmansachs.svg",  label: "Goldman Sachs" },
+  MorganStanley:{ src: "/company-logos/morganstanley.svg", label: "Morgan Stanley" },
+  Bloomberg:    { src: "/company-logos/bloomberg.svg",     label: "Bloomberg" },
+  Zomato:       { src: "/company-logos/zomato.svg",        label: "Zomato" },
+  Swiggy:       { src: "/company-logos/swiggy.svg",        label: "Swiggy" },
+  Flipkart:     { src: "/company-logos/flipkart.svg",      label: "Flipkart" },
+  Meesho:       { src: "/company-logos/meesho.svg",        label: "Meesho" },
+  PhonePe:      { src: "/company-logos/phonepe.svg",       label: "PhonePe" },
 }
 
 function cn(...c: (string | false | null | undefined)[]) { return c.filter(Boolean).join(" ") }
@@ -78,37 +81,31 @@ function isProblemLocked(p: BinaryTreeProblem, unlocked: string[]) {
   return LOCKED_IDS.has(p.slug) && !unlocked.includes(p.slug)
 }
 
-// ─────────────────────────────────────────────────────────────
-// Company Logo + Marquee (identical to sorting)
-// ─────────────────────────────────────────────────────────────
+// ─── Company Logo + Marquee ───────────────────────────────────
 function CompanyLogoBadge({ company, compact = false }: { company: Company; compact?: boolean }) {
   const logo = COMPANY_LOGO_MAP[company]
   return (
-    <div
-      className={cn("inline-flex shrink-0 items-center justify-center rounded-full border border-violet-500/10 bg-white/85 shadow-sm dark:bg-white/[0.04]",
-        compact ? "h-7 w-7" : "h-8 w-8")}
-      title={logo?.label || company}
-    >
+    <div className={cn("inline-flex shrink-0 items-center justify-center rounded-full border border-violet-500/10 bg-white/85 shadow-sm dark:bg-white/[0.04]",
+      compact ? "h-7 w-7" : "h-8 w-8")} title={logo?.label || company}>
       {logo?.src ? (
         <img src={logo.src} alt={logo.label}
           className={cn("block w-auto object-contain", compact ? "h-3.5 max-w-[14px]" : "h-4 max-w-[16px]")}
           onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none" }} />
       ) : (
-        <span className={cn("font-medium text-muted-foreground", compact ? "text-[7px]" : "text-[8px]")}>
-          {company.slice(0, 2)}
-        </span>
+        <span className={cn("font-medium text-muted-foreground", compact ? "text-[7px]" : "text-[8px]")}>{company.slice(0, 2)}</span>
       )}
     </div>
   )
 }
 
 function CompanyMarquee({ companies, compact = false, speed = 18 }: { companies: Company[]; compact?: boolean; speed?: number }) {
-  const items = [...companies, ...companies]
   return (
     <div className="relative w-full min-w-0 overflow-hidden">
       <div className="flex w-max items-center gap-2.5 will-change-transform"
         style={{ animation: `companyLoop ${speed}s linear infinite` }}>
-        {items.map((c, i) => <CompanyLogoBadge key={`${c}-${i}`} company={c} compact={compact} />)}
+        {[...companies, ...companies].map((c, i) => (
+          <CompanyLogoBadge key={`${c}-${i}`} company={c} compact={compact} />
+        ))}
       </div>
     </div>
   )
@@ -126,18 +123,16 @@ function LockPill() {
 }
 
 function StatCard({ label, value, accent }: { label: string; value: string; accent: "default" | "easy" | "medium" | "hard" }) {
-  const accentClass = accent === "easy" ? "text-emerald-500" : accent === "medium" ? "text-amber-500" : accent === "hard" ? "text-rose-500" : "text-foreground"
+  const cl = accent === "easy" ? "text-emerald-500" : accent === "medium" ? "text-amber-500" : accent === "hard" ? "text-rose-500" : "text-foreground"
   return (
     <div className="rounded-2xl border border-violet-500/10 bg-white/65 px-4 py-4 dark:bg-white/[0.03]">
-      <div className={cn("text-2xl font-bold", accentClass)}>{value}</div>
+      <div className={cn("text-2xl font-bold", cl)}>{value}</div>
       <div className="mt-1 text-xs text-muted-foreground">{label}</div>
     </div>
   )
 }
 
-// ─────────────────────────────────────────────────────────────
-// SVG Tree Visualizer
-// ─────────────────────────────────────────────────────────────
+// ─── SVG Tree Visualizer ──────────────────────────────────────
 function computePositions(
   nodeId: string | null,
   nodes: Record<string, BinaryTreeNodeVis>,
@@ -163,9 +158,7 @@ function getNodeColors(id: string, step: BinaryTreeVisStep) {
 function TreeSVG({ step, currentStep }: { step: BinaryTreeVisStep; currentStep: number }) {
   if (!step.rootId || Object.keys(step.nodes).length === 0) {
     return (
-      <div className="flex h-40 items-center justify-center text-xs italic text-muted-foreground/50">
-        Empty tree
-      </div>
+      <div className="flex h-40 items-center justify-center text-xs italic text-muted-foreground/50">Empty tree</div>
     )
   }
 
@@ -174,59 +167,42 @@ function TreeSVG({ step, currentStep }: { step: BinaryTreeVisStep; currentStep: 
 
   const allX = Object.values(positions).map(p => p.x)
   const allY = Object.values(positions).map(p => p.y)
-  const minX = Math.min(...allX) - 36
-  const minY = Math.min(...allY) - 36
-  const maxX = Math.max(...allX) + 36
-  const maxY = Math.max(...allY) + 36
-  const vw = maxX - minX
-  const vh = maxY - minY
+  const minX = Math.min(...allX) - 36, minY = Math.min(...allY) - 36
+  const maxX = Math.max(...allX) + 36, maxY = Math.max(...allY) + 36
+  const vw = maxX - minX, vh = maxY - minY
 
   return (
-    <svg
-      viewBox={`${minX} ${minY} ${vw} ${vh}`}
-      className="w-full"
-      style={{ maxHeight: "280px" }}
-    >
-      {/* edges */}
+    <svg viewBox={`${minX} ${minY} ${vw} ${vh}`} className="w-full" style={{ maxHeight: "280px" }}>
+      {/* Edges */}
       {Object.values(step.nodes).map(node => {
         const pos = positions[node.id]
         if (!pos) return null
         return (
-          <>
+          <g key={`edges-${node.id}`}>
             {node.leftId && positions[node.leftId] && (
-              <line key={`e-l-${node.id}`}
-                x1={pos.x} y1={pos.y}
-                x2={positions[node.leftId].x} y2={positions[node.leftId].y}
+              <line x1={pos.x} y1={pos.y} x2={positions[node.leftId].x} y2={positions[node.leftId].y}
                 stroke="rgba(139,92,246,0.25)" strokeWidth="1.5" />
             )}
             {node.rightId && positions[node.rightId] && (
-              <line key={`e-r-${node.id}`}
-                x1={pos.x} y1={pos.y}
-                x2={positions[node.rightId].x} y2={positions[node.rightId].y}
+              <line x1={pos.x} y1={pos.y} x2={positions[node.rightId].x} y2={positions[node.rightId].y}
                 stroke="rgba(139,92,246,0.25)" strokeWidth="1.5" />
             )}
-          </>
+          </g>
         )
       })}
-
-      {/* nodes */}
+      {/* Nodes */}
       {Object.values(step.nodes).map((node, idx) => {
         const pos = positions[node.id]
         if (!pos) return null
         const c = getNodeColors(node.id, step)
-        const r = 22
         return (
           <g key={`n-${node.id}-${currentStep}`}
             style={{ animation: `treeNodeIn 0.3s ease forwards`, animationDelay: `${idx * 25}ms`, opacity: 0 }}
             filter={c.glow}>
-            <circle cx={pos.x} cy={pos.y} r={r}
-              fill={c.fill}
-              stroke={c.stroke}
-              strokeWidth="2"
+            <circle cx={pos.x} cy={pos.y} r={22} fill={c.fill} stroke={c.stroke} strokeWidth="2"
               style={{ transition: "all 0.3s" }} />
             <text x={pos.x} y={pos.y} textAnchor="middle" dominantBaseline="central"
-              fontSize="12" fontWeight="700" fontFamily="monospace"
-              fill={c.text}>
+              fontSize="12" fontWeight="700" fontFamily="monospace" fill={c.text}>
               {String(node.val).length > 3 ? String(node.val).slice(0, 3) : node.val}
             </text>
           </g>
@@ -240,11 +216,11 @@ function VizLegend() {
   return (
     <div className="flex flex-wrap gap-3 pt-3 border-t border-violet-500/10">
       {[
-        { color: "border-violet-500/30 bg-white/80", label: "Default" },
-        { color: "border-violet-500 bg-violet-500/18", label: "Visiting" },
-        { color: "border-amber-400 bg-amber-400/18", label: "Comparing" },
+        { color: "border-violet-500/30 bg-white/80",    label: "Default" },
+        { color: "border-violet-500 bg-violet-500/18",   label: "Visiting" },
+        { color: "border-amber-400 bg-amber-400/18",     label: "Comparing" },
         { color: "border-emerald-400 bg-emerald-500/18", label: "Done" },
-        { color: "border-rose-400 bg-rose-500/18", label: "Path" },
+        { color: "border-rose-400 bg-rose-500/18",       label: "Path" },
       ].map(({ color, label }) => (
         <div key={label} className="flex items-center gap-1.5">
           <div className={cn("h-3 w-3 rounded-full border-2", color)} />
@@ -255,13 +231,10 @@ function VizLegend() {
   )
 }
 
-// ─────────────────────────────────────────────────────────────
-// Problem Row
-// ─────────────────────────────────────────────────────────────
+// ─── Problem Row ──────────────────────────────────────────────
 function ProblemRow({ problem, idx, onSelect, isSignedIn, onLockedClick, unlockedTopics, payingSlug }: {
-  problem: BinaryTreeProblem; idx: number
-  onSelect: (p: BinaryTreeProblem) => void; isSignedIn: boolean
-  onLockedClick: (slug: string) => void; unlockedTopics: string[]; payingSlug: string | null
+  problem: BinaryTreeProblem; idx: number; onSelect: (p: BinaryTreeProblem) => void
+  isSignedIn: boolean; onLockedClick: (slug: string) => void; unlockedTopics: string[]; payingSlug: string | null
 }) {
   const locked = isProblemLocked(problem, unlockedTopics)
   const isPayingThis = payingSlug === problem.slug
@@ -272,9 +245,7 @@ function ProblemRow({ problem, idx, onSelect, isSignedIn, onLockedClick, unlocke
         locked ? "cursor-pointer hover:bg-amber-500/[0.04]" : "hover:bg-violet-500/[0.035]")}>
       <div className="absolute inset-x-6 bottom-0 h-px bg-gradient-to-r from-transparent via-violet-500/10 to-transparent" />
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[56px_minmax(260px,1.55fr)_minmax(220px,1.15fr)_100px_96px] xl:items-center">
-        <div className="hidden xl:block">
-          <span className="text-xs font-mono text-muted-foreground/50">#{problem.id}</span>
-        </div>
+        <div className="hidden xl:block"><span className="text-xs font-mono text-muted-foreground/50">#{problem.id}</span></div>
         <div className="min-w-0">
           <div className="flex items-center gap-3">
             <span className="xl:hidden text-[11px] font-mono text-muted-foreground/50">#{problem.id}</span>
@@ -294,23 +265,16 @@ function ProblemRow({ problem, idx, onSelect, isSignedIn, onLockedClick, unlocke
             </p>
           )}
         </div>
-        <div className="hidden xl:block min-w-0">
-          <CompanyMarquee companies={problem.companies} compact speed={18} />
-        </div>
+        <div className="hidden xl:block min-w-0"><CompanyMarquee companies={problem.companies} compact speed={18} /></div>
         <div className="text-xs font-mono text-muted-foreground xl:text-right">{problem.timeComplexity}</div>
         <div className="flex items-center justify-between xl:justify-end gap-3">
           <span className={cn("inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold", DIFF_STYLE[problem.difficulty])}>
             {problem.difficulty}
           </span>
-          {locked ? (
-            <svg className="h-4 w-4 text-amber-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.5 10.5V7.25a4.25 4.25 0 10-8.5 0v3.25m-.75 0h10a2 2 0 012 2v6a2 2 0 01-2 2h-10a2 2 0 01-2-2v-6a2 2 0 012-2z" />
-            </svg>
-          ) : (
-            <svg className="h-4 w-4 text-muted-foreground/35 group-hover:text-violet-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          )}
+          {locked
+            ? <svg className="h-4 w-4 text-amber-500/80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.5 10.5V7.25a4.25 4.25 0 10-8.5 0v3.25m-.75 0h10a2 2 0 012 2v6a2 2 0 01-2 2h-10a2 2 0 01-2-2v-6a2 2 0 012-2z" /></svg>
+            : <svg className="h-4 w-4 text-muted-foreground/35 group-hover:text-violet-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+          }
         </div>
       </div>
     </div>
@@ -323,35 +287,27 @@ function ProblemRow({ problem, idx, onSelect, isSignedIn, onLockedClick, unlocke
   return <button onClick={() => onSelect(problem)} className="w-full text-left">{rowContent}</button>
 }
 
-// ─────────────────────────────────────────────────────────────
-// Main list page
-// ─────────────────────────────────────────────────────────────
+// ─── Main list page ───────────────────────────────────────────
 export default function BinaryTreeCodeView() {
   const router = useRouter()
   const { isSignedIn } = useUser()
   const [selectedProblem, setSelectedProblem] = useState<BinaryTreeProblem | null>(null)
-  const [filterDiff, setFilterDiff] = useState<Difficulty | "All">("All")
-  const [search, setSearch] = useState("")
-  const [unlockedTopics, setUnlockedTopics] = useState<string[]>([])
-  const [payingSlug, setPayingSlug] = useState<string | null>(null)
+  const [filterDiff, setFilterDiff]           = useState<Difficulty | "All">("All")
+  const [search, setSearch]                   = useState("")
+  const [unlockedTopics, setUnlockedTopics]   = useState<string[]>([])
+  const [payingSlug, setPayingSlug]           = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchUnlocked = async () => {
-      try {
-        if (!isSignedIn) { setUnlockedTopics([]); return }
-        const res = await fetch("/api/payment/unlocked", { method: "GET", cache: "no-store" })
-        const data = await res.json()
-        setUnlockedTopics(Array.isArray(data.unlockedTopics) ? data.unlockedTopics : [])
-      } catch { setUnlockedTopics([]) }
-    }
-    fetchUnlocked()
+    if (!isSignedIn) { setUnlockedTopics([]); return }
+    fetch("/api/payment/unlocked", { method: "GET", cache: "no-store" })
+      .then(r => r.json()).then(d => setUnlockedTopics(Array.isArray(d.unlockedTopics) ? d.unlockedTopics : []))
+      .catch(() => setUnlockedTopics([]))
   }, [isSignedIn])
 
   const filtered = BINARY_TREE_PROBLEMS.filter(p => {
     const matchDiff = filterDiff === "All" || p.difficulty === filterDiff
     const q = search.toLowerCase()
-    return (filterDiff === "All" || matchDiff) &&
-      (p.title.toLowerCase().includes(q) || p.tags.some(t => t.toLowerCase().includes(q)) || p.companies.some(c => c.toLowerCase().includes(q)))
+    return matchDiff && (p.title.toLowerCase().includes(q) || p.tags.some(t => t.toLowerCase().includes(q)) || p.companies.some(c => c.toLowerCase().includes(q)))
   })
 
   const counts = {
@@ -373,16 +329,20 @@ export default function BinaryTreeCodeView() {
     try {
       setPayingSlug(topicSlug)
       if (!await loadRazorpay()) { alert("Razorpay SDK failed to load."); return }
-      const orderRes = await fetch("/api/payment/create-order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ topicSlug }) })
-      const orderData = await orderRes.json()
-      if (!orderRes.ok) { alert(orderData.error || "Failed to create order."); return }
+      const od = await (await fetch("/api/payment/create-order", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topicSlug }),
+      })).json()
+      if (!od.key) { alert(od.error || "Failed to create order."); return }
       new window.Razorpay({
-        key: orderData.key, amount: orderData.amount, currency: orderData.currency || "INR",
-        name: "AlgoMaitri", description: `Unlock ${topicSlug}`, order_id: orderData.orderId,
+        key: od.key, amount: od.amount, currency: od.currency || "INR",
+        name: "AlgoMaitri", description: `Unlock ${topicSlug}`, order_id: od.orderId,
         handler: async (response: any) => {
-          const vRes = await fetch("/api/payment/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...response, topicSlug }) })
-          const vData = await vRes.json()
-          if (!vRes.ok) { alert(vData.error || "Payment verification failed."); return }
+          const vd = await (await fetch("/api/payment/verify", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ...response, topicSlug }),
+          })).json()
+          if (!vd || vd.error) { alert(vd?.error || "Payment verification failed."); return }
           setUnlockedTopics(prev => prev.includes(topicSlug) ? prev : [...prev, topicSlug])
           alert("Payment successful. Problem unlocked.")
         },
@@ -468,7 +428,7 @@ export default function BinaryTreeCodeView() {
                 <button key={d} onClick={() => setFilterDiff(d)}
                   className={cn("rounded-full px-4 py-2 text-xs font-semibold border transition-all",
                     filterDiff === d
-                      ? d === "All" ? "bg-gradient-to-r from-violet-600 to-blue-600 text-white border-transparent shadow-[0_6px_20px_rgba(139,92,246,0.25)]"
+                      ? d === "All"    ? "bg-gradient-to-r from-violet-600 to-blue-600 text-white border-transparent shadow-[0_6px_20px_rgba(139,92,246,0.25)]"
                         : d === "Easy" ? "bg-emerald-500/12 text-emerald-600 border-emerald-500/20 dark:text-emerald-300"
                         : d === "Medium" ? "bg-amber-500/12 text-amber-600 border-amber-500/20 dark:text-amber-300"
                         : "bg-rose-500/12 text-rose-600 border-rose-500/20 dark:text-rose-300"
@@ -483,11 +443,9 @@ export default function BinaryTreeCodeView() {
         {/* Table */}
         <div className={cn(PANEL, "overflow-hidden")}>
           <div className="hidden xl:grid xl:grid-cols-[56px_minmax(260px,1.55fr)_minmax(220px,1.15fr)_100px_96px] items-center gap-4 px-6 py-4 border-b border-violet-500/8 bg-violet-500/[0.03]">
-            <span className="text-[11px] uppercase tracking-wider text-muted-foreground/55">#</span>
-            <span className="text-[11px] uppercase tracking-wider text-muted-foreground/55">Problem</span>
-            <span className="text-[11px] uppercase tracking-wider text-muted-foreground/55">Companies</span>
-            <span className="text-[11px] uppercase tracking-wider text-muted-foreground/55 text-right">Complexity</span>
-            <span className="text-[11px] uppercase tracking-wider text-muted-foreground/55 text-right">Difficulty</span>
+            {["#", "Problem", "Companies", "Complexity", "Difficulty"].map((h, i) => (
+              <span key={h} className={cn("text-[11px] uppercase tracking-wider text-muted-foreground/55", i >= 3 ? "text-right" : "")}>{h}</span>
+            ))}
           </div>
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
@@ -507,19 +465,19 @@ export default function BinaryTreeCodeView() {
   )
 }
 
-// ─────────────────────────────────────────────────────────────
-// Problem Detail
-// ─────────────────────────────────────────────────────────────
+// ─── Problem Detail ───────────────────────────────────────────
 function ProblemDetail({ problem, onBack, onPay, unlockedTopics, payingSlug }: {
   problem: BinaryTreeProblem; onBack: () => void
   onPay: (slug: string) => void; unlockedTopics: string[]; payingSlug: string | null
 }) {
   const { isSignedIn } = useUser()
-  const [steps]       = useState<BinaryTreeVisStep[]>(() => problem.generateSteps())
+  const [steps]        = useState<BinaryTreeVisStep[]>(() => problem.generateSteps())
   const [currentStep, setCurrentStep] = useState(0)
   const [isPlaying, setIsPlaying]     = useState(false)
-  const [speed, setSpeed]             = useState(700)
+  // ── Speed: default to 1× (500 ms) ──────────────────────────
+  const [speedMs, setSpeedMs]         = useState(500)
   const [activeTab, setActiveTab]     = useState<"description" | "approaches" | "pitfalls">("description")
+
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const codeRef     = useRef<HTMLDivElement>(null)
 
@@ -529,20 +487,22 @@ function ProblemDetail({ problem, onBack, onPay, unlockedTopics, payingSlug }: {
   const progress     = steps.length > 1 ? (currentStep / (steps.length - 1)) * 100 : 0
   const isPayingThis = payingSlug === problem.slug
 
+  // ── Auto-play uses speedMs ─────────────────────────────────
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current)
     if (!isPlaying) return
     intervalRef.current = setInterval(() => {
       setCurrentStep(s => { if (s >= steps.length - 1) { setIsPlaying(false); return s } return s + 1 })
-    }, speed)
+    }, speedMs)
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [isPlaying, speed, steps.length])
+  }, [isPlaying, speedMs, steps.length])
 
   useEffect(() => {
     if (!codeRef.current || !current) return
     codeRef.current.querySelector(`[data-line="${current.codeLine}"]`)?.scrollIntoView({ block: "nearest", behavior: "smooth" })
   }, [currentStep, current])
 
+  // ── Locked gate ───────────────────────────────────────────
   if (locked) {
     return (
       <div className="container mx-auto space-y-5">
@@ -556,19 +516,17 @@ function ProblemDetail({ problem, onBack, onPay, unlockedTopics, payingSlug }: {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16.5 10.5V7.25a4.25 4.25 0 10-8.5 0v3.25m-.75 0h10a2 2 0 012 2v6a2 2 0 01-2 2h-10a2 2 0 01-2-2v-6a2 2 0 012-2z" />
             </svg>
           </div>
-          <h1 className="mt-6 text-2xl md:text-3xl font-bold text-foreground">{problem.title}</h1>
-          <p className="mt-3 text-sm md:text-base text-muted-foreground">
-            This problem is locked. Sign in first, then pay ₹{LOCK_PRICE} using Razorpay to access it.
-          </p>
+          <h1 className="mt-6 text-2xl md:text-3xl font-bold">{problem.title}</h1>
+          <p className="mt-3 text-sm text-muted-foreground">Sign in and pay ₹{LOCK_PRICE} to unlock this problem.</p>
           <div className="mt-6 flex items-center justify-center gap-3">
             {isSignedIn ? (
               <button onClick={() => onPay(problem.slug)} disabled={isPayingThis}
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(139,92,246,0.24)] disabled:opacity-70">
+                className="rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(139,92,246,0.24)] disabled:opacity-70">
                 {isPayingThis ? "Opening Razorpay..." : `Pay ₹${LOCK_PRICE} on Razorpay`}
               </button>
             ) : (
               <SignInButton mode="modal">
-                <button className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(139,92,246,0.24)]">
+                <button className="rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(139,92,246,0.24)]">
                   Sign in to Continue
                 </button>
               </SignInButton>
@@ -579,10 +537,11 @@ function ProblemDetail({ problem, onBack, onPay, unlockedTopics, payingSlug }: {
     )
   }
 
+  // ── Full detail ───────────────────────────────────────────
   return (
     <>
       <style>{`
-        @keyframes treeNodeIn { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
+        @keyframes treeNodeIn  { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
         @keyframes companyLoop { from{transform:translateX(0)} to{transform:translateX(-50%)} }
         .active-line { background: linear-gradient(90deg,rgba(139,92,246,0.18) 0%,rgba(139,92,246,0.05) 55%,transparent 100%); }
       `}</style>
@@ -603,16 +562,15 @@ function ProblemDetail({ problem, onBack, onPay, unlockedTopics, payingSlug }: {
                 {problem.difficulty}
               </span>
             </div>
-            <div className="mt-4 min-w-0">
-              <CompanyMarquee companies={problem.companies} speed={22} />
-            </div>
+            <div className="mt-4 min-w-0"><CompanyMarquee companies={problem.companies} speed={22} /></div>
           </div>
         </div>
 
-        {/* 2-col */}
+        {/* 2-col layout */}
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_1.1fr]">
           {/* LEFT */}
           <div className="space-y-5">
+
             {/* Viz card */}
             <div className={cn(PANEL, "overflow-hidden")}>
               <div className="border-b border-violet-500/10 px-5 py-4">
@@ -655,7 +613,7 @@ function ProblemDetail({ problem, onBack, onPay, unlockedTopics, payingSlug }: {
               </div>
             </div>
 
-            {/* Controls */}
+            {/* Controls card */}
             <div className={cn(PANEL, "p-5")}>
               <div className="mb-4">
                 <p className="text-sm leading-6 text-muted-foreground">
@@ -663,11 +621,15 @@ function ProblemDetail({ problem, onBack, onPay, unlockedTopics, payingSlug }: {
                   {current?.message}
                 </p>
               </div>
+
+              {/* Scrubber */}
               <div className="mb-5">
                 <input type="range" min={0} max={Math.max(steps.length - 1, 0)} value={currentStep}
                   onChange={e => { setIsPlaying(false); setCurrentStep(Number(e.target.value)) }}
                   className="w-full accent-violet-600" />
               </div>
+
+              {/* Play buttons */}
               <div className="grid grid-cols-[48px_1fr_1.2fr_1fr] gap-2">
                 <button onClick={() => { setIsPlaying(false); setCurrentStep(0) }}
                   className="flex h-11 items-center justify-center rounded-xl border border-violet-500/12 bg-white/70 transition-all hover:bg-violet-500/5 dark:bg-white/[0.03]">
@@ -688,17 +650,30 @@ function ProblemDetail({ problem, onBack, onPay, unlockedTopics, payingSlug }: {
                   Next ›
                 </button>
               </div>
-              <div className="mt-5 border-t border-violet-500/10 pt-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Animation Speed</span>
-                  <span className="text-xs font-mono text-violet-500">{speed}ms</span>
+
+              {/* ── Speed Selector — pill style ── */}
+              <div className="mt-5 border-t border-violet-500/10 pt-4 space-y-2">
+                <label className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <Zap className="h-3.5 w-3.5 text-amber-500" />
+                  Animation Speed
+                </label>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {SPEED_OPTIONS.map(({ label, ms }) => (
+                    <button key={ms} onClick={() => setSpeedMs(ms)}
+                      className={cn(
+                        "h-9 rounded-xl border text-xs font-semibold transition-all",
+                        speedMs === ms
+                          ? "border-amber-400/50 bg-amber-400/15 text-amber-600 dark:text-amber-300"
+                          : "border-violet-500/10 bg-white/60 text-muted-foreground hover:bg-amber-400/5 dark:bg-white/[0.03]"
+                      )}>
+                      {label}
+                    </button>
+                  ))}
                 </div>
-                <input type="range" min={150} max={1500} step={50} value={speed}
-                  onChange={e => setSpeed(Number(e.target.value))} className="w-full accent-violet-600" />
               </div>
             </div>
 
-            {/* Complexity */}
+            {/* Complexity cards */}
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-[22px] border border-sky-400/15 bg-sky-500/[0.05] p-4">
                 <p className="mb-1 text-[10px] uppercase tracking-[0.18em] text-sky-400/70">Time Complexity</p>
@@ -711,7 +686,7 @@ function ProblemDetail({ problem, onBack, onPay, unlockedTopics, payingSlug }: {
             </div>
           </div>
 
-          {/* RIGHT: Code */}
+          {/* RIGHT: Code panel */}
           <div className="overflow-hidden rounded-[24px] border border-violet-500/12 bg-[#0c0d11] shadow-[0_24px_70px_rgba(0,0,0,0.35)] self-start sticky top-4">
             <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.03] px-4 py-3">
               <div className="flex gap-1.5">
@@ -724,7 +699,7 @@ function ProblemDetail({ problem, onBack, onPay, unlockedTopics, payingSlug }: {
             </div>
             <div ref={codeRef} className="max-h-[calc(100vh-160px)] overflow-y-auto font-mono text-sm leading-7">
               {codeLines.map((line, idx) => {
-                const lineNum = idx + 1
+                const lineNum  = idx + 1
                 const isActive = current?.codeLine === lineNum
                 return (
                   <div key={lineNum} data-line={lineNum}
@@ -798,7 +773,7 @@ function ProblemDetail({ problem, onBack, onPay, unlockedTopics, payingSlug }: {
                 {problem.approaches.map((a, i) => (
                   <div key={i} className="rounded-2xl border border-violet-500/10 bg-white/45 p-5 dark:bg-white/[0.03]">
                     <div className="mb-3 flex items-start justify-between gap-2">
-                      <div className="text-sm font-semibold text-foreground">{a.name}</div>
+                      <div className="text-sm font-semibold">{a.name}</div>
                       <span className="rounded-full border border-sky-400/15 bg-sky-500/10 px-2 py-0.5 text-[10px] text-sky-400 shrink-0">⏱ {a.complexity}</span>
                     </div>
                     <p className="text-sm leading-6 text-muted-foreground">{a.description}</p>

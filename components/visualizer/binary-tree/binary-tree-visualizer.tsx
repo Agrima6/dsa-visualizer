@@ -81,7 +81,7 @@ function BinaryTreeVisualizerOriginal({ content }: BinaryTreeVisualizerProps) {
             </div>
 
             <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-gradient-to-r from-violet-700 via-fuchsia-500 to-blue-500 bg-clip-text text-transparent">
-              Binary Tree Visualization
+              Binary Search Tree Visualization
             </h1>
 
             <p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">

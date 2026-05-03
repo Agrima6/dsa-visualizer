@@ -24,6 +24,7 @@ export function useLinkedList(type: ListType) {
     tail: null,
     nodes: new Map(),
   })
+
   const [operations, setOperations] = useState<ListOperation[]>([])
   const [animationState, setAnimationState] = useState<AnimationState>({
     highlightedNodes: [],
@@ -33,6 +34,8 @@ export function useLinkedList(type: ListType) {
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
 
+  const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
   const addOperation = (operation: Omit<ListOperation, 'timestamp'>) => {
     setOperations((prev) => [...prev, { ...operation, timestamp: Date.now() }])
   }
@@ -41,31 +44,53 @@ export function useLinkedList(type: ListType) {
     setAnimationState({ highlightedNodes: nodeIds, message })
   }
 
+  // 🔥 CORE FIX — centralized circular consistency
+  const normalizeCircularLinks = (
+    nodes: Map<string, ListNode>,
+    head: string | null,
+    tail: string | null
+  ) => {
+    if (!head || !tail) return
+
+    const headNode = nodes.get(head)
+    const tailNode = nodes.get(tail)
+
+    if (!headNode || !tailNode) return
+
+    if (type === 'CSLL' || type === 'CDLL') {
+      tailNode.next = head
+    }
+
+    if (type === 'CDLL') {
+      headNode.prev = tail
+    }
+  }
+
+  // ================= INSERT FRONT =================
   const insertFront = async (value: number) => {
     if (isAnimating) return
     setIsAnimating(true)
+
     addOperation({ type: 'insert-front', value })
 
-    const newNode = createNode(value)
     const nodes = new Map(list.nodes)
+    const newNode = createNode(value)
     nodes.set(newNode.id, newNode)
 
     if (!list.head) {
       setHighlight([newNode.id], 'Creating first node')
       stepSound()
-      await new Promise((r) => setTimeout(r, 500))
+      await delay(400)
 
       if (type === 'CSLL' || type === 'CDLL') {
         newNode.next = newNode.id
-        if (type === 'CDLL') newNode.prev = newNode.id
+      }
+      if (type === 'CDLL') {
+        newNode.prev = newNode.id
       }
 
       setList({ ...list, head: newNode.id, tail: newNode.id, nodes })
     } else {
-      setHighlight([newNode.id], 'Creating new node')
-      stepSound()
-      await new Promise((r) => setTimeout(r, 500))
-
       const oldHead = nodes.get(list.head)!
       newNode.next = list.head
 
@@ -73,15 +98,11 @@ export function useLinkedList(type: ListType) {
         oldHead.prev = newNode.id
       }
 
-      if (type === 'CSLL' || type === 'CDLL') {
-        const tail = nodes.get(list.tail!)!
-        tail.next = newNode.id
-        if (type === 'CDLL') newNode.prev = list.tail
-      }
-
-      setHighlight([newNode.id, list.head], 'Linking nodes')
+      setHighlight([newNode.id, list.head], 'Linking new head')
       stepSound()
-      await new Promise((r) => setTimeout(r, 500))
+      await delay(400)
+
+      normalizeCircularLinks(nodes, newNode.id, list.tail)
 
       setList({ ...list, head: newNode.id, nodes })
     }
@@ -89,34 +110,33 @@ export function useLinkedList(type: ListType) {
     setHighlight([], '')
     setIsAnimating(false)
     endSound()
-    showEndMessage('Algorithm ended', 'Insert front completed successfully.')
   }
 
+  // ================= INSERT BACK =================
   const insertBack = async (value: number) => {
     if (isAnimating) return
     setIsAnimating(true)
+
     addOperation({ type: 'insert-back', value })
 
-    const newNode = createNode(value)
     const nodes = new Map(list.nodes)
+    const newNode = createNode(value)
     nodes.set(newNode.id, newNode)
 
     if (!list.tail) {
       setHighlight([newNode.id], 'Creating first node')
       stepSound()
-      await new Promise((r) => setTimeout(r, 500))
+      await delay(400)
 
       if (type === 'CSLL' || type === 'CDLL') {
         newNode.next = newNode.id
-        if (type === 'CDLL') newNode.prev = newNode.id
+      }
+      if (type === 'CDLL') {
+        newNode.prev = newNode.id
       }
 
       setList({ ...list, head: newNode.id, tail: newNode.id, nodes })
     } else {
-      setHighlight([newNode.id], 'Creating new node')
-      stepSound()
-      await new Promise((r) => setTimeout(r, 500))
-
       const oldTail = nodes.get(list.tail)!
       oldTail.next = newNode.id
 
@@ -124,13 +144,11 @@ export function useLinkedList(type: ListType) {
         newNode.prev = list.tail
       }
 
-      if (type === 'CSLL' || type === 'CDLL') {
-        newNode.next = list.head
-      }
-
-      setHighlight([list.tail, newNode.id], 'Linking nodes')
+      setHighlight([list.tail, newNode.id], 'Linking new tail')
       stepSound()
-      await new Promise((r) => setTimeout(r, 500))
+      await delay(400)
+
+      normalizeCircularLinks(nodes, list.head, newNode.id)
 
       setList({ ...list, tail: newNode.id, nodes })
     }
@@ -138,185 +156,117 @@ export function useLinkedList(type: ListType) {
     setHighlight([], '')
     setIsAnimating(false)
     endSound()
-    showEndMessage('Algorithm ended', 'Insert back completed successfully.')
   }
 
+  // ================= DELETE FRONT =================
   const deleteFront = async () => {
     if (isAnimating || !list.head) return
     setIsAnimating(true)
+
     addOperation({ type: 'delete-front' })
 
     const nodes = new Map(list.nodes)
     const oldHead = nodes.get(list.head)!
 
-    setHighlight([list.head], 'Removing front node')
+    setHighlight([list.head], 'Removing head')
     stepSound()
-    await new Promise((r) => setTimeout(r, 500))
+    await delay(400)
 
     if (list.head === list.tail) {
       setList({ ...list, head: null, tail: null, nodes: new Map() })
     } else {
       const newHead = oldHead.next!
-      const newHeadNode = nodes.get(newHead)!
+      nodes.delete(list.head)
 
       if (type === 'DLL' || type === 'CDLL') {
+        const newHeadNode = nodes.get(newHead)!
         newHeadNode.prev = type === 'CDLL' ? list.tail : null
       }
 
-      if (type === 'CSLL' || type === 'CDLL') {
-        const tail = nodes.get(list.tail!)!
-        tail.next = newHead
-      }
+      normalizeCircularLinks(nodes, newHead, list.tail)
 
-      nodes.delete(list.head)
-      stepSound()
       setList({ ...list, head: newHead, nodes })
     }
 
     setHighlight([], '')
     setIsAnimating(false)
     endSound()
-    showEndMessage('Algorithm ended', 'Delete front completed successfully.')
   }
 
+  // ================= DELETE BACK =================
   const deleteBack = async () => {
     if (isAnimating || !list.tail) return
     setIsAnimating(true)
+
     addOperation({ type: 'delete-back' })
 
     const nodes = new Map(list.nodes)
 
-    setHighlight([list.tail], 'Removing back node')
+    setHighlight([list.tail], 'Removing tail')
     stepSound()
-    await new Promise((r) => setTimeout(r, 500))
+    await delay(400)
 
     if (list.head === list.tail) {
       setList({ ...list, head: null, tail: null, nodes: new Map() })
     } else {
-      let newTail: string | null = list.head
-      let current: string | null = list.head
+      let current = list.head
+      let newTail: string | null = null
 
-      while (current !== null) {
-        const currentNode = nodes.get(current)
-        if (!currentNode) break
-        if (currentNode.next === list.tail) {
+      while (current) {
+        const node = nodes.get(current)!
+        if (node.next === list.tail) {
           newTail = current
           break
         }
-        current = currentNode.next
+        current = node.next
       }
 
       if (newTail) {
-        const newTailNode = nodes.get(newTail)
-        if (newTailNode) {
-          newTailNode.next =
-            type === 'CSLL' || type === 'CDLL' ? list.head : null
+        nodes.delete(list.tail)
 
-          if (type === 'CDLL' && list.head) {
-            const headNode = nodes.get(list.head)
-            if (headNode) {
-              headNode.prev = newTail
-            }
-          }
-
-          nodes.delete(list.tail)
-          stepSound()
-          setList({ ...list, tail: newTail, nodes })
+        if (type === 'DLL' || type === 'CDLL') {
+          const newTailNode = nodes.get(newTail)!
+          newTailNode.next = null
         }
+
+        normalizeCircularLinks(nodes, list.head, newTail)
+
+        setList({ ...list, tail: newTail, nodes })
       }
     }
 
     setHighlight([], '')
     setIsAnimating(false)
     endSound()
-    showEndMessage('Algorithm ended', 'Delete back completed successfully.')
   }
 
+  // ================= REVERSE =================
   const reverse = async () => {
     if (isAnimating || !list.head) return
     setIsAnimating(true)
+
     addOperation({ type: 'reverse' })
 
     const nodes = new Map(list.nodes)
-    let curr: string | null = list.head
+
+    let curr = list.head
     let prev: string | null = null
-    let next: string | null = null
-    const reversedLinks = new Set<string>()
-
-    const updateReverseStep = (
-      activeLink: { from: string; to: string } | null = null
-    ) => {
-      setAnimationState({
-        highlightedNodes: [curr, prev, next].filter(
-          (id): id is string => id !== null
-        ),
-        message: `Current: ${curr ? nodes.get(curr)?.value : 'null'}, Next: ${
-          next ? nodes.get(next)?.value : 'null'
-        }, Prev: ${prev ? nodes.get(prev)?.value : 'null'}`,
-        reverseStep: {
-          curr,
-          prev,
-          next,
-          reversedLinks: new Set(reversedLinks),
-          activeLink,
-        },
-      })
-    }
-
-    updateReverseStep()
-    stepSound()
-    await new Promise((r) => setTimeout(r, 1000))
 
     while (curr) {
-      const currentNode = nodes.get(curr)
-      if (!currentNode) break
+      const node = nodes.get(curr)!
+      const next = node.next
 
-      next = currentNode.next
-
-      if (next) {
-        updateReverseStep({ from: curr, to: next })
-        stepSound()
-        await new Promise((r) => setTimeout(r, 1000))
-      }
-
-      currentNode.next = prev
-      reversedLinks.add(curr)
+      node.next = prev
 
       if (type === 'DLL' || type === 'CDLL') {
-        if (prev) {
-          const prevNode = nodes.get(prev)
-          if (prevNode) {
-            prevNode.prev = curr
-          }
-        }
-        currentNode.prev = next
-      }
-
-      if (prev) {
-        updateReverseStep({ from: curr, to: prev })
-        stepSound()
-        await new Promise((r) => setTimeout(r, 1000))
+        node.prev = next
       }
 
       prev = curr
-      curr = next
-      updateReverseStep()
-      stepSound()
-      await new Promise((r) => setTimeout(r, 1000))
+      curr = next !== null ? next : ''
     }
 
-    if (type === 'CSLL' || type === 'CDLL') {
-      if (list.head && list.tail) {
-        const oldHead = nodes.get(list.head)
-        const oldTail = nodes.get(list.tail)
-        if (oldHead && oldTail) {
-          oldHead.next = list.tail
-          if (type === 'CDLL') {
-            oldTail.prev = list.head
-          }
-        }
-      }
-    }
+    normalizeCircularLinks(nodes, list.tail, list.head)
 
     setList({
       ...list,
@@ -328,7 +278,6 @@ export function useLinkedList(type: ListType) {
     setHighlight([], '')
     setIsAnimating(false)
     endSound()
-    showEndMessage('Algorithm ended', 'Linked list reversal completed successfully.')
   }
 
   return {
