@@ -1,169 +1,331 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, BrainCircuit, MoveRight, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Navbar } from "@/components/navigation/navbar";
+import { useEffect, useState } from "react";
 
 const founders = [
   {
     name: "Dr. Kiran Khatter",
     role: "Co-Founder",
-    image:
-      "https://img.freepik.com/premium-photo/businesswoman-office-young-indian-girl-head-shot-woman-portrait-ai-generative_955712-4844.jpg",
+    initials: "KK",
+    focus: "Learning Architecture",
     description:
       "Focused on building meaningful learning experiences that make DSA concepts easier to understand through clarity, structure, and intuition.",
+    accent: "#6366f1",
+    accentLight: "#4f46e5",
   },
   {
     name: "Maheshwar Dwivedy",
     role: "Co-Founder",
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80",
+    initials: "MD",
+    focus: "Technology & Education",
     description:
       "Passionate about combining technology and education to help learners explore problem solving in a more visual and approachable way.",
+    accent: "#8b5cf6",
+    accentLight: "#7c3aed",
   },
   {
     name: "Aaradhya Gupta",
     role: "Co-Founder",
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQr-X-BE1xj89wZdH5Qc-iCScCPDvXLAJziZg&s",
+    initials: "AG",
+    focus: "Design & Interaction",
     description:
       "Works on shaping a learner-first platform where design, simplicity, and interactivity come together for better conceptual understanding.",
+    accent: "#a855f7",
+    accentLight: "#9333ea",
   },
   {
     name: "Agrima Agarwal",
     role: "Co-Founder",
-    image:
-      "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?auto=format&fit=crop&w=900&q=80",
+    initials: "AA",
+    focus: "Product Vision",
     description:
       "Driven by the vision of making data structures and algorithms feel less intimidating and more intuitive for every student.",
+    accent: "#7c3aed",
+    accentLight: "#6d28d9",
+  },
+];
+
+const stats = [
+  { value: "50+", label: "Algorithms Visualized" },
+  { value: "10K+", label: "Learners Helped" },
+  { value: "4", label: "Co-Founders" },
+  { value: "∞", label: "Concepts to Explore" },
+];
+
+const missionPoints = [
+  {
+    emoji: "🎯",
+    title: "Stop guessing. Start seeing.",
+    body: "Most students fail DSA not because they're not smart  but because nobody showed them how it actually works. We fix that with step-by-step visuals.",
+  },
+  {
+    emoji: "💡",
+    title: "That 'aha!' moment, every time.",
+    body: "We build AlgoMaitri so every student gets that moment where everything suddenly makes sense. Not just for the exam forever.",
+  },
+  {
+    emoji: "🚀",
+    title: "From confused to confident.",
+    body: "Whether you're a beginner or prepping for FAANG, AlgoMaitri meets you where you are and helps you level up  one algorithm at a time.",
   },
 ];
 
 export default function AboutPage() {
+  const [isDark, setIsDark] = useState(true);
+
+  // Sync with actual document theme
+  useEffect(() => {
+    const checkTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+    checkTheme();
+
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  const t = {
+    bg: isDark ? "#0a0a0f" : "#f4f4f8",
+    surface: isDark ? "#111118" : "#ffffff",
+    surfaceHover: isDark ? "#18181f" : "#f9f9fc",
+    border: isDark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.08)",
+    borderStrong: isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.14)",
+    text: isDark ? "#e8e8f0" : "#111118",
+    textMuted: isDark ? "rgba(232,232,240,0.5)" : "rgba(17,17,24,0.5)",
+    textFaint: isDark ? "rgba(232,232,240,0.25)" : "rgba(17,17,24,0.25)",
+    cardNumColor: isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.08)",
+    gridLine: isDark ? "rgba(99,102,241,0.04)" : "rgba(99,102,241,0.06)",
+    glow1: isDark
+      ? "rgba(99,102,241,0.12)"
+      : "rgba(99,102,241,0.07)",
+    glow2: isDark
+      ? "rgba(139,92,246,0.10)"
+      : "rgba(139,92,246,0.06)",
+    missionBg: isDark ? "rgba(99,102,241,0.07)" : "rgba(99,102,241,0.05)",
+    missionBorder: isDark
+      ? "rgba(99,102,241,0.18)"
+      : "rgba(99,102,241,0.2)",
+    statsBg: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
+    statsBorder: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)",
+  };
+
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-background">
-      <div className="relative z-10 flex min-h-screen flex-col p-4 sm:p-8 lg:p-10">
+    <main
+      className="relative min-h-screen overflow-x-hidden"
+      style={{ background: t.bg, color: t.text, transition: "background 0.3s, color 0.3s" }}
+    >
+      {/* Grid background */}
+      <div
+        style={{
+          position: "fixed", inset: 0,
+          backgroundImage: `linear-gradient(${t.gridLine} 1px, transparent 1px), linear-gradient(90deg, ${t.gridLine} 1px, transparent 1px)`,
+          backgroundSize: "60px 60px",
+          pointerEvents: "none", zIndex: 0,
+        }}
+      />
+      {/* Glow orbs */}
+      <div style={{ position: "fixed", top: "-8%", left: "-4%", width: 500, height: 500, borderRadius: "50%", background: `radial-gradient(circle, ${t.glow1} 0%, transparent 70%)`, pointerEvents: "none", zIndex: 0 }} />
+      <div style={{ position: "fixed", bottom: "10%", right: "-4%", width: 400, height: 400, borderRadius: "50%", background: `radial-gradient(circle, ${t.glow2} 0%, transparent 70%)`, pointerEvents: "none", zIndex: 0 }} />
+
+      <div className="relative z-10 flex min-h-screen flex-col" style={{ padding: "1.5rem 1.5rem 5rem" }}>
         <Navbar />
 
-        <section className="w-full pt-10 pb-8 lg:pt-16 lg:pb-12">
-          <div className="container mx-auto">
-            <Link
-              href="/"
-              className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Home
-            </Link>
+        {/* Back nav */}
+        <div style={{ maxWidth: 1200, margin: "2.5rem auto 0", width: "100%" }}>
+          <Link
+            href="/"
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, fontSize: 13, color: t.textMuted, textDecoration: "none", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 500, transition: "color 0.2s" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = t.text)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = t.textMuted)}
+          >
+            <ArrowLeft size={14} /> Back to Home
+          </Link>
+        </div>
 
-            <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-background/70 p-6 shadow-[0_10px_50px_rgba(0,0,0,0.08)] backdrop-blur-xl md:p-8 lg:p-10">
-              <div className="absolute -left-20 top-0 h-60 w-60 rounded-full bg-primary/10 blur-3xl" />
-              <div className="absolute -right-16 bottom-0 h-72 w-72 rounded-full bg-purple-500/10 blur-3xl" />
-
-              <div className="relative z-10 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
-                <div className="flex flex-col gap-5">
-                  <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-sm text-foreground/90 shadow-sm backdrop-blur">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    <span>About AlgoMaitri</span>
-                  </div>
-
-                  <h1 className="max-w-3xl text-4xl font-semibold leading-[0.95] tracking-[-0.05em] md:text-6xl lg:text-7xl">
-                    <span className="bg-gradient-to-r from-foreground via-primary to-purple-500 bg-clip-text text-transparent">
-                      Building a smarter way to learn DSA
-                    </span>
-                  </h1>
-
-                  <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-                    AlgoMaitri is designed to make data structures and algorithms
-                    easier to understand through interactive visualizations,
-                    guided exploration, and beautiful learning experiences.
-                  </p>
-
-                  <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
-                    Our goal is to bridge the gap between theory and intuition so
-                    learners do not just memorize concepts, but truly see how
-                    they work step by step.
-                  </p>
-
-                  <div className="flex flex-wrap gap-3 pt-2">
-                    <Link
-                      href="/visualizer"
-                      className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition hover:scale-[1.02] hover:shadow-lg"
-                    >
-                      Explore Visualizer <MoveRight className="h-4 w-4" />
-                    </Link>
-
-                    <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-4 py-3 text-sm text-muted-foreground backdrop-blur">
-                      <BrainCircuit className="h-4 w-4 text-primary" />
-                      Visual Learning • Clear Concepts • Better Intuition
-                    </div>
-                  </div>
-                </div>
-
-                <div className="relative flex min-h-[260px] items-center justify-center lg:min-h-[340px]">
-                  <div className="relative h-[260px] w-full overflow-hidden rounded-3xl border border-border/50 bg-muted shadow-xl md:h-[320px]">
-                    <img
-                      src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80"
-                      alt="AlgoMaitri team vision"
-                      className="h-full w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-black/30 via-transparent to-primary/10" />
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* ── HERO ── */}
+        <section style={{ maxWidth: 1200, margin: "3rem auto 0", width: "100%" }}>
+          {/* Label */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "2rem" }}>
+            <div style={{ width: 32, height: 1, background: "rgba(99,102,241,0.7)" }} />
+            <span style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#6366f1", fontWeight: 700 }}>
+              About AlgoMaitri
+            </span>
           </div>
-        </section>
 
-        <section className="w-full pt-4 pb-16 lg:pt-6 lg:pb-20">
-          <div className="container mx-auto">
-            <div className="mb-8 flex flex-col gap-3">
-              <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-sm text-foreground/90 shadow-sm backdrop-blur">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <span>Co-Founders</span>
-              </div>
+          {/* Big headline */}
+          <h1 style={{ fontSize: "clamp(2.8rem, 8vw, 6.5rem)", fontWeight: 900, lineHeight: 0.92, letterSpacing: "-0.04em", margin: "0 0 2.5rem" }}>
+            <span style={{ color: t.text, display: "block" }}>Making DSA</span>
+            <span style={{ display: "block", background: "linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #8b5cf6 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              click with you.
+            </span>
+          </h1>
 
-              <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
-                The people behind AlgoMaitri
-              </h2>
-
-              <p className="max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-                Meet the team shaping a more intuitive, interactive, and learner-friendly
-                way to explore data structures and algorithms.
+          {/* Two-col: text + stats */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "3rem", alignItems: "start" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              <p style={{ fontSize: "1.15rem", lineHeight: 1.75, color: t.textMuted, margin: 0, maxWidth: 480 }}>
+                AlgoMaitri is built on a simple belief  that everyone can understand data structures and algorithms when they can actually <em>see</em> them working. We design for the moment things finally click.
               </p>
+              <p style={{ fontSize: "1rem", lineHeight: 1.75, color: t.textFaint, margin: 0, maxWidth: 480 }}>
+                Our platform bridges the gap between theory and intuition, replacing rote memorization with visual, step-by-step exploration that sticks.
+              </p>
+              <div style={{ paddingTop: 8 }}>
+                <Link
+                  href="/visualizer"
+                  style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", borderRadius: 100, color: "#fff", textDecoration: "none", fontSize: 14, fontWeight: 600, letterSpacing: "0.02em", transition: "opacity 0.2s, transform 0.2s" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.85"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = "translateY(0)"; }}
+                >
+                  Explore Visualizer <ArrowUpRight size={15} />
+                </Link>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {founders.map((founder) => (
-                <div
-                  key={founder.name}
-                  className="group relative overflow-hidden rounded-2xl border border-border/50 bg-background/70 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_50px_rgba(0,0,0,0.12)]"
-                >
-                  <div className="relative h-[190px] w-full overflow-hidden sm:h-[210px]">
-                    <img
-                      src={founder.image}
-                      alt={founder.name}
-                      className="h-full w-full object-cover object-center transition duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-transparent" />
-                  </div>
-
-                  <div className="flex flex-col gap-2 p-5 md:p-6">
-                    <div className="w-fit rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-primary">
-                      {founder.role}
-                    </div>
-
-                    <h3 className="text-2xl font-semibold tracking-tight md:text-3xl">
-                      {founder.name}
-                    </h3>
-
-                    <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
-                      {founder.description}
-                    </p>
-                  </div>
+            {/* Stats grid */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1px", background: t.statsBorder, borderRadius: 16, overflow: "hidden", border: `1px solid ${t.statsBorder}` }}>
+              {stats.map((stat) => (
+                <div key={stat.label} style={{ padding: "1.8rem 1.5rem", background: isDark ? "rgba(255,255,255,0.02)" : "#ffffff", display: "flex", flexDirection: "column", gap: 6 }}>
+                  <span style={{ fontSize: "2.4rem", fontWeight: 900, letterSpacing: "-0.04em", background: "linear-gradient(135deg, #6366f1, #a855f7)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", lineHeight: 1 }}>
+                    {stat.value}
+                  </span>
+                  <span style={{ fontSize: 11, color: t.textFaint, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 600 }}>
+                    {stat.label}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
+        </section>
+
+        {/* Divider */}
+        <div style={{ maxWidth: 1200, margin: "5rem auto", width: "100%", height: 1, background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent)" }} />
+
+        {/* ── MISSION ── */}
+        <section style={{ maxWidth: 1200, margin: "0 auto", width: "100%" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+            <div style={{ width: 32, height: 1, background: "rgba(99,102,241,0.7)" }} />
+            <span style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#6366f1", fontWeight: 700 }}>Our Mission</span>
+          </div>
+
+          <h2 style={{ fontSize: "clamp(1.8rem, 4vw, 3rem)", fontWeight: 900, letterSpacing: "-0.04em", margin: "0 0 2.5rem", color: t.text, lineHeight: 1.05 }}>
+            We built this for every student
+            <br />
+            <span style={{ color: t.textMuted, fontWeight: 500 }}>who ever said "I'm just not a CS person."</span>
+          </h2>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.25rem" }}>
+            {missionPoints.map((point) => (
+              <div
+                key={point.title}
+                style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: 20, padding: "2rem", display: "flex", flexDirection: "column", gap: 14, transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s" }}
+                onMouseEnter={(e) => {
+                  const el = e.currentTarget as HTMLDivElement;
+                  el.style.borderColor = "rgba(99,102,241,0.4)";
+                  el.style.transform = "translateY(-3px)";
+                  el.style.boxShadow = isDark ? "0 12px 40px rgba(99,102,241,0.12)" : "0 12px 40px rgba(99,102,241,0.1)";
+                }}
+                onMouseLeave={(e) => {
+                  const el = e.currentTarget as HTMLDivElement;
+                  el.style.borderColor = t.border;
+                  el.style.transform = "translateY(0)";
+                  el.style.boxShadow = "none";
+                }}
+              >
+                <span style={{ fontSize: 32 }}>{point.emoji}</span>
+                <h3 style={{ fontSize: "1.1rem", fontWeight: 800, letterSpacing: "-0.02em", color: t.text, margin: 0, lineHeight: 1.3 }}>{point.title}</h3>
+                <p style={{ fontSize: "0.9rem", lineHeight: 1.75, color: t.textMuted, margin: 0 }}>{point.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Divider */}
+        <div style={{ maxWidth: 1200, margin: "5rem auto", width: "100%", height: 1, background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent)" }} />
+
+        {/* ── TEAM ── */}
+        <section style={{ maxWidth: 1200, margin: "0 auto", width: "100%" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3rem", flexWrap: "wrap", gap: "1.5rem" }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
+                <div style={{ width: 32, height: 1, background: "rgba(99,102,241,0.7)" }} />
+                <span style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#6366f1", fontWeight: 700 }}>The Team</span>
+              </div>
+              <h2 style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 900, letterSpacing: "-0.04em", margin: 0, lineHeight: 1, color: t.text }}>
+                Four minds,<br />one mission.
+              </h2>
+            </div>
+            <p style={{ maxWidth: 340, fontSize: "0.95rem", color: t.textMuted, lineHeight: 1.7, margin: 0 }}>
+              A cross-functional founding team united by the belief that learning algorithms shouldn't be painful.
+            </p>
+          </div>
+
+          {/* Founder cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1px", background: t.border, borderRadius: 24, overflow: "hidden", border: `1px solid ${t.border}` }}>
+            {founders.map((founder, i) => (
+              <div
+                key={founder.name}
+                style={{ background: t.surface, padding: "2.5rem 2rem", display: "flex", flexDirection: "column", gap: 20, transition: "background 0.2s", cursor: "default", position: "relative", overflow: "hidden" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = t.surfaceHover; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = t.surface; }}
+              >
+                {/* Big visible number */}
+                <span style={{ position: "absolute", top: 12, right: 18, fontSize: 72, fontWeight: 900, color: t.cardNumColor, letterSpacing: "-0.06em", lineHeight: 1, userSelect: "none", fontVariantNumeric: "tabular-nums", transition: "color 0.3s" }}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+
+                {/* Initials badge */}
+                <div style={{ width: 56, height: 56, borderRadius: 14, background: `linear-gradient(135deg, ${founder.accent}25, ${founder.accent}45)`, border: `1.5px solid ${founder.accent}60`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 900, color: founder.accent, letterSpacing: "-0.02em", flexShrink: 0 }}>
+                  {founder.initials}
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                  <span style={{ fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: founder.accent, fontWeight: 700 }}>
+                    {founder.focus}
+                  </span>
+                  <h3 style={{ fontSize: "1.3rem", fontWeight: 800, letterSpacing: "-0.03em", margin: 0, color: t.text, lineHeight: 1.2 }}>
+                    {founder.name}
+                  </h3>
+                  <span style={{ fontSize: 11, color: t.textFaint, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 600 }}>
+                    {founder.role}
+                  </span>
+                </div>
+
+                <p style={{ fontSize: "0.88rem", lineHeight: 1.8, color: t.textMuted, margin: 0 }}>
+                  {founder.description}
+                </p>
+
+                {/* Bottom accent line */}
+                <div style={{ height: 2, borderRadius: 2, background: `linear-gradient(90deg, ${founder.accent}70, transparent)`, marginTop: "auto" }} />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── CLOSING MANIFESTO ── */}
+        <section style={{ maxWidth: 1200, margin: "5rem auto 0", width: "100%", padding: "3rem 2.5rem", borderRadius: 24, background: t.missionBg, border: `1px solid ${t.missionBorder}`, display: "flex", flexWrap: "wrap", gap: "2rem", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <p style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.65rem)", fontWeight: 800, letterSpacing: "-0.03em", margin: 0, color: t.text, lineHeight: 1.35, maxWidth: 560 }}>
+              "You don't need to be a genius.{" "}
+              <span style={{ color: t.textMuted, fontWeight: 500 }}>
+                You just need to see it. That's what AlgoMaitri is here for."
+              </span>
+            </p>
+          </div>
+          <Link
+            href="/visualizer"
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 28px", border: `1px solid rgba(99,102,241,0.4)`, borderRadius: 100, color: isDark ? "rgba(232,232,240,0.85)" : "#111118", textDecoration: "none", fontSize: 14, fontWeight: 700, letterSpacing: "0.02em", whiteSpace: "nowrap", transition: "all 0.2s" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(99,102,241,0.15)"; e.currentTarget.style.borderColor = "rgba(99,102,241,0.6)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "rgba(99,102,241,0.4)"; }}
+          >
+            Start Learning <ArrowUpRight size={15} />
+          </Link>
         </section>
       </div>
     </main>
