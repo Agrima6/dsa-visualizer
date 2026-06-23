@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { HeapNode, HeapType } from "@/components/visualizer/heap/types"
 import { useAlgorithmFeedback } from "@/hooks/use-algorithm-feedback"
+import { playNarration } from "@/lib/narration"
 
 let nodeIdCounter = 0
 
@@ -9,6 +10,7 @@ export function useHeap() {
   const [heapArray, setHeapArray] = useState<number[]>([])
   const [heapType, setHeapType] = useState<HeapType>("max")
   const [highlightedNodes, setHighlightedNodes] = useState<string[]>([])
+  const [voiceEnabled, setVoiceEnabled] = useState(true)
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
 
@@ -100,6 +102,10 @@ export function useHeap() {
   }
 
   const insert = async (value: number) => {
+    if (voiceEnabled) {
+      await playNarration(`Inserting value ${value} into the ${heapType} heap.`)
+    }
+
     const newArray = [...heapArray, value]
 
     setHighlightedNodes([`array-${newArray.length - 1}`])
@@ -124,6 +130,10 @@ export function useHeap() {
 
     if (nums.length === 0) return
 
+    if (voiceEnabled) {
+      await playNarration(`Inserting ${nums.length} elements into the ${heapType} heap.`)
+    }
+
     const newArray = [...heapArray]
 
     for (const value of nums) {
@@ -146,6 +156,11 @@ export function useHeap() {
 
   const toggleHeapType = async () => {
     const newType: HeapType = heapType === "max" ? "min" : "max"
+
+    if (voiceEnabled) {
+      await playNarration(`Changing heap type from ${heapType} heap to ${newType} heap.`)
+    }
+
     const newArray = [...heapArray]
 
     setHeapType(newType)
@@ -226,5 +241,7 @@ export function useHeap() {
     insertMany,
     toggleHeapType,
     clear,
+    voiceEnabled,
+    setVoiceEnabled,
   }
 }

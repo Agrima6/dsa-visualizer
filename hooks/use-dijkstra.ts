@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { exampleGraphs } from "@/components/visualizer/dijkstra/example-graphs"
+import { playNarration } from "@/lib/narration"
 
 export interface Node {
   id: string
@@ -24,6 +25,7 @@ interface Step {
   visited: Set<string>
   path: string[]
   message: string
+  narration?: string
 }
 
 export function useDijkstra() {
@@ -39,6 +41,7 @@ export function useDijkstra() {
   const [isAnimating, setIsAnimating] = useState(false)
   const [isAutoPlaying, setIsAutoPlaying] = useState(false)
   const [autoPlayInterval, setAutoPlayInterval] = useState<NodeJS.Timeout | null>(null)
+  const [voiceEnabled, setVoiceEnabled] = useState(true)
 
   const addNode = (x: number, y: number) => {
     const id = `node-${graph.nodes.length}`

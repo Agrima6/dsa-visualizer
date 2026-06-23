@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { StackNode, StackOperation } from "@/components/visualizer/stack/types"
 import { useAlgorithmFeedback } from "@/hooks/use-algorithm-feedback"
+import { playNarration } from "@/lib/narration"
 let nodeIdCounter = 0
 
 export function useStack(maxSize: number = 8) {
@@ -8,6 +9,7 @@ export function useStack(maxSize: number = 8) {
   const [operations, setOperations] = useState<StackOperation[]>([])
   const [isAnimating, setIsAnimating] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null)
+  const [voiceEnabled, setVoiceEnabled] = useState(true)
 const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
   const push = async (value: number) => {
    
@@ -15,6 +17,9 @@ const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
     
     setIsAnimating(true)
      stepSound()
+    if (voiceEnabled) {
+      await playNarration(`Pushing value ${value} onto the stack.`)
+    }
     setOperations(prev => [...prev, { type: 'push', value, timestamp: Date.now() }])
 
     // Highlight the new position
@@ -44,6 +49,9 @@ showEndMessage("Algorithm ended", `Push operation completed for ${value}.`)
     
     setIsAnimating(true)
      stepSound()
+    if (voiceEnabled) {
+      await playNarration(`Popping value ${stack[stack.length - 1].value} from the stack.`)
+    }
     setOperations(prev => [...prev, { type: 'pop', value: stack[stack.length - 1].value, timestamp: Date.now() }])
 
     // Highlight the top element
@@ -78,5 +86,7 @@ showEndMessage("Algorithm ended", "Pop operation completed.")
     clear,
     isFull: stack.length >= maxSize,
     isEmpty: stack.length === 0,
+    voiceEnabled,
+    setVoiceEnabled,
   }
 } 

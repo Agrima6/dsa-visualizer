@@ -7,6 +7,7 @@ import {
   AnimationState,
 } from '@/components/visualizer/linked-list/types'
 import { useAlgorithmFeedback } from '@/hooks/use-algorithm-feedback'
+import { playNarration } from '@/lib/narration'
 
 let nodeIdCounter = 0
 
@@ -31,6 +32,7 @@ export function useLinkedList(type: ListType) {
     message: '',
   })
   const [isAnimating, setIsAnimating] = useState(false)
+  const [voiceEnabled, setVoiceEnabled] = useState(true)
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
 
@@ -70,6 +72,10 @@ export function useLinkedList(type: ListType) {
   const insertFront = async (value: number) => {
     if (isAnimating) return
     setIsAnimating(true)
+
+    if (voiceEnabled) {
+      await playNarration(`Inserting value ${value} at the front of the linked list.`)
+    }
 
     addOperation({ type: 'insert-front', value })
 
@@ -117,6 +123,10 @@ export function useLinkedList(type: ListType) {
     if (isAnimating) return
     setIsAnimating(true)
 
+    if (voiceEnabled) {
+      await playNarration(`Inserting value ${value} at the back of the linked list.`)
+    }
+
     addOperation({ type: 'insert-back', value })
 
     const nodes = new Map(list.nodes)
@@ -163,6 +173,10 @@ export function useLinkedList(type: ListType) {
     if (isAnimating || !list.head) return
     setIsAnimating(true)
 
+    if (voiceEnabled) {
+      await playNarration("Deleting node from the front of the linked list.")
+    }
+
     addOperation({ type: 'delete-front' })
 
     const nodes = new Map(list.nodes)
@@ -197,6 +211,10 @@ export function useLinkedList(type: ListType) {
   const deleteBack = async () => {
     if (isAnimating || !list.tail) return
     setIsAnimating(true)
+
+    if (voiceEnabled) {
+      await playNarration("Deleting node from the back of the linked list.")
+    }
 
     addOperation({ type: 'delete-back' })
 
@@ -290,5 +308,7 @@ export function useLinkedList(type: ListType) {
     deleteFront,
     deleteBack,
     reverse,
+    voiceEnabled,
+    setVoiceEnabled,
   }
 }

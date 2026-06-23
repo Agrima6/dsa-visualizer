@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { BinaryTreeNode } from "@/components/visualizer/binary-tree/types"
 import { useAlgorithmFeedback } from "@/hooks/use-algorithm-feedback"
+import { playNarration } from "@/lib/narration"
 
 let nodeIdCounter = 0
 
@@ -9,6 +10,7 @@ export function useBinaryTree() {
   const [highlightedNodes, setHighlightedNodes] = useState<string[]>([])
   const [traversalHistory, setTraversalHistory] = useState<number[]>([])
   const [isAnimating, setIsAnimating] = useState(false)
+  const [voiceEnabled, setVoiceEnabled] = useState(true)
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
 
@@ -16,6 +18,10 @@ export function useBinaryTree() {
     if (isNaN(value) || isAnimating) return
 
     setIsAnimating(true)
+
+    if (voiceEnabled) {
+      await playNarration(`Inserting value ${value} into the binary tree.`)
+    }
 
     const newNode: BinaryTreeNode = {
       id: `node-${nodeIdCounter++}`,
@@ -144,6 +150,10 @@ export function useBinaryTree() {
     setHighlightedNodes([])
     setTraversalHistory([])
 
+    if (voiceEnabled) {
+      await playNarration("Starting inorder traversal of the binary tree.")
+    }
+
     try {
       await traverseWithAnimation(
         tree,
@@ -168,6 +178,10 @@ export function useBinaryTree() {
     setHighlightedNodes([])
     setTraversalHistory([])
 
+    if (voiceEnabled) {
+      await playNarration("Starting preorder traversal of the binary tree.")
+    }
+
     try {
       await traverseWithAnimation(
         tree,
@@ -191,6 +205,10 @@ export function useBinaryTree() {
     setIsAnimating(true)
     setHighlightedNodes([])
     setTraversalHistory([])
+
+    if (voiceEnabled) {
+      await playNarration("Starting postorder traversal of the binary tree.")
+    }
 
     try {
       await traverseWithAnimation(
@@ -219,5 +237,7 @@ export function useBinaryTree() {
     inorderTraversal,
     preorderTraversal,
     postorderTraversal,
+    voiceEnabled,
+    setVoiceEnabled,
   }
 }

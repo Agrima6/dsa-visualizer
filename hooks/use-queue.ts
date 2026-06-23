@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { QueueNode, QueueOperation } from "@/components/visualizer/queue/types"
 import { useAlgorithmFeedback } from "@/hooks/use-algorithm-feedback"
+import { playNarration } from "@/lib/narration"
 
 let nodeIdCounter = 0
 
@@ -9,6 +10,7 @@ export function useQueue(maxSize: number = 8) {
   const [operations, setOperations] = useState<QueueOperation[]>([])
   const [isAnimating, setIsAnimating] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null)
+  const [voiceEnabled, setVoiceEnabled] = useState(true)
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
 
@@ -16,6 +18,10 @@ export function useQueue(maxSize: number = 8) {
     if (queue.length >= maxSize || isAnimating) return
 
     setIsAnimating(true)
+
+    if (voiceEnabled) {
+      await playNarration(`Enqueuing value ${value} to the queue.`)
+    }
 
     setOperations((prev) => [
       ...prev,
@@ -55,11 +61,17 @@ export function useQueue(maxSize: number = 8) {
 
     setIsAnimating(true)
 
+    const value = queue[0].value
+
+    if (voiceEnabled) {
+      await playNarration(`Dequeuing value ${value} from the queue.`)
+    }
+
     setOperations((prev) => [
       ...prev,
       {
         type: "dequeue",
-        value: queue[0].value,
+        value,
         timestamp: Date.now(),
       },
     ])
@@ -108,5 +120,7 @@ export function useQueue(maxSize: number = 8) {
     clear,
     isFull: queue.length >= maxSize,
     isEmpty: queue.length === 0,
+    voiceEnabled,
+    setVoiceEnabled,
   }
 }
