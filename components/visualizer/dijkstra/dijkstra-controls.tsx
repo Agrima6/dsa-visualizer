@@ -9,7 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useState } from "react"
 import { Node } from "@/hooks/use-dijkstra"
 import { exampleGraphs } from "./example-graphs"
-import { Play, Pause } from "lucide-react"
+import { Play, Pause, Volume2 } from "lucide-react"
+const speedOptions = [{ label: "0.5x", value: 1500 }, { label: "1x", value: 800 }, { label: "1.5x", value: 500 }, { label: "2x", value: 250 }]
 
 interface DijkstraControlsProps {
   onAddNode: (x: number, y: number) => void
@@ -30,6 +31,10 @@ interface DijkstraControlsProps {
   distances: Map<string, number>
   onAutoPlay: () => void
   isAutoPlaying: boolean
+  speed: number
+  onSetSpeed: (speed: number) => void
+  voiceEnabled: boolean
+  onSetVoiceEnabled: (enabled: boolean) => void
 }
 
 export function DijkstraControls({
@@ -51,6 +56,7 @@ export function DijkstraControls({
   distances,
   onAutoPlay,
   isAutoPlaying,
+  speed, onSetSpeed, voiceEnabled, onSetVoiceEnabled,
 }: DijkstraControlsProps) {
   const [sourceNode, setSourceNode] = useState("")
   const [targetNode, setTargetNode] = useState("")
@@ -130,6 +136,7 @@ export function DijkstraControls({
         <CardDescription>Configure and run the algorithm</CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="mb-4 space-y-3 rounded-lg border p-3"><div><p className="mb-2 text-sm">Animation Speed</p><div className="flex gap-2">{speedOptions.map(option => <button key={option.label} onClick={() => onSetSpeed(option.value)} className={`rounded-lg border px-3 py-1.5 text-sm ${speed === option.value ? "border-violet-600 bg-violet-600 text-white" : "border-violet-500/20 text-muted-foreground"}`}>{option.label}</button>)}</div></div><Button variant="outline" className={`w-full rounded-xl ${voiceEnabled ? "border-green-500 bg-green-500/10 text-green-600" : "border-violet-500/20"}`} onClick={() => onSetVoiceEnabled(!voiceEnabled)}><Volume2 className="mr-1 h-4 w-4" />{voiceEnabled ? "🔊 Voice Narration ON" : "🔇 Voice Narration OFF"}</Button></div>
         <Tabs defaultValue="build" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="build">Build Graph</TabsTrigger>

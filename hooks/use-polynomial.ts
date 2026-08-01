@@ -79,6 +79,12 @@ export function usePolynomial() {
     setCurrentStep(-1)
   }
 
+  const setPolynomials = (first: Term[], second: Term[]) => {
+    setPoly1(createPolynomial(first)); setPoly2(createPolynomial(second))
+    setResult({ head: null, nodes: new Map() }); setSteps([]); setCurrentStep(-1)
+    setHighlightedNodes({ poly1: [], poly2: [], result: [] })
+  }
+
   const parsePolynomial = (input: string): Term[] => {
     // Basic parsing of format like "2x^2 + 3x + 1"
     const terms: Term[] = []
@@ -97,6 +103,7 @@ export function usePolynomial() {
   }
 
   const multiply = async () => {
+    setResult({ head: null, nodes: new Map() })
     const steps: MultiplicationStep[] = []
     const resultTerms = new Map<number, number>()
 
@@ -223,6 +230,7 @@ export function usePolynomial() {
     multiply,
     setCurrentStep,
     setPoly1,
-    setPoly2
+    setPoly2,
+    setPolynomials
   }
 } 

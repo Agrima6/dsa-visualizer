@@ -3,6 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { motion, AnimatePresence } from "framer-motion"
 import { Token } from "./types"
+import { Volume2 } from "lucide-react"
+const speedOptions = [{ label: "0.5x", value: 1500 }, { label: "1x", value: 800 }, { label: "1.5x", value: 500 }, { label: "2x", value: 250 }]
 import { usePostfixEvaluation } from "@/hooks/use-postfix-evaluation"
 import { TokenDisplay } from "@/components/visualizer/stack-applications/token-display"
 
@@ -11,7 +13,7 @@ interface PostfixEvaluationProps {
 }
 
 export function PostfixEvaluation({ expression }: PostfixEvaluationProps) {
-  const { steps, isEvaluating, result, evaluate } = usePostfixEvaluation()
+  const { steps, isEvaluating, result, error, evaluate, speed, setSpeed, voiceEnabled, setVoiceEnabled } = usePostfixEvaluation()
 
   const handleEvaluate = () => {
     if (!isEvaluating) {
@@ -49,6 +51,8 @@ export function PostfixEvaluation({ expression }: PostfixEvaluationProps) {
           >
             Evaluate Expression
           </button>
+          <div className="mt-3 space-y-3"><div><p className="mb-2 text-sm">Animation Speed</p><div className="flex gap-2">{speedOptions.map(option => <button key={option.label} onClick={() => setSpeed(option.value)} className={`rounded-lg border px-3 py-1.5 text-sm ${speed === option.value ? "border-violet-600 bg-violet-600 text-white" : "border-violet-500/20 text-muted-foreground"}`}>{option.label}</button>)}</div></div><button onClick={() => setVoiceEnabled(!voiceEnabled)} className={`w-full rounded-xl border py-2 text-sm transition-all ${voiceEnabled ? "border-green-500 bg-green-500/10 text-green-600" : "border-violet-500/20"}`}><Volume2 className="mr-1 inline h-4 w-4" />{voiceEnabled ? "🔊 Voice Narration ON" : "🔇 Voice Narration OFF"}</button></div>
+          {error && <p role="alert" className="mt-3 rounded-xl border border-rose-500/20 bg-rose-500/5 px-3 py-2 text-sm text-rose-600 dark:text-rose-300">{error}</p>}
         </CardContent>
       </Card>
 

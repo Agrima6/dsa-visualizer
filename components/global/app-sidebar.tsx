@@ -51,7 +51,7 @@ const dataStructures = [
     description: "Linear data structure with elements linked using pointers",
   },
   {
-    name: "Binary Search Tree",
+    name: "Binary Tree",
     url: "/visualizer/binary-tree",
     icon: Binary,
     description: "Basic binary tree with BST properties",

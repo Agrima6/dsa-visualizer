@@ -1,4 +1,15 @@
 const audioCache = new Map<string, string>()
+let activeAudio: HTMLAudioElement | null = null
+let resolveActivePlayback: (() => void) | null = null
+let narrationRequestId = 0
+
+export function stopNarration() {
+  narrationRequestId += 1
+  activeAudio?.pause()
+  activeAudio = null
+  resolveActivePlayback?.()
+  resolveActivePlayback = null
+}
 
 export async function generateNarration(
   text: string
@@ -50,17 +61,25 @@ export async function playNarration(
   text: string
 ) {
   try {
+    const requestId = ++narrationRequestId
     const audioUrl =
       await generateNarration(text)
 
-    if (!audioUrl) return
+    // Ignore an out-of-date fetch if the visualizer has already advanced.
+    if (!audioUrl || requestId !== narrationRequestId) return
 
     return new Promise<void>((resolve) => {
+      // A visualizer can move to a new step before a previous clip finishes.
+      // Stop and resolve that clip so narration never overlaps or multiplies.
+      if (activeAudio) stopNarration()
       const audio = new Audio(audioUrl)
+      activeAudio = audio
+      resolveActivePlayback = resolve
 
       audio.volume = 1
 
       audio.onended = () => {
+        if (activeAudio === audio) { activeAudio = null; resolveActivePlayback = null }
         resolve()
       }
 
@@ -70,6 +89,7 @@ export async function playNarration(
           e
         )
 
+        if (activeAudio === audio) { activeAudio = null; resolveActivePlayback = null }
         resolve()
       }
 
@@ -79,6 +99,7 @@ export async function playNarration(
           err
         )
 
+        if (activeAudio === audio) { activeAudio = null; resolveActivePlayback = null }
         resolve()
       })
     })

@@ -109,7 +109,7 @@ const features = [
     previewType: "linked-list",
   },
   {
-    title: "Binary Search Trees",
+    title: "Binary Tree",
     description:
       "Understand ordered insertion, search paths, and traversals.",
     image: "/ds-bst.png",

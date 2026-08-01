@@ -36,6 +36,7 @@ export function DijkstraVisualizer({ content }: DijkstraVisualizerProps) {
     endNodeId,
     isAutoPlaying,
     toggleAutoPlay,
+    speed, setSpeed, voiceEnabled, setVoiceEnabled,
   } = useDijkstra()
 
   useStepFeedback(currentStep, totalSteps, "Dijkstra's Algorithm")
@@ -112,6 +113,10 @@ export function DijkstraVisualizer({ content }: DijkstraVisualizerProps) {
                   distances={distances}
                   onAutoPlay={toggleAutoPlay}
                   isAutoPlaying={isAutoPlaying}
+                  speed={speed}
+                  onSetSpeed={setSpeed}
+                  voiceEnabled={voiceEnabled}
+                  onSetVoiceEnabled={setVoiceEnabled}
                 />
               </div>
             </div>

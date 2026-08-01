@@ -77,7 +77,7 @@ const featureList: FeatureProps[] = [
     url: "/visualizer/linked-list",
   },
   {
-    title: "Binary Search Trees",
+    title: "Binary Tree",
     description: "See insertions, traversals, and structure clearly.",
     url: "/visualizer/binary-tree",
   },

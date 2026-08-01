@@ -1,12 +1,10 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
 
 import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/global/theme-provider"
 import { ClerkProvider } from "@clerk/nextjs"
-
-const inter = Inter({ subsets: ["latin"] })
+import { ProgressProvider } from "@/hooks/use-progress"
 
 export const metadata: Metadata = {
   title: "AlgoMaitri",
@@ -21,7 +19,8 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className={inter.className}>
+        <body>
+          <ProgressProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -40,6 +39,7 @@ export default function RootLayout({
 
             <Toaster />
           </ThemeProvider>
+          </ProgressProvider>
         </body>
       </html>
     </ClerkProvider>

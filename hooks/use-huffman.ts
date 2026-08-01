@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { playNarration } from '@/lib/narration'
 import { HuffmanNode, HuffmanStep } from '@/components/visualizer/huffman/types'
 
 let nodeIdCounter = 0
@@ -12,6 +13,8 @@ export function useHuffman() {
   const [isAnimating, setIsAnimating] = useState(false)
   const [originalText, setOriginalText] = useState("")
   const [frequencies, setFrequencies] = useState<Map<string, number>>(new Map())
+  const [speed, setSpeed] = useState(700)
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false)
 
   const getFrequencies = (text: string): Map<string, number> => {
     const frequencies = new Map<string, number>()
@@ -50,13 +53,13 @@ export function useHuffman() {
     let allNodes = [...leafNodes]
     
     // Initial state
-    setSteps([{
+    const generatedSteps: HuffmanStep[] = [{
       type: 'BUILD_QUEUE',
       nodes: allNodes,
       priorityQueue: [...priorityQueue],
       message: 'Initial nodes with frequencies',
       highlightedNodes: allNodes.map(n => n.id)
-    }])
+    }]
 
     // Build tree step by step
     while (priorityQueue.length > 1) {
@@ -64,13 +67,13 @@ export function useHuffman() {
       const right = priorityQueue.shift()!
 
       // Highlight nodes being merged
-      setSteps(prev => [...prev, {
+      generatedSteps.push({
         type: 'MERGE_NODES',
         nodes: allNodes,
         priorityQueue: [...priorityQueue],
         message: `Selecting nodes with frequencies ${left.frequency} and ${right.frequency}`,
         highlightedNodes: [left.id, right.id]
-      }])
+      })
 
       const parent = createNode(
         `${left.frequency + right.frequency}`,
@@ -89,13 +92,13 @@ export function useHuffman() {
       priorityQueue.splice(i, 0, parent)
 
       // Show merged result
-      setSteps(prev => [...prev, {
+      generatedSteps.push({
         type: 'MERGE_NODES',
         nodes: allNodes,
         priorityQueue: [...priorityQueue],
         message: `Created new node with frequency ${parent.frequency}`,
         highlightedNodes: [parent.id]
-      }])
+      })
     }
 
     const root = priorityQueue[0]
@@ -107,43 +110,44 @@ export function useHuffman() {
       if (!node.left && !node.right) {
         newCodes.set(node.value, code)
         node.code = code
-        setSteps(prev => [...prev, {
+        generatedSteps.push({
           type: 'ASSIGN_CODES',
           nodes: allNodes,
           priorityQueue: [],
           message: `Assigning code ${code} to character '${node.value}'`,
           highlightedNodes: [node.id],
           codes: new Map(newCodes)
-        }])
+        })
       }
       if (node.left) {
-        setSteps(prev => [...prev, {
+        generatedSteps.push({
           type: 'ASSIGN_CODES',
           nodes: allNodes,
           priorityQueue: [],
           message: `Going left (0) from ${node.frequency}`,
           highlightedNodes: [node.id, node.left?.id || ''],
           codes: new Map(newCodes)
-        }])
+        })
         assignCodes(node.left, code + '0')
       }
       if (node.right) {
-        setSteps(prev => [...prev, {
+        generatedSteps.push({
           type: 'ASSIGN_CODES',
           nodes: allNodes,
           priorityQueue: [],
           message: `Going right (1) from ${node.frequency}`,
           highlightedNodes: [node.id, node.right?.id || ''],
           codes: new Map(newCodes)
-        }])
+        })
         assignCodes(node.right, code + '1')
       }
     }
     assignCodes(root)
 
+    setSteps(generatedSteps)
     setCodes(newCodes)
     setCurrentStep(0)
-    setHighlightedNodes(steps[0]?.highlightedNodes || [])
+    setHighlightedNodes(generatedSteps[0]?.highlightedNodes || [])
     setIsAnimating(false)
   }
 
@@ -155,6 +159,7 @@ export function useHuffman() {
       if (step.codes) {
         setCodes(step.codes)
       }
+      void playNarration(step.message)
     }
   }
 
@@ -178,7 +183,17 @@ export function useHuffman() {
     setOriginalText("")
     setFrequencies(new Map())
     nodeIdCounter = 0
+    setIsAutoPlaying(false)
   }
+
+  useEffect(() => {
+    if (!isAutoPlaying || currentStep >= steps.length - 1) {
+      if (currentStep >= steps.length - 1) setIsAutoPlaying(false)
+      return
+    }
+    const timer = window.setTimeout(nextStep, speed)
+    return () => window.clearTimeout(timer)
+  }, [isAutoPlaying, currentStep, steps.length, speed])
 
   return {
     tree,
@@ -193,5 +208,9 @@ export function useHuffman() {
     reset,
     originalText,
     frequencies,
+    speed,
+    setSpeed,
+    isAutoPlaying,
+    setIsAutoPlaying,
   }
 } 

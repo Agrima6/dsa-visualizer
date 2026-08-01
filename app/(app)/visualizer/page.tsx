@@ -29,7 +29,7 @@ const sections = {
       icon: ArrowLeftRight,
     },
     {
-      name: "Binary Search Tree",
+      name: "Binary Tree",
       description: "A binary tree that maintains sorted data with O(log n) operations. Learn about tree traversals.",
       href: "/visualizer/binary-tree",
       icon: Binary,

@@ -22,6 +22,7 @@ function GraphVisualizerOriginal({ onSwitchToCode }: { onSwitchToCode: () => voi
     nodes, edges, highlighted, visited, inQueue, path,
     message, isAnimating, operations, selectedNode, startNode, algorithm,
     setSelectedNode, setStartNode, setAlgorithm,
+    speed, setSpeed, voiceEnabled, setVoiceEnabled,
     addNode, removeNode, addEdge, moveNode, clear, run, resetViz,
   } = useGraph()
 
@@ -102,6 +103,10 @@ function GraphVisualizerOriginal({ onSwitchToCode }: { onSwitchToCode: () => voi
           onClear={clear}
           onRun={run}
           onReset={resetViz}
+          speed={speed}
+          onSetSpeed={setSpeed}
+          voiceEnabled={voiceEnabled}
+          onSetVoiceEnabled={setVoiceEnabled}
         />
 
         <GraphDisplay

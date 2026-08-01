@@ -12,7 +12,7 @@ export async function POST(req) {
   store[userId].push({
     topic,
     action,
-    timestamp: new Date(),
+    timestamp: new Date().toISOString(),
   });
 
   return Response.json({ success: true });

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState, useRef } from "react"
 
 const MAX_LENGTH = 20
+const speedOptions = [{ label: "0.5x", value: 1500 }, { label: "1x", value: 800 }, { label: "1.5x", value: 500 }, { label: "2x", value: 250 }]
 
 // Huffman works on printable ASCII — allow letters, digits, spaces,
 // and common punctuation. Block control characters and anything non-printable.
@@ -19,6 +20,10 @@ interface HuffmanControlsProps {
   isAnimating: boolean
   currentStep: number
   totalSteps: number
+  speed: number
+  onSetSpeed: (speed: number) => void
+  isAutoPlaying: boolean
+  onToggleAutoPlay: () => void
 }
 
 export function HuffmanControls({
@@ -29,6 +34,7 @@ export function HuffmanControls({
   isAnimating,
   currentStep,
   totalSteps,
+  speed, onSetSpeed, isAutoPlaying, onToggleAutoPlay,
 }: HuffmanControlsProps) {
   const [text, setText] = useState("")
   const [invalidChar, setInvalidChar] = useState<string | null>(null)
@@ -164,6 +170,11 @@ export function HuffmanControls({
           >
             Reset
           </Button>
+        </div>
+
+        <div className="space-y-3">
+          <Button variant="outline" className="flex-1" onClick={onToggleAutoPlay} disabled={totalSteps === 0}>{isAutoPlaying ? "Pause" : "Auto play"}</Button>
+          <div><p className="mb-2 text-sm">Animation Speed</p><div className="flex gap-2">{speedOptions.map(option => <button key={option.label} onClick={() => onSetSpeed(option.value)} className={`rounded-lg border px-3 py-1.5 text-sm ${speed === option.value ? "border-violet-600 bg-violet-600 text-white" : "border-violet-500/20 text-muted-foreground"}`}>{option.label}</button>)}</div></div>
         </div>
 
         {/* ── Step indicator ── */}

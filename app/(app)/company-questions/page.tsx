@@ -2,7 +2,11 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Building2, Code2, ChevronRight, Flame, Star, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowRight, Building2, CheckCircle2, Code2, ChevronRight, Flame, Star, Zap } from "lucide-react";
+import { useProgress } from "@/hooks/use-progress";
+import { useUser } from "@clerk/nextjs";
+import { trackActivity } from "@/components/activity-tracker";
 
 interface Topic {
   title: string;
@@ -69,7 +73,7 @@ const topics: Topic[] = [
     url: "/visualizer/queue?mode=code",
   },
   {
-    title: "Binary Search Trees",
+    title: "Binary Tree",
     questions: 40,
     companies: ["Google", "Amazon", "Meta", "Microsoft"],
     difficulty: "Hard",
@@ -107,11 +111,51 @@ const tagConfig = {
 
 export default function CompanyQuestionsPage() {
   const [activeCompany, setActiveCompany] = useState("All");
+  const { markSolved, markMultipleSolved, unmarkSolved, isSolved } = useProgress();
+  const { user } = useUser();
+  const router = useRouter();
 
   const filtered =
     activeCompany === "All"
       ? topics
       : topics.filter((t) => t.companies.includes(activeCompany));
+
+  const getTopicSlug = (topic: Topic) =>
+    `company-${topic.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+
+  const buildEntry = (topic: Topic) => ({
+    slug: getTopicSlug(topic),
+    title: topic.title,
+    difficulty: topic.difficulty,
+    topic: topic.title.toLowerCase().replace(/\s+/g, "-"),
+  });
+
+  const handleToggleSolved = async (topic: Topic) => {
+    const entry = buildEntry(topic);
+    if (isSolved(entry.slug)) {
+      await unmarkSolved(entry.slug);
+      if (user?.id) void trackActivity(user.id, topic.title, "unmarked");
+      return;
+    }
+    await markSolved(entry);
+  };
+
+  const handleMarkAllVisible = async () => {
+    const entries = filtered.map(buildEntry);
+    await markMultipleSolved(entries);
+  };
+
+  const solvedCount = filtered.filter((topic) => isSolved(getTopicSlug(topic))).length;
+  const unsolvedCount = filtered.length - solvedCount;
+  const allVisibleSolved = filtered.length > 0 && unsolvedCount === 0;
+
+  const handleOpenTopic = async (topic: Topic) => {
+    if (user?.id) {
+      void trackActivity(user.id, topic.title, "opened");
+    }
+    await markSolved(buildEntry(topic));
+    router.push(topic.url);
+  };
 
   return (
     <main className="min-h-screen bg-background">
@@ -192,7 +236,7 @@ export default function CompanyQuestionsPage() {
 
       {/* ── Topics Grid ── */}
       <section className="mx-auto max-w-screen-xl px-6 py-10">
-        <div className="mb-6">
+        <div className="mb-6 space-y-4">
           <p className="text-sm text-muted-foreground">
             Showing{" "}
             <span className="font-semibold text-foreground">{filtered.length}</span>{" "}
@@ -201,6 +245,27 @@ export default function CompanyQuestionsPage() {
               <> for <span className="font-semibold text-violet-400">{activeCompany}</span></>
             )}
           </p>
+          <div className="flex flex-col gap-3 rounded-3xl border border-violet-500/10 bg-violet-500/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-foreground">Topic progress</p>
+              <p className="text-xs text-muted-foreground">
+                {solvedCount} solved, {unsolvedCount} remaining in this view.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleMarkAllVisible}
+              disabled={allVisibleSolved}
+              className={`inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+                allVisibleSolved
+                  ? "border border-violet-500/15 bg-violet-500/10 text-violet-300 cursor-not-allowed"
+                  : "border border-violet-500/40 bg-violet-600 text-white shadow-sm hover:bg-violet-500"
+              }`}
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              {allVisibleSolved ? "All solved" : "Mark all visible solved"}
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -257,17 +322,30 @@ export default function CompanyQuestionsPage() {
                 </div>
 
                 {/* Try with Code button */}
-                <div className="mt-auto border-t border-border/40 pt-4">
-                  <Link
-                    href={topic.url}
-                    className="group/btn flex w-full items-center justify-between rounded-xl border border-border/50 bg-muted/30 px-4 py-2.5 text-sm font-medium text-foreground transition-all duration-200 hover:border-violet-500/50 hover:bg-violet-500/10 hover:text-violet-300"
+                <div className="mt-4 grid gap-3 border-t border-border/30 pt-4 sm:grid-cols-[1.6fr_1fr]">
+                  <button
+                    type="button"
+                    onClick={() => void handleOpenTopic(topic)}
+                    className="group/btn flex w-full items-center justify-between rounded-2xl border border-border/50 bg-muted/30 px-4 py-2.5 text-sm font-medium text-foreground transition-all duration-200 hover:border-violet-500/50 hover:bg-violet-500/10 hover:text-violet-300"
                   >
                     <span className="flex items-center gap-2">
                       <Code2 className="h-4 w-4 text-muted-foreground group-hover/btn:text-violet-400 transition-colors" />
                       Try with Code
                     </span>
                     <ArrowRight className="h-4 w-4 text-muted-foreground group-hover/btn:translate-x-1 group-hover/btn:text-violet-400 transition-all" />
-                  </Link>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void handleToggleSolved(topic)}
+                    className={`inline-flex items-center justify-center gap-2 rounded-2xl border px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${
+                      isSolved(getTopicSlug(topic))
+                        ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-300 shadow-sm"
+                        : "border-violet-500/40 bg-violet-600 text-white hover:bg-violet-500"
+                    }`}
+                  >
+                    <CheckCircle2 className={`h-4 w-4 transition-colors ${isSolved(getTopicSlug(topic)) ? "text-emerald-400" : "text-white"}`} />
+                    {isSolved(getTopicSlug(topic)) ? "Solved" : "Mark solved"}
+                  </button>
                 </div>
 
                 <div className="pointer-events-none absolute inset-0 -z-10 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(ellipse_at_top_right,rgba(139,92,246,0.08),transparent_60%)]" />

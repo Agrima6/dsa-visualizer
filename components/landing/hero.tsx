@@ -124,7 +124,7 @@ export const Hero = () => {
                 ref={descRef}
                 className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-xl text-left"
               >
-                Master DSA problems asked at Google, Amazon, Microsoft & more - through visual, step-by-step animationsn.
+                Master DSA problems asked at Google, Amazon, Microsoft & more - through visual, step-by-step animations.
               </p>
             </div>
 

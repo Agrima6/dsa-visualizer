@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { usePolynomial, PolynomialNode, Term } from "@/hooks/use-polynomial"
 import { LinkedListDisplay } from "../linked-list/linked-list-display"
 import { ListNode, LinkedList } from "../linked-list/types"
@@ -12,6 +12,7 @@ import { useStepFeedback } from "@/hooks/use-step-feedback"
 
 // ── Input limits ──────────────────────────────────────────────────────────────
 const MAX_POLY_LENGTH = 20
+const speedOptions = [{ label: "0.5x", value: 1500 }, { label: "1x", value: 800 }, { label: "1.5x", value: 500 }, { label: "2x", value: 250 }]
 
 // ── Only these characters are valid in a polynomial expression ────────────────
 // digits, letters (coefficients/variables), spaces, operators, ^, dot
@@ -67,6 +68,7 @@ export function PolynomialMultiplication() {
     setCurrentStep,
     setPoly1,
     setPoly2,
+    setPolynomials,
   } = usePolynomial()
 
   useStepFeedback(currentStep, steps.length, "Polynomial Multiplication")
@@ -107,8 +109,8 @@ export function PolynomialMultiplication() {
   }
 
   // Separate timer refs per field so they don't interfere
-  const timer1 = { current: null as ReturnType<typeof setTimeout> | null }
-  const timer2 = { current: null as ReturnType<typeof setTimeout> | null }
+  const timer1 = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const timer2 = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handlePoly1Change = makeChangeHandler(setPoly1Input, setInvalidChar1, timer1)
   const handlePoly2Change = makeChangeHandler(setPoly2Input, setInvalidChar2, timer2)
@@ -119,8 +121,8 @@ export function PolynomialMultiplication() {
     try {
       const terms1 = parsePolynomial(poly1Input)
       const terms2 = parsePolynomial(poly2Input)
-      setPoly1(createPolynomial(terms1))
-      setPoly2(createPolynomial(terms2))
+      if (!terms1.length || !terms2.length) return
+      setPolynomials(terms1, terms2)
     } catch {
       console.error("Invalid input format")
     }
@@ -153,18 +155,19 @@ export function PolynomialMultiplication() {
   }
 
   const [isAutoPlaying, setIsAutoPlaying] = useState(false)
+  const [speed, setSpeed] = useState(900)
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
     if (isAutoPlaying && currentStep < steps.length - 1) {
       timeoutId = setTimeout(() => {
         setCurrentStep((prev) => prev + 1)
-      }, 1500)
+      }, speed)
     } else if (currentStep >= steps.length - 1) {
       setIsAutoPlaying(false)
     }
     return () => clearTimeout(timeoutId)
-  }, [isAutoPlaying, currentStep, steps.length, setCurrentStep])
+  }, [isAutoPlaying, currentStep, steps.length, setCurrentStep, speed])
 
   // ── Derived state for UI ──────────────────────────────────────────────────
   const isAtLimit1 = poly1Input.length >= MAX_POLY_LENGTH
@@ -292,6 +295,7 @@ export function PolynomialMultiplication() {
             Start Multiplication
           </Button>
             </div>
+            <div><p className="mb-2 text-sm">Animation Speed</p><div className="flex gap-2">{speedOptions.map(option => <button key={option.label} onClick={() => setSpeed(option.value)} className={`rounded-lg border px-3 py-1.5 text-sm transition-all ${speed === option.value ? "border-violet-600 bg-violet-600 text-white" : "border-violet-500/20 text-muted-foreground hover:bg-violet-500/10"}`}>{option.label}</button>)}</div></div>
           </div>
         </Card>
 

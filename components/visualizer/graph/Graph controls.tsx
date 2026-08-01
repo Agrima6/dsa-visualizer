@@ -4,7 +4,7 @@
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import type { GraphNode, GraphEdge, GraphOperation, GraphAlgorithm } from "./types"
-import { Play, Trash2, RotateCcw, GitBranch } from "lucide-react"
+import { Play, Trash2, RotateCcw, GitBranch, Volume2 } from "lucide-react"
 
 interface GraphControlsProps {
   nodes: GraphNode[]
@@ -22,16 +22,22 @@ interface GraphControlsProps {
   onClear: () => void
   onRun: () => void
   onReset: () => void
+  speed: number
+  onSetSpeed: (speed: number) => void
+  voiceEnabled: boolean
+  onSetVoiceEnabled: (enabled: boolean) => void
 }
 
 function cn(...c: (string | false | null | undefined)[]) { return c.filter(Boolean).join(" ") }
 
 const PANEL = "rounded-2xl border border-violet-500/15 bg-white/70 backdrop-blur-xl dark:bg-white/[0.04] shadow-[0_10px_40px_rgba(139,92,246,0.08)]"
+const speedOptions = [{ label: "0.5x", value: 1500 }, { label: "1x", value: 800 }, { label: "1.5x", value: 500 }, { label: "2x", value: 250 }]
 
 export function GraphControls({
   nodes, edges, algorithm, startNode, selectedNode, isAnimating, operations,
   onSetAlgorithm, onSetStartNode, onSetSelectedNode,
   onAddEdge, onRemoveNode, onClear, onRun, onReset,
+  speed, onSetSpeed, voiceEnabled, onSetVoiceEnabled,
 }: GraphControlsProps) {
   const [edgeFrom, setEdgeFrom] = useState("")
   const [edgeTo,   setEdgeTo]   = useState("")
@@ -67,6 +73,11 @@ export function GraphControls({
         {/* Instruction */}
         <div className="mb-4 rounded-xl border border-violet-500/10 bg-violet-500/5 px-3 py-2.5 text-xs text-muted-foreground leading-5">
           <span className="font-semibold text-violet-600 dark:text-violet-300">Tip:</span> Click the canvas to add nodes. Use the form below to add edges, then run BFS or DFS.
+        </div>
+
+        <div className="mb-4 space-y-3 rounded-xl border border-violet-500/10 bg-violet-500/[0.03] p-3">
+          <div><p className="mb-2 text-sm">Animation Speed</p><div className="flex gap-2">{speedOptions.map(option => <button key={option.label} onClick={() => onSetSpeed(option.value)} className={cn("rounded-lg border px-3 py-1.5 text-sm transition-all", speed === option.value ? "border-violet-600 bg-violet-600 text-white" : "border-violet-500/20 text-muted-foreground hover:bg-violet-500/10")}>{option.label}</button>)}</div></div>
+          <button type="button" onClick={() => onSetVoiceEnabled(!voiceEnabled)} className={cn("w-full rounded-xl border py-2 text-sm transition-all", voiceEnabled ? "border-green-500 bg-green-500/10 text-green-600" : "border-violet-500/20")}><Volume2 className="mr-1 inline h-4 w-4" />{voiceEnabled ? "🔊 Voice Narration ON" : "🔇 Voice Narration OFF"}</button>
         </div>
 
         {/* Algorithm picker */}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { exampleGraphs } from "@/components/visualizer/dijkstra/example-graphs"
-import { playNarration } from "@/lib/narration"
+import { playNarration, stopNarration } from "@/lib/narration"
 
 export interface Node {
   id: string
@@ -40,8 +40,9 @@ export function useDijkstra() {
   const [currentStep, setCurrentStep] = useState(-1)
   const [isAnimating, setIsAnimating] = useState(false)
   const [isAutoPlaying, setIsAutoPlaying] = useState(false)
-  const [autoPlayInterval, setAutoPlayInterval] = useState<NodeJS.Timeout | null>(null)
   const [voiceEnabled, setVoiceEnabled] = useState(true)
+  const [speed, setSpeed] = useState(900)
+  useEffect(() => { if (!voiceEnabled) stopNarration() }, [voiceEnabled])
 
   const addNode = (x: number, y: number) => {
     const id = `node-${graph.nodes.length}`
@@ -218,14 +219,15 @@ export function useDijkstra() {
     setIsAnimating(false)
   }
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (currentStep < steps.length - 1) {
       const nextStep = steps[currentStep + 1]
-      setCurrentStep(prev => prev + 1)
       setCurrentNode(nextStep.currentNode)
       setDistances(nextStep.distances)
       setVisitedNodes(nextStep.visited)
       setPath(nextStep.path)
+      if (voiceEnabled) await playNarration(nextStep.message)
+      setCurrentStep(prev => prev + 1)
     }
   }
 
@@ -291,51 +293,27 @@ export function useDijkstra() {
     setIsAnimating(false)
   }
 
-  const startAutoPlay = () => {
-    if (currentStep >= steps.length - 1) {
-      setCurrentStep(0)
-    }
-    setIsAutoPlaying(true)
-  }
-
-  const stopAutoPlay = () => {
-    setIsAutoPlaying(false)
-    if (autoPlayInterval) {
-      clearInterval(autoPlayInterval)
-      setAutoPlayInterval(null)
-    }
-  }
-
   useEffect(() => {
-    if (isAutoPlaying) {
-      const interval = setInterval(() => {
-        setCurrentStep(prev => {
-          if (prev >= steps.length - 1) {
-            stopAutoPlay()
-            return prev
-          }
-          const nextStep = steps[prev + 1]
-          setCurrentNode(nextStep.currentNode)
-          setDistances(nextStep.distances)
-          setVisitedNodes(nextStep.visited)
-          setPath(nextStep.path)
-          return prev + 1
-        })
-      }, 1000) // Adjust speed as needed
-      setAutoPlayInterval(interval)
-    }
-    return () => {
-      if (autoPlayInterval) {
-        clearInterval(autoPlayInterval)
-      }
-    }
-  }, [isAutoPlaying, steps.length])
+    if (!isAutoPlaying || steps.length === 0) return
+    if (currentStep >= steps.length - 1) { setIsAutoPlaying(false); return }
+    let cancelled = false
+    const timer = window.setTimeout(async () => {
+      const next = steps[currentStep + 1]
+      if (!next || cancelled) return
+      setCurrentNode(next.currentNode); setDistances(next.distances)
+      setVisitedNodes(next.visited); setPath(next.path)
+      if (voiceEnabled) await playNarration(next.message)
+      if (!cancelled) setCurrentStep(currentStep + 1)
+    }, speed)
+    return () => { cancelled = true; window.clearTimeout(timer) }
+  }, [isAutoPlaying, currentStep, steps, speed, voiceEnabled])
 
   const toggleAutoPlay = () => {
     if (isAutoPlaying) {
-      stopAutoPlay()
+      setIsAutoPlaying(false)
     } else {
-      startAutoPlay()
+      if (currentStep >= steps.length - 1) setCurrentStep(0)
+      setIsAutoPlaying(true)
     }
   }
 
@@ -361,5 +339,9 @@ export function useDijkstra() {
     endNodeId,
     isAutoPlaying,
     toggleAutoPlay,
+    speed,
+    setSpeed,
+    voiceEnabled,
+    setVoiceEnabled,
   }
 } 

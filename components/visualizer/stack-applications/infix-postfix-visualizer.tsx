@@ -11,10 +11,11 @@ import { PostfixEvaluation } from "./postfix-evaluation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MarkdownContent } from "@/components/shared/markdown-content"
 import { useAlgorithmFeedback } from "@/hooks/use-algorithm-feedback"
-import { Sparkles } from "lucide-react"
+import { Sparkles, Volume2 } from "lucide-react"
 
 const EXAMPLE_EXPRESSION = "A+B*C-D"
 const MAX_LENGTH = 10
+const speedOptions = [{ label: "0.5x", value: 1500 }, { label: "1x", value: 800 }, { label: "1.5x", value: 500 }, { label: "2x", value: 250 }]
 
 // ── Only these characters are allowed in an infix expression ─────────────────
 // Operands : A-Z  a-z  0-9
@@ -31,7 +32,7 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
   const [invalidChar, setInvalidChar] = useState<string | null>(null)
   const invalidTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const { steps, isConverting, result, convert } = useInfixConversion()
+  const { steps, isConverting, result, convert, speed, setSpeed, voiceEnabled, setVoiceEnabled } = useInfixConversion()
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
   const wasConvertingRef = useRef(false)
 
@@ -223,6 +224,7 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
                       Use Example
                     </Button>
                   </div>
+                  <div className="space-y-3"><div><p className="mb-2 text-sm">Animation Speed</p><div className="flex gap-2">{speedOptions.map(option => <button key={option.label} onClick={() => setSpeed(option.value)} className={`rounded-lg border px-3 py-1.5 text-sm ${speed === option.value ? "border-violet-600 bg-violet-600 text-white" : "border-violet-500/20 text-muted-foreground"}`}>{option.label}</button>)}</div></div><Button variant="outline" className={`w-full rounded-xl ${voiceEnabled ? "border-green-500 bg-green-500/10 text-green-600" : "border-violet-500/20"}`} onClick={() => setVoiceEnabled(!voiceEnabled)}><Volume2 className="mr-1 h-4 w-4" />{voiceEnabled ? "🔊 Voice Narration ON" : "🔇 Voice Narration OFF"}</Button></div>
                 </CardContent>
               </Card>
 

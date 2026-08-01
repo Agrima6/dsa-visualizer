@@ -1,12 +1,11 @@
 "use client"
 // hooks/Use graph.ts
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
+import { playNarration, stopNarration } from "@/lib/narration"
 import type {
   GraphNode, GraphEdge, GraphOperation, GraphAlgorithm,
 } from "@/components/visualizer/graph/types"
-
-const DELAY_MS = 650
 
 function sleep(ms: number) {
   return new Promise<void>(res => setTimeout(res, ms))
@@ -40,6 +39,9 @@ export function useGraph() {
   const [selectedNode, setSelectedNode] = useState<string | null>(null)
   const [startNode,   setStartNode]   = useState<string>("A")
   const [algorithm,   setAlgorithm]   = useState<GraphAlgorithm>("bfs")
+  const [speed, setSpeed] = useState(650)
+  const [voiceEnabled, setVoiceEnabled] = useState(true)
+  useEffect(() => { if (!voiceEnabled) stopNarration() }, [voiceEnabled])
 
   const addOp = (op: Omit<GraphOperation, "timestamp">) =>
     setOperations(prev => [{ ...op, timestamp: Date.now() }, ...prev].slice(0, 15))
@@ -118,7 +120,8 @@ export function useGraph() {
 
     setInQueue([startNode])
     setMessage(`BFS from ${startNode}. Queue: [${startNode}]`)
-    await sleep(DELAY_MS)
+    if (voiceEnabled) await playNarration(`Starting breadth first search from ${startNode}.`)
+    await sleep(speed)
 
     while (queue.length > 0) {
       const curr = queue.shift()!
@@ -127,7 +130,8 @@ export function useGraph() {
       setHighlighted([curr])
       setVisited([...order])
       setMessage(`Visiting ${curr}. Queue: [${queue.join(",")}]`)
-      await sleep(DELAY_MS)
+      if (voiceEnabled) await playNarration(`Visiting ${curr}.`)
+      await sleep(speed)
 
       for (const nb of (adj[curr] ?? [])) {
         if (!visitedSet.has(nb)) {
@@ -135,7 +139,7 @@ export function useGraph() {
           queue.push(nb)
           setInQueue([...queue])
           setMessage(`${curr} → ${nb} discovered. Queue: [${queue.join(",")}]`)
-          await sleep(DELAY_MS / 2)
+          await sleep(speed / 2)
         }
       }
     }
@@ -144,7 +148,7 @@ export function useGraph() {
     setPath([...order])
     setMessage(`BFS complete: ${order.join(" → ")}`)
     setIsAnimating(false)
-  }, [nodes, edges, startNode, isAnimating])
+  }, [nodes, edges, startNode, isAnimating, speed, voiceEnabled])
 
   const runDFS = useCallback(async () => {
     if (isAnimating || !startNode || !nodes.find(n => n.id === startNode)) return
@@ -161,16 +165,17 @@ export function useGraph() {
       setHighlighted([node])
       setVisited([...order])
       setMessage(`DFS visiting ${node}. Stack depth: ${order.length}`)
-      await sleep(DELAY_MS)
+      if (voiceEnabled) await playNarration(`Visiting ${node} in depth first search.`)
+      await sleep(speed)
 
       for (const nb of (adj[node] ?? [])) {
         if (!visitedSet.has(nb)) {
           setInQueue([nb])
           setMessage(`${node} → recurse into ${nb}`)
-          await sleep(DELAY_MS / 2)
+          await sleep(speed / 2)
           await dfs(nb)
           setHighlighted([node])
-          await sleep(DELAY_MS / 3)
+          await sleep(speed / 3)
         }
       }
     }
@@ -181,7 +186,7 @@ export function useGraph() {
     setPath([...order])
     setMessage(`DFS complete: ${order.join(" → ")}`)
     setIsAnimating(false)
-  }, [nodes, edges, startNode, isAnimating])
+  }, [nodes, edges, startNode, isAnimating, speed, voiceEnabled])
 
   const run = useCallback(() => {
     if (algorithm === "bfs") return runBFS()
@@ -192,6 +197,7 @@ export function useGraph() {
     nodes, edges, highlighted, visited, inQueue, path,
     message, isAnimating, operations, selectedNode, startNode, algorithm,
     setSelectedNode, setStartNode, setAlgorithm,
+    speed, setSpeed, voiceEnabled, setVoiceEnabled,
     addNode, removeNode, addEdge, moveNode, clear, run, resetViz,
   }
 }

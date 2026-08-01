@@ -1,11 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Token, ConversionStep } from '@/components/visualizer/stack-applications/types'
 import { isOperator, hasHigherPrecedence, Operator } from '@/lib/stack-operations'
+import { playNarration, stopNarration } from '@/lib/narration'
 
 export function useInfixConversion() {
   const [steps, setSteps] = useState<ConversionStep[]>([])
   const [isConverting, setIsConverting] = useState(false)
   const [result, setResult] = useState<Token[]>([])
+  const [speed, setSpeed] = useState(700)
+  const [voiceEnabled, setVoiceEnabled] = useState(true)
+  useEffect(() => { if (!voiceEnabled) stopNarration() }, [voiceEnabled])
 
   const tokenize = (expression: string): Token[] => {
     const tokens: Token[] = []
@@ -66,11 +70,12 @@ export function useInfixConversion() {
     
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i]
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise(resolve => setTimeout(resolve, speed))
       
       if (token.type === 'operand') {
         output.push(token)
         addStep(stack, output, token, i, `Add operand ${token.value} to output`)
+        if (voiceEnabled) await playNarration(`Add ${token.value} to the postfix output.`)
       }
       else if (token.type === 'operator') {
         while (stack.length > 0 && 
@@ -82,6 +87,7 @@ export function useInfixConversion() {
         }
         stack.push(token)
         addStep(stack, output, token, i, `Push operator ${token.value} to stack`)
+        if (voiceEnabled) await playNarration(`Push operator ${token.value} onto the stack.`)
       }
       else if (token.value === '(') {
         stack.push(token)
@@ -112,6 +118,10 @@ export function useInfixConversion() {
     steps,
     isConverting,
     result,
-    convert
+    convert,
+    speed,
+    setSpeed,
+    voiceEnabled,
+    setVoiceEnabled,
   }
 } 

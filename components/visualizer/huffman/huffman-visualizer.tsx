@@ -30,6 +30,7 @@ export function HuffmanVisualizer({ content }: HuffmanVisualizerProps) {
     reset,
     originalText,
     frequencies,
+    speed, setSpeed, isAutoPlaying, setIsAutoPlaying,
   } = useHuffman()
 
   useStepFeedback(currentStep, steps.length, "Huffman Coding")
@@ -95,6 +96,10 @@ export function HuffmanVisualizer({ content }: HuffmanVisualizerProps) {
                   isAnimating={isAnimating}
                   currentStep={currentStep}
                   totalSteps={steps.length}
+                  speed={speed}
+                  onSetSpeed={setSpeed}
+                  isAutoPlaying={isAutoPlaying}
+                  onToggleAutoPlay={() => setIsAutoPlaying(!isAutoPlaying)}
                 />
               </div>
 
