@@ -1,7 +1,8 @@
 "use client"
 // hooks/use-array.ts
 
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
+import { playNarration, stopNarration } from '@/lib/narration'
 import type { ArrayOperation, ArrayStep } from "@/components/visualizer/array/types"
 
 function sleep(ms: number) {
@@ -20,6 +21,7 @@ export function useArray() {
   const [sortedIndices,      setSortedIndices]       = useState<number[]>([])
   const [message,            setMessage]             = useState("")
   const [isAnimating,        setIsAnimating]         = useState(false)
+  const [voiceEnabled, setVoiceEnabled] = useState(true)
   const [operations,         setOperations]          = useState<ArrayOperation[]>([])
   const [foundIndex,         setFoundIndex]          = useState<number | null>(null)
 
@@ -84,6 +86,8 @@ export function useArray() {
     addOp({ type: "set" })
   }, [isAnimating])
 
+  useEffect(() => { if (!voiceEnabled) stopNarration() }, [voiceEnabled])
+
   const insertAt = useCallback(async (index: number, value: number) => {
     if (isAnimating) return
     setIsAnimating(true)
@@ -93,6 +97,7 @@ export function useArray() {
     const arr  = [...snap]
 
     setMessage(`Inserting ${value} at index ${index}. Shifting elements right...`)
+    if (voiceEnabled) await playNarration(`Inserting ${value} at index ${index}. Shifting elements right.`)
     for (let i = arr.length - 1; i >= index; i--) {
       setHighlightedIndices([i])
       await halfDelay()
@@ -103,6 +108,7 @@ export function useArray() {
     setHighlightedIndices([index])
     setSwappedIndices([index])
     setMessage(`✓ Inserted ${value} at index ${index}`)
+    if (voiceEnabled) await playNarration(`Inserted ${value} at index ${index}.`)
     await delay()
 
     finalizeResult([...arr], { sorted: [index] })
@@ -125,6 +131,7 @@ export function useArray() {
 
     setHighlightedIndices([index])
     setMessage(`Deleting element ${removed} at index ${index}...`)
+    if (voiceEnabled) await playNarration(`Deleting element ${removed} at index ${index}.`)
     await delay()
 
     setSwappedIndices([index])
@@ -133,6 +140,7 @@ export function useArray() {
     arr.splice(index, 1)
     setArray([...arr])
     setMessage(`✓ Deleted ${removed} from index ${index}. Elements shifted left.`)
+    if (voiceEnabled) await playNarration(`Deleted ${removed} from index ${index}. Elements shifted left.`)
     resetHighlights()
     await delay()
 
@@ -149,34 +157,57 @@ export function useArray() {
     setIsAnimating(true)
     resetHighlights()
 
-    const snap = [...inputArray]
+    // Keep an origin snapshot of the original input display so we can
+    // restore it after searching the current results (if any).
+    const originSnap = [...inputArray]
+    const isSearchingResult = (hasResult && resultArray && resultArray.length > 0)
+    const source = isSearchingResult ? resultArray : inputArray
+    const snap = [...source]
+
     setMessage(`Searching for ${value}...`)
+    if (voiceEnabled) await playNarration(`Searching for ${value}.`)
 
     for (let i = 0; i < snap.length; i++) {
-      setHighlightedIndices([i])
+      if (isSearchingResult) {
+        setResultHighlighted([i])
+      } else {
+        setHighlightedIndices([i])
+      }
       setMessage(`Checking index ${i}: array[${i}] = ${snap[i]}${snap[i] === value ? " ✓ Found!" : " ✗"}`)
+      if (voiceEnabled) await playNarration(`Checking index ${i}. Value ${snap[i]}.`)
       await delay()
 
       if (snap[i] === value) {
-        setSortedIndices([i])
-        setHighlightedIndices([])
-        setFoundIndex(i)
+        if (isSearchingResult) {
+          setResultSorted([i])
+          setResultHighlighted([])
+          setResultFound(i)
+        } else {
+          setSortedIndices([i])
+          setHighlightedIndices([])
+          setFoundIndex(i)
+        }
         setMessage(`✓ Found ${value} at index ${i}`)
+        if (voiceEnabled) await playNarration(`Found ${value} at index ${i}.`)
+        // Finalize using the array we searched
         finalizeResult([...snap], { found: i })
-        restoreInputDisplay(snap)
+        // Restore the displayed array back to the original input
+        restoreInputDisplay(originSnap)
         setIsAnimating(false)
         addOp({ type: "search", value })
         return
       }
     }
 
-    setHighlightedIndices([])
+    if (isSearchingResult) setResultHighlighted([])
+    else setHighlightedIndices([])
     setMessage(`✗ ${value} not found in array`)
+    if (voiceEnabled) await playNarration(`${value} not found in the array.`)
     finalizeResult([...snap])
-    restoreInputDisplay(snap)
+    restoreInputDisplay(originSnap)
     setIsAnimating(false)
     addOp({ type: "search", value })
-  }, [inputArray, isAnimating])
+  }, [inputArray, isAnimating, hasResult, resultArray, voiceEnabled])
 
   const reverse = useCallback(async () => {
     if (isAnimating) return
@@ -187,10 +218,12 @@ export function useArray() {
     const arr  = [...snap]
     let left = 0, right = arr.length - 1
     setMessage("Reversing array with two pointers...")
+    if (voiceEnabled) await playNarration('Reversing the array with two pointers.')
 
     while (left < right) {
       setHighlightedIndices([left, right])
       setMessage(`Swapping arr[${left}]=${arr[left]} and arr[${right}]=${arr[right]}`)
+      if (voiceEnabled) await playNarration(`Swapping index ${left} and index ${right}.`)
       await delay()
       ;[arr[left], arr[right]] = [arr[right], arr[left]]
       setArray([...arr])
@@ -204,6 +237,7 @@ export function useArray() {
     if (left === right) setSortedIndices((prev) => [...prev, left])
     setHighlightedIndices([])
     setMessage("✓ Array reversed!")
+    if (voiceEnabled) await playNarration('Array reversed successfully.')
     await delay()
 
     finalizeResult([...arr], { sorted: arr.map((_, i) => i) })
@@ -227,11 +261,13 @@ export function useArray() {
 
     setHighlightedIndices([0])
     setMessage(`Rotating left: ${snap[0]} moves to the end`)
+    if (voiceEnabled) await playNarration(`${snap[0]} moves to the end.`)
     await delay()
 
     setArray(arr)
     setSwappedIndices([arr.length - 1])
     setMessage(`✓ Rotated left. ${first} is now at the end.`)
+    if (voiceEnabled) await playNarration(`Rotated left. ${first} is now at the end.`)
     await delay()
 
     finalizeResult([...arr], { sorted: arr.map((_, i) => i) })
@@ -255,11 +291,13 @@ export function useArray() {
 
     setHighlightedIndices([snap.length - 1])
     setMessage(`Rotating right: ${snap[snap.length - 1]} moves to the front`)
+    if (voiceEnabled) await playNarration(`${snap[snap.length - 1]} moves to the front.`)
     await delay()
 
     setArray(arr)
     setSwappedIndices([0])
     setMessage(`✓ Rotated right. ${last} is now at the front.`)
+    if (voiceEnabled) await playNarration(`Rotated right. ${last} is now at the front.`)
     await delay()
 
     finalizeResult([...arr], { sorted: arr.map((_, i) => i) })
@@ -280,6 +318,7 @@ export function useArray() {
     const old  = snap[index]
     setHighlightedIndices([index])
     setMessage(`Updating index ${index}: ${old} → ${value}`)
+    if (voiceEnabled) await playNarration(`Updating index ${index} from ${old} to ${value}.`)
     await delay()
 
     const arr  = [...snap]
@@ -287,6 +326,7 @@ export function useArray() {
     setArray(arr)
     setSwappedIndices([index])
     setMessage(`✓ Updated arr[${index}] to ${value}`)
+    if (voiceEnabled) await playNarration(`Updated index ${index} to ${value}.`)
     await delay()
 
     finalizeResult([...arr], { sorted: [index] })
@@ -308,6 +348,7 @@ export function useArray() {
     setHasResult(false)
     setResultArray([])
   }, [isAnimating])
+
 
   return {
     array,
@@ -335,5 +376,7 @@ export function useArray() {
     rotateRight,
     updateAt,
     clear,
+    voiceEnabled,
+    setVoiceEnabled,
   }
 }

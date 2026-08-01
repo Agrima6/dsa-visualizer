@@ -1,20 +1,20 @@
 # AVL Tree
 
-An AVL tree is a self-balancing binary search tree where the difference between heights of left and right subtrees cannot be more than one for all nodes.
+An AVL tree is a self-balancing binary search tree in which the heights of the left and right subtrees differ by at most one at every node.
 
 ## Properties
-- For each node, the heights of its left and right subtrees differ by at most 1
-- All operations (insertion, deletion, search) take O(log n) time
+- The height difference between the left and right subtrees of each node is at most 1
+- Insertion, deletion, and search operations all run in O(log n) time
 - Balance factor = height(left subtree) - height(right subtree)
-- Balance factor must be -1, 0, or 1 for all nodes
+- The balance factor must remain -1, 0, or 1 for every node
 
 ## Rotations
-- Left Rotation: Used when right subtree becomes higher
-- Right Rotation: Used when left subtree becomes higher
-- Left-Right Rotation: Combination used for more complex imbalances
-- Right-Left Rotation: Combination used for more complex imbalances
+- Left rotation: used when the right subtree becomes too tall
+- Right rotation: used when the left subtree becomes too tall
+- Left-right rotation: used for more complex imbalance patterns
+- Right-left rotation: used for more complex imbalance patterns
 
 ## Applications
-- Databases where frequent insertions and deletions occur
+- Databases with frequent insertions and deletions
 - Memory management systems
-- File systems requiring balanced tree structures 
+- File systems that require balanced tree structures

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import type { ArrayOperation } from "./types"
 import {
   Search, RotateCcw, ChevronLeft, ChevronRight,
-  Trash2, Plus, RefreshCw, ArrowLeftRight, Zap,
+  Trash2, Plus, RefreshCw, ArrowLeftRight, Zap, Volume2,
 } from "lucide-react"
 
 interface ArrayControlsProps {
@@ -24,6 +24,8 @@ interface ArrayControlsProps {
   isAnimating: boolean
   operations: ArrayOperation[]
   arrayLength: number
+  voiceEnabled?: boolean
+  onSetVoiceEnabled?: (enabled: boolean) => void
 }
 
 function cn(...c: (string | false | null | undefined)[]) {
@@ -60,6 +62,7 @@ export function ArrayControls({
   onReverse, onRotateLeft, onRotateRight, onUpdateAt,
   onClear, onRandom, onSpeedChange,
   isAnimating, operations, arrayLength,
+  voiceEnabled = true, onSetVoiceEnabled = () => {},
 }: ArrayControlsProps) {
   const [inputStr,   setInputStr]   = useState("3,7,1,9,4,6,2,8,5")
   const [inputError, setInputError] = useState("")
@@ -282,6 +285,19 @@ export function ArrayControls({
                 {label}
               </button>
             ))}
+          </div>
+          <div className="mt-3">
+            <button
+              type="button"
+              onClick={() => onSetVoiceEnabled(!voiceEnabled)}
+              className={cn(
+                "w-full rounded-xl border py-2 text-sm transition-all",
+                voiceEnabled ? "border-green-500 bg-green-500/10 text-green-600" : "border-violet-500/20"
+              )}
+            >
+              <Volume2 className="mr-1 inline h-4 w-4" />
+              {voiceEnabled ? "🔊 Voice Narration ON" : "🔇 Voice Narration OFF"}
+            </button>
           </div>
         </div>
       </Card>

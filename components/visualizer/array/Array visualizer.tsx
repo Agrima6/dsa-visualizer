@@ -49,6 +49,7 @@ function ArrayVisualizerOriginal({ content }: ArrayVisualizerProps) {
     loadArray, insertAt, deleteAt, search,
     reverse, rotateLeft, rotateRight, updateAt, clear,
     setAnimationSpeed,
+    voiceEnabled, setVoiceEnabled,
   } = useArray()
 
   const handleRandom = () => {
@@ -117,6 +118,8 @@ function ArrayVisualizerOriginal({ content }: ArrayVisualizerProps) {
             isAnimating={isAnimating}
             operations={operations}
             arrayLength={array.length}
+            voiceEnabled={voiceEnabled}
+            onSetVoiceEnabled={setVoiceEnabled}
           />
         </div>
 

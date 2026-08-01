@@ -13,11 +13,11 @@ import LinkedListCodeView from "./linked-list-code-view"
 
 const MAX_SIZE = 5
 
-const LIST_TYPES: { value: ListType; label: string }[] = [
-  { value: "SLL", label: "SLL" },
-  { value: "DLL", label: "DLL" },
-  { value: "CSLL", label: "CSLL" },
-  { value: "CDLL", label: "CDLL" },
+const LIST_TYPES: { value: ListType; label: string; fullLabel: string }[] = [
+  { value: "SLL", label: "SLL", fullLabel: "Singly Linked List" },
+  { value: "DLL", label: "DLL", fullLabel: "Doubly Linked List" },
+  { value: "CSLL", label: "CSLL", fullLabel: "Circular Singly Linked List" },
+  { value: "CDLL", label: "CDLL", fullLabel: "Circular Doubly Linked List" },
 ]
 
 interface LinkedListVisualizerProps {
@@ -65,16 +65,28 @@ function LinkedListVisualizerInner({ content }: LinkedListVisualizerProps) {
             <TabsTrigger
               key={type.value}
               value={type.value}
-              className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
+              className="relative group rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
             >
               {type.label}
+              <span
+                className="pointer-events-none absolute left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-950/90 px-2 py-1 text-[11px] text-white shadow-lg opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+                style={{ bottom: '100%', marginBottom: 10, transform: 'translateX(-50%)' }}
+              >
+                {type.fullLabel}
+              </span>
             </TabsTrigger>
           ))}
           <TabsTrigger
             value="explanation"
-            className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
+            className="relative group rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
           >
             Info
+            <span
+              className="pointer-events-none absolute left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-slate-950/90 px-2 py-1 text-[11px] text-white shadow-lg opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+              style={{ bottom: '100%', marginBottom: 10, transform: 'translateX(-50%)' }}
+            >
+              Information
+            </span>
           </TabsTrigger>
         </TabsList>
 
