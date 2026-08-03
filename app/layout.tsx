@@ -9,6 +9,10 @@ import { ProgressProvider } from "@/hooks/use-progress"
 export const metadata: Metadata = {
   title: "AlgoMaitri",
   description: "AlgoMaitri is a tool for visualizing data structures",
+  icons: {
+    icon: "/algomaitri-favicon.svg",
+    shortcut: "/algomaitri-favicon.svg",
+  },
 }
 
 export default function RootLayout({

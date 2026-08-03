@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { BrainCircuit, ChevronRight, Menu, Sparkles } from "lucide-react";
+import { ChevronRight, Menu, Sparkles } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -122,7 +122,7 @@ export const Navbar = () => {
       <div className="nav-shell">
         <Link href="/" className="flex items-center gap-2 group">
           <div className="nav-brand-icon">
-            <BrainCircuit className="h-5 w-5" />
+            <img src="/algomaitri-favicon.svg" alt="AlgoMaitri" className="h-5 w-5" />
           </div>
           <div className="flex flex-col leading-none">
             <span className="text-lg font-semibold tracking-tight hero-gradient-text">
@@ -166,7 +166,11 @@ export const Navbar = () => {
                       className="flex items-center gap-2"
                       onClick={() => setIsOpen(false)}
                     >
-                      <BrainCircuit className="h-5 w-5" />
+                      <img
+                        src="/algomaitri-favicon.svg"
+                        alt="AlgoMaitri"
+                        className="h-5 w-5"
+                      />
                       <span className="hero-gradient-text">AlgoMaitri</span>
                     </Link>
                   </SheetTitle>
