@@ -1,16 +1,15 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { HeapNode, HeapType } from "@/components/visualizer/heap/types"
 import { useAlgorithmFeedback } from "@/hooks/use-algorithm-feedback"
 import { playNarration } from "@/lib/narration"
 
-let nodeIdCounter = 0
-
-export function useHeap() {
+export function useHeap(initialType: HeapType = "max") {
   const [heap, setHeap] = useState<HeapNode | null>(null)
   const [heapArray, setHeapArray] = useState<number[]>([])
-  const [heapType, setHeapType] = useState<HeapType>("max")
+  const [heapType] = useState<HeapType>(initialType)
   const [highlightedNodes, setHighlightedNodes] = useState<string[]>([])
   const [voiceEnabled, setVoiceEnabled] = useState(true)
+  const nodeIdRef = useRef(0)
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
 
@@ -89,7 +88,7 @@ export function useHeap() {
     if (index >= array.length) return null
 
     return {
-      id: `node-${nodeIdCounter++}`,
+      id: `node-${nodeIdRef.current++}`,
       value: array[index],
       left: arrayToTree(array, 2 * index + 1),
       right: arrayToTree(array, 2 * index + 2),
@@ -97,7 +96,7 @@ export function useHeap() {
   }
 
   const rebuildHeapTree = (array: number[]) => {
-    nodeIdCounter = 0
+    nodeIdRef.current = 0
     setHeap(arrayToTree(array))
   }
 
@@ -154,82 +153,12 @@ export function useHeap() {
     showEndMessage("Algorithm ended", `Inserted ${nums.length} element(s) into ${heapType} heap successfully.`)
   }
 
-  const toggleHeapType = async () => {
-    const newType: HeapType = heapType === "max" ? "min" : "max"
-
-    if (voiceEnabled) {
-      await playNarration(`Changing heap type from ${heapType} heap to ${newType} heap.`)
-    }
-
-    const newArray = [...heapArray]
-
-    setHeapType(newType)
-
-    const shouldSwapForType = (parent: number, child: number): boolean => {
-      if (newType === "max") {
-        return parent < child
-      }
-      return parent > child
-    }
-
-    const heapifyDownForType = async (array: number[], index: number) => {
-      const length = array.length
-      let currentIndex = index
-
-      while (true) {
-        let selected = currentIndex
-        const left = 2 * currentIndex + 1
-        const right = 2 * currentIndex + 2
-
-        if (left < length) {
-          setHighlightedNodes([`array-${currentIndex}`, `array-${left}`])
-          stepSound()
-          await sleep(350)
-
-          if (shouldSwapForType(array[selected], array[left])) {
-            selected = left
-          }
-        }
-
-        if (right < length) {
-          setHighlightedNodes([`array-${selected}`, `array-${right}`])
-          stepSound()
-          await sleep(350)
-
-          if (shouldSwapForType(array[selected], array[right])) {
-            selected = right
-          }
-        }
-
-        if (selected !== currentIndex) {
-          ;[array[currentIndex], array[selected]] = [array[selected], array[currentIndex]]
-          setHighlightedNodes([`array-${currentIndex}`, `array-${selected}`])
-          stepSound()
-          await sleep(450)
-          currentIndex = selected
-        } else {
-          break
-        }
-      }
-    }
-
-    for (let i = Math.floor(newArray.length / 2) - 1; i >= 0; i--) {
-      await heapifyDownForType(newArray, i)
-    }
-
-    setHeapArray(newArray)
-    rebuildHeapTree(newArray)
-    setHighlightedNodes([])
-
-    endSound()
-    showEndMessage("Algorithm ended", `Heap changed to ${newType} heap successfully.`)
-  }
 
   const clear = () => {
     setHeap(null)
     setHeapArray([])
     setHighlightedNodes([])
-    nodeIdCounter = 0
+    nodeIdRef.current = 0
   }
 
   return {
@@ -239,7 +168,6 @@ export function useHeap() {
     highlightedNodes,
     insert,
     insertMany,
-    toggleHeapType,
     clear,
     voiceEnabled,
     setVoiceEnabled,

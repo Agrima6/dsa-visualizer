@@ -103,7 +103,6 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader>
         <div className="px-6 py-4 border-b flex items-center gap-2">
-          <img src="/algomaitri-favicon.svg" alt="AlgoMaitri" className="h-6 w-6" />
           <h1 className="text-sm font-semibold">AlgoMaitri</h1>
         </div>
       </SidebarHeader>

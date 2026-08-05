@@ -3,24 +3,23 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { HeapType } from "./types"
 
 interface HeapControlsProps {
+  title: string
   onInsert: (value: number) => void
   onInsertMany: (values: string) => void
   onClear: () => void
-  onToggleType: () => void
   heapType: HeapType
 }
 
 export function HeapControls({
+  title,
   onInsert,
   onInsertMany,
   onClear,
-  onToggleType,
   heapType,
 }: HeapControlsProps) {
   const [value, setValue] = useState("")
@@ -28,7 +27,7 @@ export function HeapControls({
 
   const handleInsert = () => {
     const num = Number(value)
-    if (!isNaN(num)) {
+    if (value.trim() !== "" && !isNaN(num)) {
       onInsert(num)
       setValue("")
     }
@@ -45,18 +44,13 @@ export function HeapControls({
     <div className="space-y-4">
       <Card className="bg-card/50 backdrop-blur-sm">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">Heap Controls</CardTitle>
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="heap-type"
-                checked={heapType === 'max'}
-                onCheckedChange={onToggleType}
-              />
-              <Label htmlFor="heap-type">Max Heap</Label>
-            </div>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <CardTitle className="text-lg">{title} Controls</CardTitle>
+          <div className="rounded-full border border-violet-500/10 bg-violet-500/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-violet-700 dark:border-violet-500/20 dark:bg-violet-500/10 dark:text-violet-300">
+            {heapType === 'max' ? 'Max Heap' : 'Min Heap'}
           </div>
-        </CardHeader>
+        </div>
+      </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label>Single Insert</Label>

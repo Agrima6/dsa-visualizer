@@ -118,12 +118,9 @@ export const Navbar = () => {
   const { isSignedIn } = useUser();
 
   return (
-    <header className="sticky top-5 z-50 w-[92%] md:w-[78%] lg:w-[76%] lg:max-w-screen-xl mx-auto">
-      <div className="nav-shell">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="nav-brand-icon">
-            <img src="/algomaitri-favicon.svg" alt="AlgoMaitri" className="h-5 w-5" />
-          </div>
+    <header className="sticky top-5 z-50 w-full px-4 sm:px-6 lg:px-8">
+      <div className="nav-shell mx-auto w-full max-w-[1600px]">
+        <Link href="/" className="flex items-center gap-4 group">
           <div className="flex flex-col leading-none">
             <span className="text-lg font-semibold tracking-tight hero-gradient-text">
               AlgoMaitri
@@ -166,11 +163,6 @@ export const Navbar = () => {
                       className="flex items-center gap-2"
                       onClick={() => setIsOpen(false)}
                     >
-                      <img
-                        src="/algomaitri-favicon.svg"
-                        alt="AlgoMaitri"
-                        className="h-5 w-5"
-                      />
                       <span className="hero-gradient-text">AlgoMaitri</span>
                     </Link>
                   </SheetTitle>

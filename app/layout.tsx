@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   title: "AlgoMaitri",
   description: "AlgoMaitri is a tool for visualizing data structures",
   icons: {
-    icon: "/algomaitri-favicon.svg",
-    shortcut: "/algomaitri-favicon.svg",
+    icon: "/algomaitri-logo.svg",
+    shortcut: "/algomaitri-logo.svg",
   },
 }
 

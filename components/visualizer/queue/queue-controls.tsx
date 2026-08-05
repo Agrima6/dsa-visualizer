@@ -8,7 +8,7 @@ import { useState } from "react"
 const MAX_QUEUE_SIZE = 6
 
 interface QueueControlsProps {
-  onEnqueue: (value: number) => void
+  onEnqueue: (value: number) => Promise<void>
   onDequeue: () => void
   onClear: () => void
   isAnimating: boolean
@@ -25,6 +25,7 @@ export function QueueControls({
   isEmpty,
 }: QueueControlsProps) {
   const [value, setValue] = useState("")
+  const [bulkValue, setBulkValue] = useState("")
   const [count, setCount] = useState(0) // track queue size locally
 
   const handleEnqueue = () => {
@@ -36,6 +37,25 @@ export function QueueControls({
       setValue("")
       setCount((prev) => prev + 1)
     }
+  }
+
+  const handleBulkEnqueue = async () => {
+    if (isAnimating || count >= MAX_QUEUE_SIZE) return
+
+    const nums = bulkValue
+      .split(/[,\s]+/)
+      .map(Number)
+      .filter((n) => !isNaN(n))
+
+    if (nums.length === 0) return
+
+    for (const num of nums) {
+      if (count >= MAX_QUEUE_SIZE) break
+      await onEnqueue(num)
+      setCount((prev) => prev + 1)
+    }
+
+    setBulkValue("")
   }
 
   const handleDequeue = () => {
@@ -71,6 +91,24 @@ export function QueueControls({
             disabled={isAnimating || isFull || count >= MAX_QUEUE_SIZE}
           >
             Enqueue
+          </Button>
+        </div>
+
+        <div className="flex gap-2">
+          <Input
+            type="text"
+            value={bulkValue}
+            onChange={(e) => setBulkValue(e.target.value)}
+            placeholder="Bulk values (comma-separated)"
+            onKeyDown={(e) => e.key === 'Enter' && handleBulkEnqueue()}
+            disabled={isAnimating || isFull || count >= MAX_QUEUE_SIZE}
+            className="flex-1"
+          />
+          <Button
+            onClick={handleBulkEnqueue}
+            disabled={isAnimating || isFull || count >= MAX_QUEUE_SIZE}
+          >
+            Enqueue All
           </Button>
         </div>
 

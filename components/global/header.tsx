@@ -37,7 +37,6 @@ export function Header() {
     <header className="supports-backdrop-blur:bg-background/90 sticky top-0 z-40 w-full bg-background/60 backdrop-blur-lg border-b">
       <div className="flex h-16 items-center justify-between px-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
-          <img src="/algomaitri-favicon.svg" alt="AlgoMaitri" className="h-6 w-6" />
           <span className="font-semibold">AlgoMaitri</span>
         </div>
         <div className="hidden md:block">

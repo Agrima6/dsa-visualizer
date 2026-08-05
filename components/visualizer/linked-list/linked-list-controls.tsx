@@ -8,8 +8,8 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 
 interface LinkedListControlsProps {
-  onInsertFront: (value: number) => void
-  onInsertBack: (value: number) => void
+  onInsertFront: (value: number) => Promise<void>
+  onInsertBack: (value: number) => Promise<void>
   onDeleteFront: () => void
   onDeleteBack: () => void
   onReverse: () => void
@@ -77,7 +77,6 @@ export function LinkedListControls({
               Insert
             </Button>
           </div>
-
           {/* Full warning */}
           {isFull && (
             <p className="text-xs text-muted-foreground text-center rounded-xl border border-violet-500/15 bg-white/60 dark:bg-white/[0.04] px-3 py-2">

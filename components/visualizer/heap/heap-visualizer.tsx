@@ -61,16 +61,8 @@ export function HeapVisualizer({ content }: HeapVisualizerProps) {
 function HeapVisualizerOriginal({ content }: HeapVisualizerProps) {
   const router = useRouter()
 
-  const {
-    heap,
-    heapArray,
-    heapType,
-    highlightedNodes,
-    insert,
-    insertMany,
-    toggleHeapType,
-    clear,
-  } = useHeap()
+  const maxHeap = useHeap("max")
+  const minHeap = useHeap("min")
 
   return (
     <div className="container mx-auto space-y-8">
@@ -89,12 +81,11 @@ function HeapVisualizerOriginal({ content }: HeapVisualizerProps) {
             </div>
 
             <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-gradient-to-r from-violet-700 via-fuchsia-500 to-blue-500 bg-clip-text text-transparent">
-              {heapType === "max" ? "Max Heap" : "Min Heap"} Visualization
+              Heap Visualization
             </h1>
 
             <p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">
-              A complete binary tree where each parent node is{" "}
-              {heapType === "max" ? "greater" : "smaller"} than its children.
+              Choose the heap variant you want to explore, and the selected view will fill the workspace.
             </p>
           </div>
 
@@ -129,35 +120,77 @@ function HeapVisualizerOriginal({ content }: HeapVisualizerProps) {
 
         {/* ─── VISUALIZATION TAB ─── */}
         <TabsContent value="visualization" className="space-y-6">
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+          <Tabs defaultValue="max" className="w-full space-y-6">
+            <TabsList className="grid w-full grid-cols-2 rounded-xl bg-white/60 backdrop-blur-lg border border-violet-500/10 dark:bg-white/[0.05]">
+              <TabsTrigger value="max" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white">
+                Max Heap
+              </TabsTrigger>
 
-            {/* Controls + Array */}
-            <div className="xl:col-span-1 space-y-6">
-              <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
-                <HeapControls
-                  onInsert={insert}
-                  onInsertMany={insertMany}
-                  onClear={clear}
-                  onToggleType={toggleHeapType}
-                  heapType={heapType}
-                />
-              </div>
+              <TabsTrigger value="min" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white">
+                Min Heap
+              </TabsTrigger>
+            </TabsList>
 
-              <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
-                <HeapArray array={heapArray} />
-              </div>
-            </div>
+            <TabsContent value="max" className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+                <div className="space-y-6">
+                  <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <h2 className="text-2xl font-semibold tracking-tight">Max Heap</h2>
+                        <p className="mt-2 text-sm text-muted-foreground">Highest priority item is always at the root.</p>
+                      </div>
+                      <div className="rounded-full border border-violet-500/10 bg-violet-500/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-violet-700 dark:border-violet-500/20 dark:bg-violet-500/10 dark:text-violet-300">
+                        Max Heap
+                      </div>
+                    </div>
+                  </div>
 
-            {/* Heap Display */}
-            <div className="xl:col-span-2">
-              <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
-                <HeapDisplay
-                  heap={heap}
-                  highlightedNodes={highlightedNodes}
-                />
+                  <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">
+                    <HeapControls title="Max Heap" onInsert={maxHeap.insert} onInsertMany={maxHeap.insertMany} onClear={maxHeap.clear} heapType={maxHeap.heapType} />
+                  </div>
+
+                  <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">
+                    <HeapArray array={maxHeap.heapArray} />
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
+                  <HeapDisplay heap={maxHeap.heap} highlightedNodes={maxHeap.highlightedNodes} />
+                </div>
               </div>
-            </div>
-          </div>
+            </TabsContent>
+
+            <TabsContent value="min" className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+                <div className="space-y-6">
+                  <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <h2 className="text-2xl font-semibold tracking-tight">Min Heap</h2>
+                        <p className="mt-2 text-sm text-muted-foreground">Lowest priority item is always at the root.</p>
+                      </div>
+                      <div className="rounded-full border border-violet-500/10 bg-violet-500/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-violet-700 dark:border-violet-500/20 dark:bg-violet-500/10 dark:text-violet-300">
+                        Min Heap
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">
+                    <HeapControls title="Min Heap" onInsert={minHeap.insert} onInsertMany={minHeap.insertMany} onClear={minHeap.clear} heapType={minHeap.heapType} />
+                  </div>
+
+                  <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">
+                    <HeapArray array={minHeap.heapArray} />
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
+                  <HeapDisplay heap={minHeap.heap} highlightedNodes={minHeap.highlightedNodes} />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         {/* ─── EXPLANATION TAB ─── */}

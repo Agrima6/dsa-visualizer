@@ -13,8 +13,12 @@ import { MarkdownContent } from "@/components/shared/markdown-content"
 import { useAlgorithmFeedback } from "@/hooks/use-algorithm-feedback"
 import { Sparkles, Volume2 } from "lucide-react"
 
-const EXAMPLE_EXPRESSION = "A+B*C-D"
-const MAX_LENGTH = 10
+const EXAMPLE_EXPRESSIONS = [
+  "A+B*C-D",
+  "A+B*(C-D)",
+  "A+B*(C^D-E)^(F+G*H)-I",
+]
+const MAX_LENGTH = 30
 const speedOptions = [{ label: "0.5x", value: 1500 }, { label: "1x", value: 800 }, { label: "1.5x", value: 500 }, { label: "2x", value: 250 }]
 
 // ── Only these characters are allowed in an infix expression ─────────────────
@@ -29,6 +33,7 @@ interface InfixPostfixVisualizerProps {
 
 export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps) {
   const [expression, setExpression] = useState("")
+  const [exampleIndex, setExampleIndex] = useState(0)
   const [invalidChar, setInvalidChar] = useState<string | null>(null)
   const invalidTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -79,7 +84,8 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
   }
 
   const handleUseExample = () => {
-    setExpression(EXAMPLE_EXPRESSION.slice(0, MAX_LENGTH))
+    setExpression(EXAMPLE_EXPRESSIONS[exampleIndex])
+    setExampleIndex((current) => (current + 1) % EXAMPLE_EXPRESSIONS.length)
     setInvalidChar(null)
   }
 
@@ -221,7 +227,7 @@ export function InfixPostfixVisualizer({ content }: InfixPostfixVisualizerProps)
                       disabled={isConverting}
                       className="rounded-xl border-violet-500/20 hover:bg-violet-500/5"
                     >
-                      Use Example
+                      Use Example {exampleIndex + 1} of {EXAMPLE_EXPRESSIONS.length}
                     </Button>
                   </div>
                   <div className="space-y-3"><div><p className="mb-2 text-sm">Animation Speed</p><div className="flex gap-2">{speedOptions.map(option => <button key={option.label} onClick={() => setSpeed(option.value)} className={`rounded-lg border px-3 py-1.5 text-sm ${speed === option.value ? "border-violet-600 bg-violet-600 text-white" : "border-violet-500/20 text-muted-foreground"}`}>{option.label}</button>)}</div></div><Button variant="outline" className={`w-full rounded-xl ${voiceEnabled ? "border-green-500 bg-green-500/10 text-green-600" : "border-violet-500/20"}`} onClick={() => setVoiceEnabled(!voiceEnabled)}><Volume2 className="mr-1 h-4 w-4" />{voiceEnabled ? "🔊 Voice Narration ON" : "🔇 Voice Narration OFF"}</Button></div>

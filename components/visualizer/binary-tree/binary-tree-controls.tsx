@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState } from "react"
 
 interface BinaryTreeControlsProps {
-  onInsert: (value: number) => void
+  onInsert: (value: number) => Promise<void>
+  onInsertMany: (values: string) => Promise<void>
   onClear: () => void
   onTraversal: (type: "inorder" | "preorder" | "postorder") => void
   traversalHistory: number[]
@@ -15,12 +16,14 @@ interface BinaryTreeControlsProps {
 
 export function BinaryTreeControls({
   onInsert,
+  onInsertMany,
   onClear,
   onTraversal,
   traversalHistory,
   isAnimating,
 }: BinaryTreeControlsProps) {
   const [value, setValue] = useState("")
+  const [bulkValue, setBulkValue] = useState("")
 
   const handleInsert = () => {
     const num = Number(value)
@@ -28,6 +31,12 @@ export function BinaryTreeControls({
       onInsert(num)
       setValue("")
     }
+  }
+
+  const handleBulkInsert = async () => {
+    if (isAnimating) return
+    await onInsertMany(bulkValue)
+    setBulkValue("")
   }
 
   return (

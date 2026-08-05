@@ -8,7 +8,7 @@ import { useState } from "react"
 const MAX_STACK_SIZE = 10
 
 interface StackControlsProps {
-  onPush: (value: number) => void
+  onPush: (value: number) => Promise<void>
   onPop: () => void
   onClear: () => void
   isAnimating: boolean
@@ -25,6 +25,7 @@ export function StackControls({
   isEmpty,
 }: StackControlsProps) {
   const [value, setValue] = useState("")
+  const [bulkValue, setBulkValue] = useState("")
   const [count, setCount] = useState(0) // track pushes locally
 
   const handlePush = () => {
@@ -36,6 +37,25 @@ export function StackControls({
       setValue("")
       setCount((prev) => prev + 1)
     }
+  }
+
+  const handleBulkPush = async () => {
+    if (isAnimating || count >= MAX_STACK_SIZE) return
+
+    const nums = bulkValue
+      .split(/[,\s]+/)
+      .map(Number)
+      .filter((n) => !isNaN(n))
+
+    if (nums.length === 0) return
+
+    for (const num of nums) {
+      if (count >= MAX_STACK_SIZE) break
+      await onPush(num)
+      setCount((prev) => prev + 1)
+    }
+
+    setBulkValue("")
   }
 
   const handlePop = () => {
@@ -77,6 +97,24 @@ export function StackControls({
             disabled={isAnimating || isFull || count >= MAX_STACK_SIZE}
           >
             Push
+          </Button>
+        </div>
+
+        <div className="flex gap-2">
+          <Input
+            type="text"
+            value={bulkValue}
+            onChange={(e) => setBulkValue(e.target.value)}
+            placeholder="Bulk values (comma-separated)"
+            onKeyDown={(e) => e.key === 'Enter' && handleBulkPush()}
+            disabled={isAnimating || isFull || count >= MAX_STACK_SIZE}
+            className="flex-1"
+          />
+          <Button
+            onClick={handleBulkPush}
+            disabled={isAnimating || isFull || count >= MAX_STACK_SIZE}
+          >
+            Push All
           </Button>
         </div>
 
