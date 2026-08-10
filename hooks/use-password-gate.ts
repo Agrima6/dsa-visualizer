@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
 function getSafeRedirect(raw: string | null) {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/visualizer"
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/home"
   return raw
 }
 

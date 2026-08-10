@@ -16,7 +16,7 @@ export const CTA = () => (
             Explore data structures through interactive visualizations and hands-on examples.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/sign-in?redirect_url=%2Fvisualizer">
+            <Link href="/visualizer">
               <RainbowButton className="gap-4">
                 Start Exploring <MoveRight className="w-4 h-4 ml-2" />
               </RainbowButton>

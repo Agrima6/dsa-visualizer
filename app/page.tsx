@@ -5,7 +5,7 @@ import { GATE_COOKIE, verifyGateToken } from "@/lib/gate-cookie"
 import { AccessGate } from "@/components/prelaunch/access-gate"
 
 function getSafeRedirect(raw: string | undefined) {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/visualizer"
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/home"
   return raw
 }
 
