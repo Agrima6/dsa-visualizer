@@ -107,7 +107,7 @@ export function AccessGate() {
           >
             DSA, visualized.
             <br />
-            Coming for a select few.
+            Coming Soon.
           </motion.h1>
 
           <motion.p
