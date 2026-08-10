@@ -1,20 +1,30 @@
-import { Hero } from "@/components/landing/hero";
-import { Features } from "@/components/landing/features";
-import { CTA } from "@/components/landing/cta";
-import { Navbar } from "@/components/navigation/navbar";
-import InteractiveDots from "@/components/interactive-dots";
+import { Suspense } from "react"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
+import { GATE_COOKIE, verifyGateToken } from "@/lib/gate-cookie"
+import { AccessGate } from "@/components/prelaunch/access-gate"
 
-export default function Home() {
+function getSafeRedirect(raw: string | undefined) {
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/visualizer"
+  return raw
+}
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect_url?: string }>
+}) {
+  const store = await cookies()
+  const token = store.get(GATE_COOKIE)?.value
+
+  if (await verifyGateToken(token)) {
+    const { redirect_url } = await searchParams
+    redirect(getSafeRedirect(redirect_url))
+  }
+
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-background">
-      <InteractiveDots />
-
-      <div className="relative z-10 flex min-h-screen flex-col px-4 pb-6 pt-4 sm:px-10 sm:pb-10 sm:pt-6">
-        <Navbar />
-        <Hero />
-        <Features />
-        <CTA />
-      </div>
-    </main>
-  );
+    <Suspense fallback={null}>
+      <AccessGate />
+    </Suspense>
+  )
 }

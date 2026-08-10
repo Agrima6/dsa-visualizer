@@ -140,12 +140,12 @@ function LinkedListContent({ type }: { type: ListType }) {
   const isFull = nodeCount >= MAX_SIZE
 
   // ✅ Guard insert handlers — no-op when full
-  const handleInsertFront = (value: number) => {
-    if (!isFull) insertFront(value)
+  const handleInsertFront = async (value: number) => {
+    if (!isFull) await insertFront(value)
   }
 
-  const handleInsertBack = (value: number) => {
-    if (!isFull) insertBack(value)
+  const handleInsertBack = async (value: number) => {
+    if (!isFull) await insertBack(value)
   }
 
   return (

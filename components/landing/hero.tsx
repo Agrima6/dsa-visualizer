@@ -129,9 +129,9 @@ export const Hero = () => {
             </div>
 
             <div ref={buttonRef} className="flex flex-row gap-4 pt-1">
-              <Link href="/visualizer">
+              <Link href="/sign-in?redirect_url=%2Fvisualizer">
                 <RainbowButton className="min-w-[170px] rounded-2xl px-6 py-6 text-base shadow-[0_10px_30px_rgba(139,92,246,0.18)]">
-                  Visualizer <MoveRight className="ml-1 hidden sm:block w-4 h-4" />
+                  Get Started <MoveRight className="ml-1 hidden sm:block w-4 h-4" />
                 </RainbowButton>
               </Link>
             </div>

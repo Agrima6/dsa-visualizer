@@ -127,7 +127,6 @@ function BinaryTreeVisualizerOriginal({ content }: BinaryTreeVisualizerProps) {
               <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
                 <BinaryTreeControls
                   onInsert={insert}
-                  onInsertMany={insertMany}
                   onClear={clear}
                   onTraversal={handleTraversal}
                   isAnimating={isAnimating}

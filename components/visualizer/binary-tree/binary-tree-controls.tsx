@@ -7,7 +7,6 @@ import { useState } from "react"
 
 interface BinaryTreeControlsProps {
   onInsert: (value: number) => Promise<void>
-  onInsertMany: (values: string) => Promise<void>
   onClear: () => void
   onTraversal: (type: "inorder" | "preorder" | "postorder") => void
   traversalHistory: number[]
@@ -16,7 +15,6 @@ interface BinaryTreeControlsProps {
 
 export function BinaryTreeControls({
   onInsert,
-  onInsertMany,
   onClear,
   onTraversal,
   traversalHistory,
@@ -35,7 +33,18 @@ export function BinaryTreeControls({
 
   const handleBulkInsert = async () => {
     if (isAnimating) return
-    await onInsertMany(bulkValue)
+
+    const nums = bulkValue
+      .split(/[,\s]+/)
+      .map(Number)
+      .filter((n) => !isNaN(n))
+
+    if (nums.length === 0) return
+
+    for (const num of nums) {
+      await onInsert(num)
+    }
+
     setBulkValue("")
   }
 
@@ -63,6 +72,24 @@ export function BinaryTreeControls({
               disabled={isAnimating || !value.trim()}
             >
               Insert
+            </Button>
+          </div>
+
+          <div className="flex gap-2">
+            <Input
+              value={bulkValue}
+              onChange={(e) => setBulkValue(e.target.value)}
+              placeholder="Bulk values (comma-separated)"
+              onKeyDown={(e) => e.key === "Enter" && handleBulkInsert()}
+              disabled={isAnimating}
+              className="flex-1"
+            />
+            <Button
+              onClick={handleBulkInsert}
+              disabled={isAnimating || !bulkValue.trim()}
+              variant="secondary"
+            >
+              Insert All
             </Button>
           </div>
         </CardContent>

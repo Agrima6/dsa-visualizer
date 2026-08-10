@@ -22,7 +22,8 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ModeToggle } from "@/components/global/mode-toggle";
-import { useUser, UserButton, SignInButton } from "@clerk/nextjs";
+import { useUser, UserButton } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 
 interface RouteProps {
   href: string;
@@ -116,6 +117,8 @@ const featureList: FeatureProps[] = [
 export const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { isSignedIn } = useUser();
+  const pathname = usePathname();
+  const signInHref = `/sign-in?redirect_url=${encodeURIComponent(pathname || "/visualizer")}`;
 
   return (
     <header className="sticky top-5 z-50 w-full px-4 sm:px-6 lg:px-8">
@@ -137,11 +140,9 @@ export const Navbar = () => {
           {isSignedIn ? (
             <UserButton />
           ) : (
-            <SignInButton mode="modal">
-              <Button variant="outline" size="sm" className="rounded-xl">
-                Sign in
-              </Button>
-            </SignInButton>
+            <Button variant="outline" size="sm" className="rounded-xl" asChild>
+              <Link href={signInHref}>Sign in</Link>
+            </Button>
           )}
 
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -172,9 +173,11 @@ export const Navbar = () => {
                   {isSignedIn ? (
                     <UserButton />
                   ) : (
-                    <SignInButton mode="modal">
-                      <Button className="rounded-xl w-full">Sign in</Button>
-                    </SignInButton>
+                    <Button className="rounded-xl w-full" asChild>
+                      <Link href={signInHref} onClick={() => setIsOpen(false)}>
+                        Sign in
+                      </Link>
+                    </Button>
                   )}
                 </div>
 
@@ -281,11 +284,9 @@ export const Navbar = () => {
           {isSignedIn ? (
             <UserButton />
           ) : (
-            <SignInButton mode="modal">
-              <Button variant="outline" className="rounded-xl">
-                Sign in
-              </Button>
-            </SignInButton>
+            <Button variant="outline" className="rounded-xl" asChild>
+              <Link href={signInHref}>Sign in</Link>
+            </Button>
           )}
         </div>
       </div>
