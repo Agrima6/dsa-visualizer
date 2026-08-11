@@ -157,22 +157,22 @@ const validParentheses: StackProblem = {
     for (const ch of input) {
       if (!map[ch]) {
         stack.push({ value: ch })
-        steps.push(frame([...stack], [stack.length - 1], `'${ch}' is an opener → push onto stack`, 6))
+        steps.push(frame([...stack], [stack.length - 1], `'${ch}' is an opener → push onto stack`, 7))
       } else {
         const top = stack[stack.length - 1]?.value
-        steps.push(frame([...stack], [stack.length - 1], `'${ch}' is closer. Top of stack = '${top ?? "empty"}'`, 8))
+        steps.push(frame([...stack], [stack.length - 1], `'${ch}' is closer. Top of stack = '${top ?? "empty"}'`, 9))
         if (top === map[ch]) {
-          steps.push(frame([...stack], [], `'${top}' matches '${ch}' ✓ → pop`, 8, [], [stack.length - 1]))
+          steps.push(frame([...stack], [], `'${top}' matches '${ch}' ✓ → pop`, 9, [], [stack.length - 1]))
           stack.pop()
-          steps.push(frame([...stack], [], `Popped '${top}'. Stack: [${stack.map(s => s.value).join(",")}]`, 8))
+          steps.push(frame([...stack], [], `Popped '${top}'. Stack: [${stack.map(s => s.value).join(",")}]`, 9))
         } else {
-          steps.push(frame([...stack], [stack.length - 1], `MISMATCH! '${top}' ≠ '${map[ch]}' → return false`, 9))
+          steps.push(frame([...stack], [stack.length - 1], `MISMATCH! '${top}' ≠ '${map[ch]}' → return false`, 10))
           return steps
         }
       }
     }
 
-    steps.push(frame([], [], `Loop done. Stack empty → return true ✓`, 13))
+    steps.push(frame([], [], `Loop done. Stack empty → return true ✓`, 15))
     return steps
   },
 }
@@ -276,13 +276,13 @@ getMin() → -2`,
       main.push(val)
       const curMin = mins.length ? Math.min(val, mins[mins.length - 1]) : val
       mins.push(curMin)
-      snap([main.length - 1], `push(${val}) → main top=${val}, minStack top=${curMin}`, 7)
+      snap([main.length - 1], `push(${val}) → main top=${val}, minStack top=${curMin}`, 8)
     }
 
     const popOp = () => {
       const v = main.pop()
       mins.pop()
-      snap([], `pop() → removed ${v}. New minStack top=${mins.length ? mins[mins.length - 1] : "—"}`, 15)
+      snap([], `pop() → removed ${v}. New minStack top=${mins.length ? mins[mins.length - 1] : "—"}`, 16)
     }
 
     pushOp(-2)
@@ -290,12 +290,12 @@ getMin() → -2`,
     pushOp(-3)
 
     // getMin
-    snap([main.length - 1], `getMin() → ${mins[mins.length - 1]} ✓`, 23)
+    snap([main.length - 1], `getMin() → ${mins[mins.length - 1]} ✓`, 25)
     popOp()
     // top
-    snap([main.length - 1], `top() → ${main[main.length - 1]}`, 19)
+    snap([main.length - 1], `top() → ${main[main.length - 1]}`, 21)
     // getMin again
-    snap([main.length - 1], `getMin() → ${mins[mins.length - 1]} ✓`, 23)
+    snap([main.length - 1], `getMin() → ${mins[mins.length - 1]} ✓`, 25)
 
     return steps
   },
@@ -375,14 +375,14 @@ const evalRPN: StackProblem = {
         else if (token === "*") result = a * b
         else result = Math.trunc(a / b)
         stack.push(result)
-        steps.push(frame(stack.map(v => ({ value: v })), [stack.length - 1], `${a} ${token} ${b} = ${result} → push ${result}`, 8))
+        steps.push(frame(stack.map(v => ({ value: v })), [stack.length - 1], `${a} ${token} ${b} = ${result} → push ${result}`, 9))
       } else {
         stack.push(Number(token))
-        steps.push(frame(stack.map(v => ({ value: v })), [stack.length - 1], `Number "${token}" → push ${token}`, 13))
+        steps.push(frame(stack.map(v => ({ value: v })), [stack.length - 1], `Number "${token}" → push ${token}`, 14))
       }
     }
 
-    steps.push(frame(stack.map(v => ({ value: v })), [0], `Result = stack[0] = ${stack[0]} ✓`, 16))
+    steps.push(frame(stack.map(v => ({ value: v })), [0], `Result = stack[0] = ${stack[0]} ✓`, 18))
     return steps
   },
 }
@@ -471,7 +471,7 @@ const dailyTemperatures: StackProblem = {
           stack.map(ix => ({ value: `i=${ix}(${temps[ix]})` })),
           [],
           `${temps[i]} > ${temps[idx]} → answer[${idx}]=${answer[idx]} days ✓`,
-          8,
+          9,
           [{ label: `answer[${idx}]`, value: answer[idx] }],
           [0]
         ))
@@ -482,7 +482,7 @@ const dailyTemperatures: StackProblem = {
         stack.map(idx => ({ value: `i=${idx}(${temps[idx]})` })),
         [stack.length - 1],
         `Push index ${i} (temp=${temps[i]}) onto stack`,
-        11
+        12
       ))
     }
 
@@ -490,7 +490,7 @@ const dailyTemperatures: StackProblem = {
       [],
       [],
       `Done! answer=[${answer.join(",")}] ✓`,
-      14,
+      15,
       answer.map((v, i) => ({ label: `[${i}]`, value: v }))
     ))
     return steps
@@ -566,7 +566,7 @@ const carFleet: StackProblem = {
         stack.map(t => ({ value: t.toFixed(2), label: "fleet" })),
         [stack.length - 1],
         `Car pos=${pos},spd=${spd} → time=(${target}-${pos})/${spd}=${time}s`,
-        8
+        9
       ))
 
       if (!stack.length || time > stack[stack.length - 1]) {
@@ -575,14 +575,14 @@ const carFleet: StackProblem = {
           stack.map(t => ({ value: t.toFixed(2), label: "fleet" })),
           [stack.length - 1],
           `time=${time} > top=${stack[stack.length - 2]?.toFixed(2) ?? "none"} → NEW fleet`,
-          10
+          11
         ))
       } else {
         steps.push(frame(
           stack.map(t => ({ value: t.toFixed(2), label: "fleet" })),
           [],
           `time=${time} ≤ top=${stack[stack.length - 1].toFixed(2)} → catches up, same fleet`,
-          11
+          13
         ))
       }
     }
@@ -591,7 +591,7 @@ const carFleet: StackProblem = {
       stack.map(t => ({ value: t.toFixed(2), label: "fleet" })),
       [],
       `${stack.length} fleets total ✓`,
-      14
+      16
     ))
     return steps
   },
@@ -689,7 +689,7 @@ const largestRectangle: StackProblem = {
           stack.map(([ix, ht]) => ({ value: `[${ix},h=${ht}]` })),
           [],
           `Pop [${idx},h=${h}]: area=${h}×(${i}-${idx})=${area}. maxArea=${maxArea}`,
-          8,
+          9,
           [{ label: "maxArea", value: maxArea }],
           [0]
         ))
@@ -700,20 +700,27 @@ const largestRectangle: StackProblem = {
         stack.map(([ix, ht]) => ({ value: `[${ix},h=${ht}]` })),
         [stack.length - 1],
         `Push [start=${start}, h=${heights[i]}]`,
-        11
+        14
       ))
     }
 
-    // flush
-    for (const [idx, h] of stack) {
+    // flush remaining stack entries after main loop
+    stack.forEach(([idx, h], i) => {
       const area = h * (heights.length - idx)
       if (area > maxArea) maxArea = area
-    }
+      steps.push(frame(
+        stack.map(([ix, ht]) => ({ value: `[${ix},h=${ht}]` })),
+        [i],
+        `Flush [${idx},h=${h}]: area=${h}×(${heights.length}-${idx})=${area}. maxArea=${maxArea}`,
+        18,
+        [{ label: "maxArea", value: maxArea }]
+      ))
+    })
     steps.push(frame(
       [],
       [],
-      `Flush remaining. maxArea = ${maxArea} ✓`,
-      15,
+      `Flush done. maxArea = ${maxArea} ✓`,
+      21,
       [{ label: "maxArea", value: maxArea }]
     ))
     return steps
@@ -816,18 +823,27 @@ empty() → false`,
 
     snap([], "MyQueue created. inbox=[] outbox=[]", 2)
 
-    inbox.push(1); snap([inbox.length - 1], "push(1) → inbox=[1]", 7)
-    inbox.push(2); snap([inbox.length - 1], "push(2) → inbox=[1,2]", 7)
+    inbox.push(1); snap([inbox.length - 1], "push(1) → inbox=[1]", 8)
+    inbox.push(2); snap([inbox.length - 1], "push(2) → inbox=[1,2]", 8)
 
     // peek → transfer
-    snap([], "peek(): outbox is empty → transfer inbox→outbox", 20)
-    while (inbox.length) outbox.push(inbox.pop()!)
-    inbox = []; 
+    snap([], "peek(): outbox is empty → transfer inbox→outbox", 17)
+    while (inbox.length) {
+      const v = inbox.pop()!
+      outbox.push(v)
+      steps.push(frame(
+        [...inbox.map(x => ({ value: x })), ...outbox.map(x => ({ value: x }))],
+        [inbox.length + outbox.length - 1],
+        `_transfer(): pop ${v} from inbox → push to outbox. inbox=[${inbox.join(",")}] outbox=[${outbox.join(",")}]`,
+        28,
+        [{ label: "inbox", value: `[${inbox.join(",")}]` }, { label: "outbox", value: `[${outbox.join(",")}]` }]
+      ))
+    }
     steps.push(frame(
       outbox.map(v => ({ value: v })),
       [outbox.length - 1],
       `After transfer: outbox=[${outbox.join(",")}]. peek()=${outbox[outbox.length - 1]} ✓`,
-      21,
+      18,
       [{ label: "inbox", value: "[]" }, { label: "outbox", value: `[${outbox.join(",")}]` }]
     ))
 
@@ -837,7 +853,7 @@ empty() → false`,
       outbox.map(v => ({ value: v })),
       [],
       `pop() → ${popped}. outbox=[${outbox.join(",")}] ✓`,
-      12,
+      13,
       [{ label: "inbox", value: "[]" }, { label: "outbox", value: `[${outbox.join(",")}]` }],
       [0]
     ))
@@ -846,7 +862,7 @@ empty() → false`,
       outbox.map(v => ({ value: v })),
       [],
       `empty()=${inbox.length === 0 && outbox.length === 0} ✓`,
-      16,
+      22,
       [{ label: "inbox", value: "[]" }, { label: "outbox", value: `[${outbox.join(",")}]` }]
     ))
 
@@ -950,7 +966,7 @@ const asteroidCollision: StackProblem = {
             stack.map(v => ({ value: v, label: v > 0 ? "→" : "←" })),
             [],
             `|${ast}| > ${top} → ${top} explodes! Continue checking.`,
-            9, [], [0]
+            11, [], [0]
           ))
         } else if (Math.abs(ast) === top) {
           stack.pop()
@@ -959,7 +975,7 @@ const asteroidCollision: StackProblem = {
             stack.map(v => ({ value: v, label: v > 0 ? "→" : "←" })),
             [],
             `Equal size → both explode!`,
-            11, [], [0]
+            13, [], [0]
           ))
           break
         } else {
@@ -968,7 +984,7 @@ const asteroidCollision: StackProblem = {
             stack.map(v => ({ value: v, label: v > 0 ? "→" : "←" })),
             [],
             `|${ast}| < ${top} → ${ast} explodes!`,
-            14
+            17
           ))
           break
         }
@@ -980,7 +996,7 @@ const asteroidCollision: StackProblem = {
           stack.map(v => ({ value: v, label: v > 0 ? "→" : "←" })),
           [stack.length - 1],
           `No collision (or survived) → push ${ast}`,
-          18
+          22
         ))
       }
     }
@@ -989,7 +1005,7 @@ const asteroidCollision: StackProblem = {
       stack.map(v => ({ value: v, label: v > 0 ? "→" : "←" })),
       [],
       `Final state: [${stack.join(",")}] ✓`,
-      21
+      25
     ))
     return steps
   },
@@ -1081,7 +1097,7 @@ const decodeString: StackProblem = {
           stringStack.map(s => ({ value: `"${s}"` })),
           [],
           `Digit '${ch}' → k=${k}`,
-          7,
+          9,
           [{ label: "current", value: `"${current}"` }, { label: "k", value: k }]
         ))
       } else if (ch === "[") {
@@ -1091,7 +1107,7 @@ const decodeString: StackProblem = {
           stringStack.map(s => ({ value: `"${s}"` })),
           [stringStack.length - 1],
           `'[' → push k=${k} & current="${current}". Reset.`,
-          9,
+          11,
           [{ label: "countStack", value: `[${countStack.join(",")}]` }]
         ))
         current = ""
@@ -1105,7 +1121,7 @@ const decodeString: StackProblem = {
           stringStack.map(s => ({ value: `"${s}"` })),
           [],
           `']' → pop k=${repeat}, prev="${prev}". current="${prev}"+"${expanded}"="${current}"`,
-          14,
+          16,
           [{ label: "current", value: `"${current}"` }],
           [0]
         ))
@@ -1115,13 +1131,13 @@ const decodeString: StackProblem = {
           stringStack.map(s => ({ value: `"${s}"` })),
           [],
           `Letter '${ch}' → current="${current}"`,
-          17,
+          20,
           [{ label: "current", value: `"${current}"` }]
         ))
       }
     }
 
-    steps.push(frame([], [], `Result: "${current}" ✓`, 21, [{ label: "output", value: `"${current}"` }]))
+    steps.push(frame([], [], `Result: "${current}" ✓`, 24, [{ label: "output", value: `"${current}"` }]))
     return steps
   },
 }
@@ -1195,7 +1211,7 @@ const onlineStockSpan: StackProblem = {
         stack.map(([p, s]) => ({ value: p, label: `span=${s}` })),
         [stack.length - 1],
         `next(${price}): span=1. Check stack top.`,
-        6
+        7
       ))
 
       while (stack.length && stack[stack.length - 1][0] <= price) {
@@ -1205,7 +1221,7 @@ const onlineStockSpan: StackProblem = {
           stack.map(([p, s]) => ({ value: p, label: `span=${s}` })),
           [],
           `Pop [price=${p},span=${s}]: ${p}≤${price} → span+=${s} → span=${span}`,
-          9,
+          11,
           [{ label: "span so far", value: span }],
           [0]
         ))
@@ -1216,7 +1232,7 @@ const onlineStockSpan: StackProblem = {
         stack.map(([p, s]) => ({ value: p, label: `span=${s}` })),
         [stack.length - 1],
         `Push [${price},${span}]. Return span=${span} ✓`,
-        12,
+        14,
         [{ label: "return", value: span }]
       ))
     }
