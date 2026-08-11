@@ -196,41 +196,43 @@ const invertBinaryTree: BinaryTreeProblem = {
     const n4 = findId(4), n2 = findId(2), n7 = findId(7)
     const n1 = findId(1), n3 = findId(3), n6 = findId(6), n9 = findId(9)
 
-    steps.push(tframe(nodes, rootId, [n4], visited, [], [], "Start at root (4). Will invert tree by swapping left ↔ right at each node.", 2))
+    steps.push(tframe(nodes, rootId, [n4], visited, [], [], "Start at root (4). Not null, so proceed to swap its children first.", 2))
 
-    steps.push(tframe(nodes, rootId, [n2], visited, [], [], "DFS left: visiting node 2. Recurse deeper first.", 8))
-    steps.push(tframe(nodes, rootId, [n1], visited, [], [], "DFS left of 2: visiting node 1 (leaf). No children to swap.", 2))
-    visited.push(n1)
-    steps.push(tframe(nodes, rootId, [n3], visited, [], [], "DFS right of 2: visiting node 3 (leaf). No children to swap.", 2))
-    visited.push(n3)
-
-    // Swap children of node 2
-    const tmp2L = nodes[n2].leftId
-    nodes[n2].leftId = nodes[n2].rightId
-    nodes[n2].rightId = tmp2L
-    visited.push(n2)
-    steps.push(tframe(nodes, rootId, [n2], visited, [], [], "Back at node 2 — swap left(1) ↔ right(3). ✓", 4))
-
-    steps.push(tframe(nodes, rootId, [n7], visited, [], [], "DFS right of root: visiting node 7. Recurse deeper.", 8))
-    steps.push(tframe(nodes, rootId, [n6], visited, [], [], "DFS left of 7: visiting node 6 (leaf). No children to swap.", 2))
-    visited.push(n6)
-    steps.push(tframe(nodes, rootId, [n9], visited, [], [], "DFS right of 7: visiting node 9 (leaf). No children to swap.", 2))
-    visited.push(n9)
-
-    // Swap children of node 7
-    const tmp7L = nodes[n7].leftId
-    nodes[n7].leftId = nodes[n7].rightId
-    nodes[n7].rightId = tmp7L
-    visited.push(n7)
-    steps.push(tframe(nodes, rootId, [n7], visited, [], [], "Back at node 7 — swap left(6) ↔ right(9). ✓", 4))
-
-    // Swap children of root
+    // Swap children of root (top-down: swap BEFORE recursing)
     const tmp4L = nodes[n4].leftId
     nodes[n4].leftId = nodes[n4].rightId
     nodes[n4].rightId = tmp4L
+    steps.push(tframe(nodes, rootId, [n4], visited, [], [], "At root (4) — swap left(2) ↔ right(7) now, before recursing. ✓", 6))
     visited.push(n4)
+
+    // Recurse fully into the post-swap left branch (originally node 7)
+    steps.push(tframe(nodes, rootId, [n7], visited, [], [], "Recurse into root.left (now node 7). Swap its children first.", 10))
+    const tmp7L = nodes[n7].leftId
+    nodes[n7].leftId = nodes[n7].rightId
+    nodes[n7].rightId = tmp7L
+    steps.push(tframe(nodes, rootId, [n7], visited, [], [], "At node 7 — swap left(6) ↔ right(9) now, before recursing. ✓", 6))
+    visited.push(n7)
+
+    steps.push(tframe(nodes, rootId, [n9], visited, [], [], "Recurse into 7.left (now node 9, leaf). No children to swap.", 2))
+    visited.push(n9)
+    steps.push(tframe(nodes, rootId, [n6], visited, [], [], "Recurse into 7.right (now node 6, leaf). No children to swap.", 2))
+    visited.push(n6)
+
+    // Recurse fully into the post-swap right branch (originally node 2)
+    steps.push(tframe(nodes, rootId, [n2], visited, [], [], "Recurse into root.right (now node 2). Swap its children first.", 11))
+    const tmp2L = nodes[n2].leftId
+    nodes[n2].leftId = nodes[n2].rightId
+    nodes[n2].rightId = tmp2L
+    steps.push(tframe(nodes, rootId, [n2], visited, [], [], "At node 2 — swap left(1) ↔ right(3) now, before recursing. ✓", 6))
+    visited.push(n2)
+
+    steps.push(tframe(nodes, rootId, [n3], visited, [], [], "Recurse into 2.left (now node 3, leaf). No children to swap.", 2))
+    visited.push(n3)
+    steps.push(tframe(nodes, rootId, [n1], visited, [], [], "Recurse into 2.right (now node 1, leaf). No children to swap.", 2))
+    visited.push(n1)
+
     steps.push(tframe(nodes, rootId, [], visited, [], [],
-      "Back at root (4) — swap left(2) ↔ right(7). Tree fully inverted ✓", 10,
+      "Back at root (4) — both subtrees fully inverted. Tree fully inverted ✓", 13,
       [], [4, 7, 2, 9, 6, 3, 1]))
     return steps
   },
@@ -308,21 +310,21 @@ const maxDepth: BinaryTreeProblem = {
     const n15 = findId(15), n7 = findId(7)
 
     steps.push(tframe(nodes, rootId, [n3], visited, [], [], "Start at root (3). maxDepth = 1 + max(left, right).", 2))
-    steps.push(tframe(nodes, rootId, [n9], visited, [], [], "Go left → node 9 (leaf). left=null→0, right=null→0.", 3))
+    steps.push(tframe(nodes, rootId, [n9], visited, [], [], "Go left → node 9 (leaf). left=null→0, right=null→0.", 4))
     visited.push(n9)
-    steps.push(tframe(nodes, rootId, [n9], visited, [], [], "Node 9 returns depth = 1 + max(0,0) = 1.", 5, [{ label: "depth(9)", value: 1 }]))
+    steps.push(tframe(nodes, rootId, [n9], visited, [], [], "Node 9 returns depth = 1 + max(0,0) = 1.", 7, [{ label: "depth(9)", value: 1 }]))
 
-    steps.push(tframe(nodes, rootId, [n20], visited, [], [], "Go right → node 20. Recurse into its children.", 4))
-    steps.push(tframe(nodes, rootId, [n15], visited, [], [], "Left child of 20 → node 15 (leaf). Returns depth = 1.", 5))
+    steps.push(tframe(nodes, rootId, [n20], visited, [], [], "Go right → node 20. Recurse into its children.", 5))
+    steps.push(tframe(nodes, rootId, [n15], visited, [], [], "Left child of 20 → node 15 (leaf). Returns depth = 1.", 4))
     visited.push(n15)
     steps.push(tframe(nodes, rootId, [n7], visited, [], [], "Right child of 20 → node 7 (leaf). Returns depth = 1.", 5))
     visited.push(n7)
     visited.push(n20)
-    steps.push(tframe(nodes, rootId, [n20], visited, [], [], "Node 20: depth = 1 + max(1, 1) = 2.", 5, [{ label: "depth(20)", value: 2 }]))
+    steps.push(tframe(nodes, rootId, [n20], visited, [], [], "Node 20: depth = 1 + max(1, 1) = 2.", 7, [{ label: "depth(20)", value: 2 }]))
 
     visited.push(n3)
     steps.push(tframe(nodes, rootId, [], visited, [], [],
-      "Root (3): depth = 1 + max(depth(9)=1, depth(20)=2) = 3 ✓", 5,
+      "Root (3): depth = 1 + max(depth(9)=1, depth(20)=2) = 3 ✓", 7,
       [{ label: "left depth", value: 1 }, { label: "right depth", value: 2 }, { label: "max depth", value: 3 }],
       [3]))
     return steps
@@ -398,9 +400,9 @@ const sameTree: BinaryTreeProblem = {
     const findId = (val: number) => idsP.find(id => nodesP[id].val === val)!
     const p1 = findId(1), p2 = findId(2), p3 = findId(3)
 
-    steps.push(tframe(nodesP, rootP, [p1], visited, [p1], [], "Compare root of p (1) vs root of q (1). Values match ✓", 7))
+    steps.push(tframe(nodesP, rootP, [p1], visited, [p1], [], "Compare root of p (1) vs root of q (1). Values match ✓", 9))
     visited.push(p1)
-    steps.push(tframe(nodesP, rootP, [p2], visited, [p2], [], "Go left: p.left=2, q.left=2. Values match ✓", 7))
+    steps.push(tframe(nodesP, rootP, [p2], visited, [p2], [], "Go left: p.left=2, q.left=2. Values match ✓", 9))
     visited.push(p2)
 
     steps.push(tframe(nodesP, rootP, [], visited, [], [],
@@ -408,7 +410,7 @@ const sameTree: BinaryTreeProblem = {
     steps.push(tframe(nodesP, rootP, [], visited, [], [],
       "p.left.right=null, q.left.right=null → both null → true ✓", 3))
 
-    steps.push(tframe(nodesP, rootP, [p3], visited, [p3], [], "Go right: p.right=3, q.right=3. Values match ✓", 7))
+    steps.push(tframe(nodesP, rootP, [p3], visited, [p3], [], "Go right: p.right=3, q.right=3. Values match ✓", 9))
     visited.push(p3)
     steps.push(tframe(nodesP, rootP, [], visited, [], [],
       "p.right.left=null, q.right.left=null → both null → true ✓", 3))
@@ -416,7 +418,7 @@ const sameTree: BinaryTreeProblem = {
       "p.right.right=null, q.right.right=null → both null → true ✓", 3))
 
     steps.push(tframe(nodesP, rootP, [], visited, [], [],
-      "All corresponding nodes match! isSameTree([1,2,3],[1,2,3]) = true ✓", 9,
+      "All corresponding nodes match! isSameTree([1,2,3],[1,2,3]) = true ✓", 12,
       [], ["true"]))
     return steps
   },
@@ -501,36 +503,36 @@ const levelOrderTraversal: BinaryTreeProblem = {
     const n3 = findId(3), n9 = findId(9), n20 = findId(20)
     const n15 = findId(15), n7 = findId(7)
 
-    steps.push(tframe(nodes, rootId, [n3], visited, [], [], "Init queue = [3]. BFS level-by-level.", 3))
+    steps.push(tframe(nodes, rootId, [n3], visited, [], [], "Init queue = [3]. BFS level-by-level.", 4))
 
     // Level 0
     visited.push(n3)
     steps.push(tframe(nodes, rootId, [n3], visited, [], [],
-      "Level 0: process node 3. Enqueue children: [9, 20].", 9,
+      "Level 0: process node 3. Enqueue children: [9, 20].", 14,
       [{ label: "queue", value: "[9, 20]" }, { label: "level 0", value: "[3]" }]))
 
     // Level 1
     steps.push(tframe(nodes, rootId, [n9, n20], visited, [], [],
-      "Level 1: levelSize=2. Process node 9 (leaf) → no children to enqueue.", 9,
+      "Level 1: levelSize=2. Process node 9 (leaf) → no children to enqueue.", 14,
       [{ label: "queue", value: "[20]" }]))
     visited.push(n9)
     steps.push(tframe(nodes, rootId, [n20], visited, [], [],
-      "Level 1: Process node 20 → enqueue children 15, 7.", 10,
+      "Level 1: Process node 20 → enqueue children 15, 7.", 14,
       [{ label: "queue", value: "[15, 7]" }, { label: "level 1", value: "[9, 20]" }]))
     visited.push(n20)
 
     // Level 2
     steps.push(tframe(nodes, rootId, [n15, n7], visited, [], [],
-      "Level 2: levelSize=2. Process node 15 (leaf) → no children.", 9,
+      "Level 2: levelSize=2. Process node 15 (leaf) → no children.", 14,
       [{ label: "queue", value: "[7]" }]))
     visited.push(n15)
     steps.push(tframe(nodes, rootId, [n7], visited, [], [],
-      "Level 2: Process node 7 (leaf) → no children. Queue empty.", 9,
+      "Level 2: Process node 7 (leaf) → no children. Queue empty.", 14,
       [{ label: "queue", value: "[]" }, { label: "level 2", value: "[15, 7]" }]))
     visited.push(n7)
 
     steps.push(tframe(nodes, rootId, [], visited, [], [],
-      "BFS complete! result = [[3],[9,20],[15,7]] ✓", 17,
+      "BFS complete! result = [[3],[9,20],[15,7]] ✓", 21,
       [], [[3] as any, [9, 20] as any, [15, 7] as any]))
     return steps
   },

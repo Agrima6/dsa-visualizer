@@ -175,7 +175,7 @@ const numberOfIslands: GraphProblem = {
     const visited = new Set<string>()
     const allVisited: string[] = []
 
-    steps.push(gstep(nodes, edges, [], [], [], [], "Scan grid for unvisited '1' cells (land).", 2))
+    steps.push(gstep(nodes, edges, [], [], [], [], "Scan grid for unvisited '1' cells (land).", 17))
 
     const dirs = [[1,0],[-1,0],[0,1],[0,-1]]
     const dfs = (r: number, c: number) => {
@@ -185,7 +185,7 @@ const numberOfIslands: GraphProblem = {
       visited.add(id)
       allVisited.push(id)
       steps.push(gstep(nodes, edges, [id], [...allVisited], [], [],
-        `DFS at (${r},${c}) — land! Mark visited. Island #${islands}`, 8,
+        `DFS at (${r},${c}) — land! Mark visited. Island #${islands}`, 10,
         [{ label: "islands", value: islands }]))
       for (const [dr, dc] of dirs) dfs(r + dr, c + dc)
     }
@@ -196,7 +196,7 @@ const numberOfIslands: GraphProblem = {
         if (!visited.has(id) && rawGrid[r][c] === "1") {
           islands++
           steps.push(gstep(nodes, edges, [id], [...allVisited], [], [],
-            `Found unvisited land at (${r},${c}). islands++ = ${islands}. Start DFS.`, 18,
+            `Found unvisited land at (${r},${c}). islands++ = ${islands}. Start DFS.`, 20,
             [{ label: "islands", value: islands }]))
           dfs(r, c)
         }
@@ -204,7 +204,7 @@ const numberOfIslands: GraphProblem = {
     }
 
     steps.push(gstep(nodes, edges, [], [...allVisited], [], allVisited,
-      `Total islands = ${islands} ✓`, 22, [{ label: "result", value: islands }]))
+      `Total islands = ${islands} ✓`, 26, [{ label: "result", value: islands }]))
     return steps
   },
 }
@@ -271,22 +271,22 @@ const cloneGraph: GraphProblem = {
     const visited: string[] = []
     const cloned: string[] = []
 
-    steps.push(gstep(nodes, edges, [], [], [], [], "Init HashMap. DFS from node 1.", 2))
+    steps.push(gstep(nodes, edges, [], [], [], [], "Init HashMap. DFS from node 1.", 3))
 
     const order = ["1","2","3","4"]
     for (const id of order) {
       steps.push(gstep(nodes, edges, [id], visited, [], [],
-        `DFS on node ${id}. Not in map → create clone.`, 6,
+        `DFS on node ${id}. Not in map → create clone.`, 8,
         [{ label: "cloned so far", value: `[${cloned.join(",")}]` }]))
       visited.push(id)
       cloned.push(`${id}'`)
       steps.push(gstep(nodes, edges, [], visited, [], [],
-        `Clone ${id}' created and added to map. Processing neighbors...`, 8,
+        `Clone ${id}' created and added to map. Processing neighbors...`, 9,
         [{ label: "map", value: cloned.join(" | ") }]))
     }
 
     steps.push(gstep(nodes, edges, [], visited, [], visited,
-      `All nodes cloned. Graph deep-copied successfully ✓`, 12,
+      `All nodes cloned. Graph deep-copied successfully ✓`, 18,
       [{ label: "cloned nodes", value: cloned.join(", ") }]))
     return steps
   },
@@ -381,13 +381,13 @@ const rottingOranges: GraphProblem = {
     const q = ["0,0"]
 
     steps.push(gstep(nodes, edges, rotten, [], q, [],
-      "Init: enqueue all rotten oranges. fresh=5.", 6,
-      [{ label: "fresh", value: 5 }, { label: "time", value: 0 }]))
+      "Init: enqueue all rotten oranges. fresh=6.", 6,
+      [{ label: "fresh", value: 6 }, { label: "time", value: 0 }]))
 
     const spreadOrder = [
-      { spread: ["0,1","1,0"], time: 1, fresh: 3 },
-      { spread: ["0,2","1,1"], time: 2, fresh: 1 },
-      { spread: ["2,1"],       time: 3, fresh: 0 },  // 2,1 connects via 1,1
+      { spread: ["0,1","1,0"], time: 1, fresh: 4 },
+      { spread: ["0,2","1,1"], time: 2, fresh: 2 },
+      { spread: ["2,1"],       time: 3, fresh: 1 },  // 2,1 connects via 1,1
       { spread: ["2,2"],       time: 4, fresh: 0 },
     ]
 
@@ -399,7 +399,7 @@ const rottingOranges: GraphProblem = {
     }
 
     steps.push(gstep(nodes, edges, [], visited, [], visited,
-      "fresh=0. Return time=4 ✓", 23, [{ label: "result", value: 4 }]))
+      "fresh=0. Return time=4 ✓", 31, [{ label: "result", value: 4 }]))
     return steps
   },
 }

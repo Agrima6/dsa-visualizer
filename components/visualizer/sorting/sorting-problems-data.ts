@@ -167,37 +167,62 @@ function merge(left, right) {
     const steps: VisStep[] = []
     const sorted: number[] = []
 
-    steps.push(step(arr, [], [], sorted, "Start Merge Sort on [5,2,8,1,9,3,7,4,6]", 2))
+    steps.push(step(arr, [], [], sorted, "Start Merge Sort on [5,2,8,1,9,3,7,4,6]", 1))
 
-    const n = arr.length
-    for (let width = 1; width < n; width *= 2) {
-      for (let i = 0; i < n; i += 2 * width) {
-        const left = i
-        const mid = Math.min(i + width, n)
-        const right = Math.min(i + 2 * width, n)
-
-        steps.push(step(arr, Array.from({ length: right - left }, (_, k) => left + k), [], sorted,
-          `Merging subarray [${arr.slice(left, mid).join(",")}] and [${arr.slice(mid, right).join(",")}]`, 6))
-
-        const leftHalf = arr.slice(left, mid)
-        const rightHalf = arr.slice(mid, right)
-        let lp = 0, rp = 0, ki = left
-
-        while (lp < leftHalf.length && rp < rightHalf.length) {
-          if (leftHalf[lp] <= rightHalf[rp]) {
-            arr[ki] = leftHalf[lp++]
-          } else {
-            arr[ki] = rightHalf[rp++]
-          }
-          steps.push(step(arr, [ki], [], sorted, `Placed ${arr[ki]} at index ${ki}`, 16))
-          ki++
-        }
-        while (lp < leftHalf.length) { arr[ki] = leftHalf[lp++]; ki++ }
-        while (rp < rightHalf.length) { arr[ki] = rightHalf[rp++]; ki++ }
+    function mergeSort(lo: number, hi: number): number[] {
+      const len = hi - lo + 1
+      if (len <= 1) {
+        steps.push(step(arr, [lo], [], sorted, `Base case: [${arr[lo]}] length ≤ 1, already sorted`, 3))
+        return [arr[lo]]
       }
+
+      const mid = lo + Math.floor(len / 2)
+      steps.push(step(arr, Array.from({ length: len }, (_, k) => lo + k), [], sorted,
+        `Split [${arr.slice(lo, hi + 1).join(",")}] at mid → left [${arr.slice(lo, mid).join(",")}], right [${arr.slice(mid, hi + 1).join(",")}]`, 5))
+
+      const left = mergeSort(lo, mid - 1)
+      const right = mergeSort(mid, hi)
+
+      steps.push(step(arr, Array.from({ length: len }, (_, k) => lo + k), [], sorted,
+        `Merging [${left.join(",")}] and [${right.join(",")}]`, 9))
+
+      const merged: number[] = []
+      let lp = 0, rp = 0, ki = lo
+
+      while (lp < left.length && rp < right.length) {
+        steps.push(step(arr, [lo + lp, mid + rp], [], sorted, `Compare left=${left[lp]} vs right=${right[rp]}`, 17))
+        if (left[lp] <= right[rp]) {
+          arr[ki] = left[lp]
+          merged.push(left[lp])
+          lp++
+          steps.push(step(arr, [ki], [], sorted, `Placed ${arr[ki]} at index ${ki}`, 18))
+        } else {
+          arr[ki] = right[rp]
+          merged.push(right[rp])
+          rp++
+          steps.push(step(arr, [ki], [], sorted, `Placed ${arr[ki]} at index ${ki}`, 20))
+        }
+        ki++
+      }
+      while (lp < left.length) {
+        arr[ki] = left[lp]
+        merged.push(left[lp])
+        steps.push(step(arr, [ki], [], sorted, `Copy remaining left ${arr[ki]} to index ${ki}`, 24))
+        lp++; ki++
+      }
+      while (rp < right.length) {
+        arr[ki] = right[rp]
+        merged.push(right[rp])
+        steps.push(step(arr, [ki], [], sorted, `Copy remaining right ${arr[ki]} to index ${ki}`, 24))
+        rp++; ki++
+      }
+
+      return merged
     }
 
-    steps.push(step(arr, [], [], Array.from({ length: n }, (_, i) => i), "Array fully sorted! ✓", 10))
+    mergeSort(0, arr.length - 1)
+
+    steps.push(step(arr, [], [], Array.from({ length: arr.length }, (_, i) => i), "Array fully sorted! ✓", 1))
     return steps
   },
 }
@@ -272,17 +297,17 @@ const sortColors: SortingProblem = {
     let low = 0, mid = 0, high = arr.length - 1
     const sortedIdx: number[] = []
 
-    steps.push(step(arr, [], [], [], "Dutch National Flag — low=0, mid=0, high=5", 2))
+    steps.push(step(arr, [], [], [], "Dutch National Flag — low=0, mid=0, high=5", 3))
 
     while (mid <= high) {
-      steps.push(step(arr, [mid], [], sortedIdx, `Inspecting nums[mid=${mid}] = ${arr[mid]}`, 5, low))
+      steps.push(step(arr, [mid], [], sortedIdx, `Inspecting nums[mid=${mid}] = ${arr[mid]}`, 6, low))
 
       if (arr[mid] === 0) {
         ;[arr[low], arr[mid]] = [arr[mid], arr[low]]
         steps.push(step(arr, [], [low, mid], sortedIdx, `nums[mid]=0 → swap with low=${low}`, 7))
         low++; mid++
       } else if (arr[mid] === 1) {
-        steps.push(step(arr, [mid], [], sortedIdx, `nums[mid]=1 → already in place, mid++`, 10))
+        steps.push(step(arr, [mid], [], sortedIdx, `nums[mid]=1 → already in place, mid++`, 11))
         mid++
       } else {
         ;[arr[mid], arr[high]] = [arr[high], arr[mid]]
@@ -291,7 +316,7 @@ const sortColors: SortingProblem = {
       }
     }
 
-    steps.push(step(arr, [], [], Array.from({ length: arr.length }, (_, i) => i), "Sorted! [0,0,1,1,2,2] ✓", 18))
+    steps.push(step(arr, [], [], Array.from({ length: arr.length }, (_, i) => i), "Sorted! [0,0,1,1,2,2] ✓", 19))
     return steps
   },
 }
@@ -377,13 +402,13 @@ const topKFrequent: SortingProblem = {
     const k = 2
 
     steps.push(step(arr, [], [], [], "Count frequencies of each element", 3))
-    steps.push(step(arr, [0, 1, 2, 3], [], [], "Frequencies: 1→3, 2→2, 3→4, 4→1", 9))
+    steps.push(step(arr, [0, 1, 2, 3], [], [], "Frequencies: 1→3, 2→2, 3→4, 4→1", 5))
 
     const sortedByFreq = [...entries].sort((a, b) => b.cnt - a.cnt)
     const topKIdx = sortedByFreq.slice(0, k).map(e => entries.findIndex(x => x.num === e.num))
 
-    steps.push(step(arr, topKIdx, [], [], `Top-${k} most frequent: ${sortedByFreq.slice(0, k).map(e => e.num).join(", ")}`, 14))
-    steps.push(step(arr, [], [], topKIdx, `Answer: [${sortedByFreq.slice(0, k).map(e => e.num).join(", ")}] ✓`, 16))
+    steps.push(step(arr, topKIdx, [], [], `Top-${k} most frequent: ${sortedByFreq.slice(0, k).map(e => e.num).join(", ")}`, 16))
+    steps.push(step(arr, [], [], topKIdx, `Answer: [${sortedByFreq.slice(0, k).map(e => e.num).join(", ")}] ✓`, 19))
     return steps
   },
 }
