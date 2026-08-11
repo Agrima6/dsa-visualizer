@@ -62,7 +62,7 @@ export function GrowthExplorer() {
             <span className="font-semibold text-foreground">{formatOps(slowest.value)}</span> operations while{" "}
             <span className="font-semibold" style={{ color: fastest.color }}>{fastest.notation}</span> needs just{" "}
             <span className="font-semibold text-foreground">{formatOps(fastest.value)}</span> —{" "}
-            that's <span className="font-semibold text-foreground">{ratio.toLocaleString()}×</span> more work.
+            that's <span className="font-semibold text-foreground">{formatOps(ratio)}×</span> more work.
           </motion.p>
         )}
 
@@ -90,7 +90,7 @@ export function GrowthExplorer() {
                     transition={{ type: "spring", stiffness: 120, damping: 20 }}
                   />
                 </span>
-                <span className="w-20 shrink-0 text-right font-mono text-sm tabular-nums text-muted-foreground">
+                <span className="w-[72px] shrink-0 whitespace-nowrap text-right font-mono text-sm tabular-nums text-muted-foreground">
                   {formatOps(r.value)}
                 </span>
               </button>

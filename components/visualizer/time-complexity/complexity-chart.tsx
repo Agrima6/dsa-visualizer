@@ -11,7 +11,7 @@ import {
   ReferenceLine,
   CartesianGrid,
 } from "recharts"
-import { COMPLEXITIES, ComplexityId } from "./complexity-data"
+import { COMPLEXITIES, ComplexityId, formatOps } from "./complexity-data"
 
 interface ComplexityChartProps {
   maxN: number
@@ -64,7 +64,7 @@ export function ComplexityChart({ maxN, currentN, logScale, activeIds, highlight
             }}
             formatter={(value, name) => {
               const info = COMPLEXITIES.find((c) => c.id === name)
-              return [Math.round(Number(value)).toLocaleString(), info?.notation ?? String(name)]
+              return [formatOps(Number(value)), info?.notation ?? String(name)]
             }}
             labelFormatter={(n) => `n = ${n}`}
           />

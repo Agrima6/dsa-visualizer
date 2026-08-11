@@ -95,6 +95,12 @@ export function getComplexity(id: ComplexityId): ComplexityInfo {
 }
 
 export function formatOps(n: number): string {
-  if (n >= 1e12) return n.toExponential(2)
-  return Math.round(n).toLocaleString()
+  const rounded = Math.round(n)
+  // Fixed to en-US on purpose: the visitor's locale can produce very long
+  // digit groupings (e.g. Indian lakh/crore commas) that overflow the
+  // fixed-width value column, and "1.2B" reads faster than either anyway.
+  if (rounded >= 100_000) {
+    return new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 2 }).format(rounded)
+  }
+  return new Intl.NumberFormat("en-US").format(rounded)
 }
