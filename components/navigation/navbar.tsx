@@ -53,6 +53,11 @@ const routeList: RouteProps[] = [
 
 const featureList: FeatureProps[] = [
   {
+    title: "Time Complexity",
+    description: "Learn Big-O by experimenting with live graphs, real code, and quizzes.",
+    url: "/visualizer/time-complexity",
+  },
+  {
     title: "Array",
     description: "Learn Arrays through interactive visualizations.",
     url: "/visualizer/array",

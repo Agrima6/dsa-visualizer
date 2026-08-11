@@ -1,6 +1,6 @@
 "use client"
 
-import { Binary, Home, Database, BrainCircuit, TreePine, List, SquareStack, SquareChevronLeft, Equal, MessageSquare, X, Hash, ArrowRightLeft } from "lucide-react"
+import { Binary, Home, Database, BrainCircuit, TreePine, List, SquareStack, SquareChevronLeft, Equal, MessageSquare, X, Hash, ArrowRightLeft, Gauge } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -22,6 +22,15 @@ const navItems = [
     title: "Data Structures",
     url: "/visualizer",
     icon: Database,
+  },
+]
+
+const concepts = [
+  {
+    name: "Time Complexity",
+    url: "/visualizer/time-complexity",
+    icon: Gauge,
+    description: "Learn Big-O by experimenting — live growth graphs, real code execution, and instant-feedback quizzes",
   },
 ]
 
@@ -108,6 +117,15 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navItems} />
+        <NavProjects
+          title="Concepts"
+          projects={concepts.map(c => ({
+            name: c.name,
+            url: c.url,
+            icon: c.icon,
+            description: c.description,
+          }))}
+        />
         <NavProjects
           title="Data Structures"
           projects={dataStructures.map(ds => ({

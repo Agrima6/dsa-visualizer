@@ -1,8 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BrainCircuit, Binary, TreePine, Box, List, ArrowLeftRight, Calculator, MessageSquare, Hash, ArrowRightLeft } from "lucide-react"
+import { BrainCircuit, Binary, TreePine, Box, List, ArrowLeftRight, Calculator, MessageSquare, Hash, ArrowRightLeft, Gauge } from "lucide-react"
 import Link from "next/link"
 
 const sections = {
+  concepts: [
+    {
+      name: "Time Complexity",
+      description: "Learn Big-O by experimenting — drag sliders, watch real code execute, and test yourself with instant-feedback quizzes.",
+      href: "/visualizer/time-complexity",
+      icon: Gauge,
+    },
+  ],
   dataStructures: [
        {
       name: "Linked List",
@@ -91,6 +99,31 @@ export default function HomePage() {
       </div>
 
       <div className="space-y-12">
+        {/* Concepts Section */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Concepts</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {sections.concepts.map((c) => {
+              const Icon = c.icon
+              return (
+                <Link key={c.href} href={c.href}>
+                  <Card className="h-full border-violet-500/20 bg-gradient-to-br from-violet-500/5 to-blue-500/5 hover:from-violet-500/10 hover:to-blue-500/10 transition-colors">
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-6 w-6" />
+                        <CardTitle>{c.name}</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <CardDescription className="text-base">{c.description}</CardDescription>
+                    </CardContent>
+                  </Card>
+                </Link>
+              )
+            })}
+          </div>
+        </section>
+
         {/* Data Structures Section */}
         <section>
           <h2 className="text-2xl font-semibold mb-6">Data Structures</h2>
