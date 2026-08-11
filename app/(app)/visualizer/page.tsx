@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BrainCircuit, Binary, TreePine, Box, List, ArrowLeftRight, Calculator, MessageSquare, Hash, ArrowRightLeft, Gauge } from "lucide-react"
+import { BrainCircuit, Binary, TreePine, Box, List, ArrowLeftRight, Calculator, MessageSquare, Hash, ArrowRightLeft, Gauge, Parentheses } from "lucide-react"
 import Link from "next/link"
 
 const sections = {
@@ -9,6 +9,12 @@ const sections = {
       description: "Learn Big-O by experimenting — drag sliders, watch real code execute, and test yourself with instant-feedback quizzes.",
       href: "/visualizer/time-complexity",
       icon: Gauge,
+    },
+    {
+      name: "Functions",
+      description: "Learn functions by watching real call stacks push and pop — recursion, closures, and higher-order functions in action.",
+      href: "/visualizer/functions",
+      icon: Parentheses,
     },
   ],
   dataStructures: [

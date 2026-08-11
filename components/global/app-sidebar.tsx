@@ -1,6 +1,6 @@
 "use client"
 
-import { Binary, Home, Database, BrainCircuit, TreePine, List, SquareStack, SquareChevronLeft, Equal, MessageSquare, X, Hash, ArrowRightLeft, Gauge } from "lucide-react"
+import { Binary, Home, Database, BrainCircuit, TreePine, List, SquareStack, SquareChevronLeft, Equal, MessageSquare, X, Hash, ArrowRightLeft, Gauge, Parentheses } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -31,6 +31,12 @@ const concepts = [
     url: "/visualizer/time-complexity",
     icon: Gauge,
     description: "Learn Big-O by experimenting — live growth graphs, real code execution, and instant-feedback quizzes",
+  },
+  {
+    name: "Functions",
+    url: "/visualizer/functions",
+    icon: Parentheses,
+    description: "Learn functions by watching real call stacks push and pop, with closures, recursion, and instant-feedback quizzes",
   },
 ]
 

@@ -58,6 +58,11 @@ const featureList: FeatureProps[] = [
     url: "/visualizer/time-complexity",
   },
   {
+    title: "Functions",
+    description: "Learn functions by watching real call stacks, closures, and recursion in action.",
+    url: "/visualizer/functions",
+  },
+  {
     title: "Array",
     description: "Learn Arrays through interactive visualizations.",
     url: "/visualizer/array",
