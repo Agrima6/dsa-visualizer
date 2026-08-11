@@ -151,15 +151,9 @@ export function AppSidebar() {
           }))}
         />
       </SidebarContent>
-      {/* <SidebarFooter>
-        <NavUser
-          user={{
-            name: "Guest User",
-            email: "guest@example.com",
-            avatar: "",
-          }}
-        />
-      </SidebarFooter> */}
+      <SidebarFooter>
+        <NavUser />
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )

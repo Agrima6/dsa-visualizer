@@ -1,5 +1,4 @@
 "use client";
-import { trackActivity } from "@/components/activity-tracker";
 
 import { Badge } from "@/components/ui/badge";
 import {

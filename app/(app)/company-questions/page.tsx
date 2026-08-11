@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Building2, CheckCircle2, Code2, ChevronRight, Flame, Star, Zap } from "lucide-react";
 import { useProgress } from "@/hooks/use-progress";
-import { useUser } from "@clerk/nextjs";
-import { trackActivity } from "@/components/activity-tracker";
 
 interface Topic {
   title: string;
@@ -112,7 +110,6 @@ const tagConfig = {
 export default function CompanyQuestionsPage() {
   const [activeCompany, setActiveCompany] = useState("All");
   const { markSolved, markMultipleSolved, unmarkSolved, isSolved } = useProgress();
-  const { user } = useUser();
   const router = useRouter();
 
   const filtered =
@@ -134,7 +131,6 @@ export default function CompanyQuestionsPage() {
     const entry = buildEntry(topic);
     if (isSolved(entry.slug)) {
       await unmarkSolved(entry.slug);
-      if (user?.id) void trackActivity(user.id, topic.title, "unmarked");
       return;
     }
     await markSolved(entry);
@@ -150,9 +146,6 @@ export default function CompanyQuestionsPage() {
   const allVisibleSolved = filtered.length > 0 && unsolvedCount === 0;
 
   const handleOpenTopic = async (topic: Topic) => {
-    if (user?.id) {
-      void trackActivity(user.id, topic.title, "opened");
-    }
     await markSolved(buildEntry(topic));
     router.push(topic.url);
   };
