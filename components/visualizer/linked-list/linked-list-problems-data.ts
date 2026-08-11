@@ -199,7 +199,7 @@ const reverseLinkedList: LinkedListProblem = {
 
     const reversed = [...nodes].reverse().map((n, i) => ({ ...n, isHead: i === 0, isTail: i === nodes.length - 1 }))
     steps.push(frame(reversed, [], [], ids,
-      "curr=null → done! prev is the new head ✓", 13,
+      "curr=null → done! prev is the new head ✓", 12,
       [{ label: "head", nodeId: ids[ids.length - 1] }],
       [{ label: "result", value: vals.slice().reverse().join(" → ") }]))
     return steps
@@ -289,17 +289,27 @@ const mergeTwoSortedLists: LinkedListProblem = {
       result.push(pick)
       const remNodes = makeList([...l1.slice(i), ...l2.slice(j)])
       steps.push(frame(remNodes, [remNodes[0].id], [], [],
-        `Compare ${a} vs ${b} → pick ${pick}. result=[${result.join("→")}]`, 5,
+        `Compare ${a} vs ${b} → pick ${pick}. result=[${result.join("→")}]`, 6,
         [],
         [{ label: "result so far", value: result.join(" → ") }]))
       if (a <= b) i++; else j++
     }
-    while (i < l1.length) result.push(l1[i++])
-    while (j < l2.length) result.push(l2[j++])
+    if (i < l1.length || j < l2.length) {
+      const leftover = i < l1.length ? l1.slice(i) : l2.slice(j)
+      const exhausted = i < l1.length ? "list2" : "list1"
+      result.push(...leftover)
+      const remNodes = makeList(leftover)
+      steps.push(frame(remNodes, remNodes.map(n => n.id), [], [],
+        `${exhausted} exhausted → attach remaining [${leftover.join("→")}] directly. result=[${result.join("→")}]`, 16,
+        [],
+        [{ label: "result so far", value: result.join(" → ") }]))
+      if (i < l1.length) i = l1.length
+      if (j < l2.length) j = l2.length
+    }
 
     const finalNodes = makeList(result)
     steps.push(frame(finalNodes, [], [], finalNodes.map(n => n.id),
-      `Merged: [${result.join("→")}] ✓`, 14,
+      `Merged: [${result.join("→")}] ✓`, 17,
       [],
       [{ label: "merged list", value: result.join(" → ") }]))
     return steps
@@ -396,7 +406,7 @@ const linkedListCycle: LinkedListProblem = {
         [{ label: "slow", value: m.sv }, { label: "fast", value: m.fv }]))
       if (meet) {
         steps.push(frame(nodes, [], [], nodes.map(n => n.id),
-          "return true — cycle exists ✓", 8,
+          "return true — cycle exists ✓", 10,
           [],
           [{ label: "result", value: "true" }]))
         break
@@ -589,8 +599,8 @@ const removeNthFromEnd: LinkedListProblem = {
       `n=${n}. Advance fast pointer ${n + 1} steps from dummy node.`, 1))
 
     steps.push(frame(nodes, [nodes[n].id], [], [],
-      `fast at node ${vals[n + 1]} (index ${n + 1}). slow still at dummy (before head).`, 6,
-      [{ label: "slow", nodeId: nodes[0].id }, { label: "fast", nodeId: nodes[n + 1].id }]))
+      `fast at node ${vals[n]} (index ${n}, ${n + 1} steps from dummy). slow still at dummy (before head).`, 8,
+      [{ label: "slow", nodeId: nodes[0].id }, { label: "fast", nodeId: nodes[n].id }]))
 
     const slowIdx = vals.length - n - 1
     steps.push(frame(nodes, [nodes[slowIdx].id], [], [],
@@ -598,13 +608,13 @@ const removeNthFromEnd: LinkedListProblem = {
       [{ label: "slow", nodeId: nodes[slowIdx].id }]))
 
     steps.push(frame(nodes, [], [nodes[slowIdx + 1].id], [],
-      `Remove slow.next = node ${vals[slowIdx + 1]}. Relink.`, 14,
+      `Remove slow.next = node ${vals[slowIdx + 1]}. Relink.`, 18,
       [{ label: "slow.next (remove)", nodeId: nodes[slowIdx + 1].id }]))
 
     const result = vals.filter((_, i) => i !== slowIdx + 1)
     const finalNodes = makeList(result)
     steps.push(frame(finalNodes, [], [], finalNodes.map(n => n.id),
-      `Done! [${result.join("→")}] ✓`, 15,
+      `Done! [${result.join("→")}] ✓`, 19,
       [],
       [{ label: "result", value: result.join(" → ") }]))
     return steps
@@ -698,11 +708,11 @@ const copyListWithRandomPointer: LinkedListProblem = {
     }
 
     steps.push(frame(nodes, [], [], [],
-      "Pass 2: Wire .next and .random on each clone using the map.", 12))
+      "Pass 2: Wire .next and .random on each clone using the map.", 11))
 
     const cloneNodes = makeList(vals.map(v => `${v}'`))
     steps.push(frame(cloneNodes, [], [], cloneNodes.map(n => n.id),
-      "All clones wired: .next and .random correctly set ✓", 17,
+      "All clones wired: .next and .random correctly set ✓", 20,
       [],
       [{ label: "deep copy head", value: `${vals[0]}'` }]))
     return steps
@@ -799,7 +809,7 @@ const addTwoNumbers: LinkedListProblem = {
     if (carry) result.push(carry)
     const finalNodes = makeList(result)
     steps.push(frame(finalNodes, [], [], finalNodes.map(n => n.id),
-      `Sum = [${result.join("→")}] → represents ${result.slice().reverse().join("")} ✓`, 16,
+      `Sum = [${result.join("→")}] → represents ${result.slice().reverse().join("")} ✓`, 19,
       [],
       [{ label: "result", value: result.join(" → ") }]))
     return steps
@@ -886,10 +896,12 @@ const findDuplicateNumber: LinkedListProblem = {
       "Phase 1: slow=nums[0]=1, fast=nums[0]=1.", 4,
       [{ label: "slow", nodeId: nodes[0].id }, { label: "fast", nodeId: nodes[0].id }]))
 
+    // Hand-traced for nums=[1,3,4,2,2]: slow=nums[slow], fast=nums[nums[fast]]
+    // iter1: slow=nums[1]=3, fast=nums[nums[1]]=nums[3]=2
+    // iter2: slow=nums[3]=2, fast=nums[nums[2]]=nums[4]=2  → meet
     const trace = [
-      { s: 1, f: 2, sv: 3, fv: 4, meet: false },
-      { s: 2, f: 3, sv: 4, fv: 2, meet: false },
-      { s: 3, f: 3, sv: 2, fv: 2, meet: true },
+      { sv: 3, fv: 2, meet: false },
+      { sv: 2, fv: 2, meet: true },
     ]
 
     for (const t of trace) {
@@ -909,8 +921,8 @@ const findDuplicateNumber: LinkedListProblem = {
       "Phase 2: slow2=nums[0]=1. Walk slow & slow2 until they meet.", 12))
 
     steps.push(frame(nodes, [], [], nodes.map(n => n.id),
-      "slow===slow2 at value 2 → duplicate = 2 ✓", 15,
-      [{ label: "duplicate", nodeId: nodes[1].id }],
+      "slow===slow2 at value 2 → duplicate = 2 ✓", 18,
+      [{ label: "duplicate", nodeId: nodes[3].id }],
       [{ label: "duplicate", value: 2 }]))
     return steps
   },
@@ -991,13 +1003,13 @@ const reverseLinkedListII: LinkedListProblem = {
       [{ label: "prev", nodeId: nodes[left - 2].id }, { label: "curr", nodeId: nodes[left - 1].id }]))
 
     steps.push(frame(nodes, nodes.slice(left - 1, right).map(n => n.id), [], [],
-      `Reversing positions ${left}–${right}: [${vals.slice(left - 1, right).join("→")}] → [${vals.slice(left - 1, right).reverse().join("→")}]`, 9,
+      `Reversing positions ${left}–${right}: [${vals.slice(left - 1, right).join("→")}] → [${vals.slice(left - 1, right).reverse().join("→")}]`, 11,
       [{ label: "range start", nodeId: nodes[left - 1].id }]))
 
     const result = [...vals.slice(0, left - 1), ...vals.slice(left - 1, right).reverse(), ...vals.slice(right)]
     const finalNodes = makeList(result)
     steps.push(frame(finalNodes, [], [], finalNodes.map(n => n.id),
-      `Done! [${result.join("→")}] ✓`, 14,
+      `Done! [${result.join("→")}] ✓`, 18,
       [],
       [{ label: "result", value: result.join(" → ") }]))
     return steps
@@ -1106,14 +1118,14 @@ get(1)→-1, get(3)→3, get(4)→4`,
 
     snap("LRUCache(2). head(LRU sentinel) ↔ tail(MRU sentinel).", 1)
     cache.push({ key: 1, val: 1 })
-    snap("put(1,1) → insert at MRU end.", 30)
+    snap("put(1,1) → insert at MRU end.", 35)
     cache.push({ key: 2, val: 2 })
-    snap("put(2,2) → insert at MRU end.", 30)
+    snap("put(2,2) → insert at MRU end.", 35)
     cache = [...cache.filter(c => c.key !== 1), { key: 1, val: 1 }]
-    snap("get(1)=1 → move key 1 to MRU end.", 24)
+    snap("get(1)=1 → move key 1 to MRU end.", 27)
     cache.shift()
     cache.push({ key: 3, val: 3 })
-    snap("put(3,3) → cache full, evict LRU (key 2). Insert key 3.", 34)
+    snap("put(3,3) → cache full, evict LRU (key 2). Insert key 3.", 37)
 
     const finalNodes = makeList(cache.map(c => `${c.key}:${c.val}`))
     steps.push(frame(finalNodes, [], [], finalNodes.map(n => n.id),

@@ -184,16 +184,16 @@ empty() → false`,
     q.push(2)
     snap([q.length - 1], "push(2): enqueue 2. queue=[1,2]. Rotate 1 element.", 7)
     const front = q.shift()!; q.push(front)
-    snap([0], "Rotated: moved 1 to back. queue=[2,1]. Front=2 (top) ✓", 10)
+    snap([0], "Rotated: moved 1 to back. queue=[2,1]. Front=2 (top) ✓", 11)
 
     // top
-    snap([0], `top() → ${q[0]} ✓ (just peek front)`, 16)
+    snap([0], `top() → ${q[0]} ✓ (just peek front)`, 20)
 
     // pop
     const popped = q[0]
-    steps.push(frame(q.map((v, i) => ({ value: v })), [], `pop() → ${popped}. Dequeue front.`, 13, [{ label: "popped", value: popped }], [0]))
+    steps.push(frame(q.map((v, i) => ({ value: v })), [], `pop() → ${popped}. Dequeue front.`, 16, [{ label: "popped", value: popped }], [0]))
     q.shift()
-    snap([], `queue=[${q.join(",")}]. empty()=${q.length === 0}`, 20, [{ label: "empty", value: String(q.length === 0) }])
+    snap([], `queue=[${q.join(",")}]. empty()=${q.length === 0}`, 24, [{ label: "empty", value: String(q.length === 0) }])
 
     return steps
   },
@@ -265,31 +265,31 @@ const binaryTreeLevelOrder: QueueProblem = {
     const steps: QueueVisStep[] = []
     let q: { value: number; label?: string }[] = []
 
-    steps.push(frame([], [], "Enqueue root (3). Start BFS.", 4))
+    steps.push(frame([], [], "Enqueue root (3). Start BFS.", 5))
     q = [{ value: 3, label: "root" }]
-    steps.push(frame(q, [0], "queue=[3]. Begin level 0.", 6))
+    steps.push(frame(q, [0], "queue=[3]. Begin level 0.", 7))
 
     // Level 0: process 3
-    steps.push(frame(q, [0], "levelSize=1. Dequeue 3 → level=[3].", 9, [{ label: "level 0", value: "[3]" }]))
-    steps.push(frame(q, [], "Enqueue children: 9 (left), 20 (right).", 12, [{ label: "level 0", value: "[3]" }], [0]))
+    steps.push(frame(q, [0], "levelSize=1. Dequeue 3 → level=[3].", 8, [{ label: "level 0", value: "[3]" }]))
+    steps.push(frame(q, [], "Enqueue children: 9 (left), 20 (right).", 15, [{ label: "level 0", value: "[3]" }], [0]))
     q = [{ value: 9, label: "left" }, { value: 20, label: "right" }]
-    steps.push(frame(q, [0, 1], "queue=[9,20]. Level 0 done → result=[[3]].", 16, [{ label: "result so far", value: "[[3]]" }]))
+    steps.push(frame(q, [0, 1], "queue=[9,20]. Level 0 done → result=[[3]].", 19, [{ label: "result so far", value: "[[3]]" }]))
 
     // Level 1: process 9 and 20
-    steps.push(frame(q, [0], "levelSize=2. Dequeue 9 → level=[9]. No children.", 9, [{ label: "level 1 so far", value: "[9]" }]))
-    steps.push(frame(q, [], "Dequeue 9 done.", 11, [{ label: "level 1 so far", value: "[9]" }], [0]))
+    steps.push(frame(q, [0], "levelSize=2. Dequeue 9 → level=[9]. No children.", 8, [{ label: "level 1 so far", value: "[9]" }]))
+    steps.push(frame(q, [], "Dequeue 9 done.", 12, [{ label: "level 1 so far", value: "[9]" }], [0]))
     q = [{ value: 20, label: "right" }]
-    steps.push(frame(q, [0], "Dequeue 20 → level=[9,20]. Enqueue 15, 7.", 9, [{ label: "level 1 so far", value: "[9,20]" }]))
-    steps.push(frame(q, [], "Enqueue 15, 7.", 12, [{ label: "level 1", value: "[9,20]" }], [0]))
+    steps.push(frame(q, [0], "Dequeue 20 → level=[9,20]. Enqueue 15, 7.", 12, [{ label: "level 1 so far", value: "[9,20]" }]))
+    steps.push(frame(q, [], "Enqueue 15, 7.", 15, [{ label: "level 1", value: "[9,20]" }], [0]))
     q = [{ value: 15, label: "left" }, { value: 7, label: "right" }]
-    steps.push(frame(q, [0, 1], "queue=[15,7]. Level 1 done → result=[[3],[9,20]].", 16, [{ label: "result so far", value: "[[3],[9,20]]" }]))
+    steps.push(frame(q, [0, 1], "queue=[15,7]. Level 1 done → result=[[3],[9,20]].", 19, [{ label: "result so far", value: "[[3],[9,20]]" }]))
 
     // Level 2
-    steps.push(frame(q, [0], "levelSize=2. Dequeue 15 → level=[15]. No children.", 9, [{ label: "level 2 so far", value: "[15]" }]))
-    steps.push(frame(q, [], "Dequeue 15 done.", 11, [{ label: "level 2 so far", value: "[15]" }], [0]))
+    steps.push(frame(q, [0], "levelSize=2. Dequeue 15 → level=[15]. No children.", 8, [{ label: "level 2 so far", value: "[15]" }]))
+    steps.push(frame(q, [], "Dequeue 15 done.", 12, [{ label: "level 2 so far", value: "[15]" }], [0]))
     q = [{ value: 7, label: "right" }]
-    steps.push(frame(q, [0], "Dequeue 7 → level=[15,7]. No children.", 9, [{ label: "level 2 so far", value: "[15,7]" }]))
-    steps.push(frame([], [], "queue empty. Level 2 done. Result: [[3],[9,20],[15,7]] ✓", 16, [{ label: "result", value: "[[3],[9,20],[15,7]]" }], [0]))
+    steps.push(frame(q, [0], "Dequeue 7 → level=[15,7]. No children.", 12, [{ label: "level 2 so far", value: "[15,7]" }]))
+    steps.push(frame([], [], "queue empty. Level 2 done. Result: [[3],[9,20],[15,7]] ✓", 22, [{ label: "result", value: "[[3],[9,20],[15,7]]" }], [0]))
 
     return steps
   },
@@ -403,28 +403,28 @@ const numberOfIslands: QueueProblem = {
     const steps: QueueVisStep[] = []
     let q: { value: string | number; label?: string }[] = []
 
-    steps.push(frame([], [], `grid has land ('1') cells. Scan for unvisited '1'.`, 1))
+    steps.push(frame([], [], `grid has land ('1') cells. Scan for unvisited '1'.`, 30))
 
     // Island 1 — cell (0,0)
-    steps.push(frame([], [], `Found '1' at (0,0) → islands=1. Start BFS.`, 4, [{ label: "islands", value: 1 }]))
+    steps.push(frame([], [], `Found '1' at (0,0) → islands=1. Start BFS.`, 33, [{ label: "islands", value: 1 }]))
     q = [{ value: "(0,0)", label: "start" }]
-    steps.push(frame(q, [0], `Enqueue (0,0), mark visited.`, 8, [{ label: "islands", value: 1 }]))
-    steps.push(frame(q, [0], `Dequeue (0,0). Check neighbors: (0,1)='1', (1,0)='1'.`, 9, [{ label: "islands", value: 1 }], [0]))
-    q = [{ value: "(0,1)" }, { value: "(1,0)" }]
-    steps.push(frame(q, [0, 1], `Enqueue (0,1) and (1,0), mark both visited.`, 17, [{ label: "islands", value: 1 }]))
-    steps.push(frame(q, [0], `Dequeue (0,1). Neighbors already visited or water.`, 9, [{ label: "islands", value: 1 }], [0]))
-    q = [{ value: "(1,0)" }]
-    steps.push(frame(q, [0], `Dequeue (1,0). Neighbors already visited or water.`, 9, [{ label: "islands", value: 1 }], [0]))
+    steps.push(frame(q, [0], `Enqueue (0,0), mark visited.`, 7, [{ label: "islands", value: 1 }]))
+    steps.push(frame(q, [0], `Dequeue (0,0). dirs order down,up,right,left → neighbors: (1,0)='1', (0,1)='1'.`, 11, [{ label: "islands", value: 1 }], [0]))
+    q = [{ value: "(1,0)" }, { value: "(0,1)" }]
+    steps.push(frame(q, [0, 1], `Enqueue (1,0) and (0,1), mark both visited.`, 21, [{ label: "islands", value: 1 }]))
+    steps.push(frame(q, [0], `Dequeue (1,0). Neighbors already visited or water.`, 11, [{ label: "islands", value: 1 }], [0]))
+    q = [{ value: "(0,1)" }]
+    steps.push(frame(q, [0], `Dequeue (0,1). Neighbors already visited or water.`, 11, [{ label: "islands", value: 1 }], [0]))
     q = []
-    steps.push(frame([], [], `BFS done. Island 1 fully marked.`, 6, [{ label: "islands", value: 1 }]))
+    steps.push(frame([], [], `BFS done. Island 1 fully marked.`, 25, [{ label: "islands", value: 1 }]))
 
     // Island 2
-    steps.push(frame([], [], `Scan continues… Found '1' at (2,2) → islands=2. Start BFS.`, 25, [{ label: "islands", value: 2 }]))
+    steps.push(frame([], [], `Scan continues… Found '1' at (2,2) → islands=2. Start BFS.`, 33, [{ label: "islands", value: 2 }]))
     q = [{ value: "(2,2)", label: "start" }]
-    steps.push(frame(q, [0], `Enqueue (2,2), mark visited.`, 8, [{ label: "islands", value: 2 }]))
-    steps.push(frame(q, [0], `Dequeue (2,2). No '1' neighbors.`, 9, [{ label: "islands", value: 2 }], [0]))
-    steps.push(frame([], [], `BFS done. island 2 marked. No more '1' cells.`, 6, [{ label: "islands", value: 2 }]))
-    steps.push(frame([], [], `Return 2 islands ✓`, 29, [{ label: "result", value: 2 }]))
+    steps.push(frame(q, [0], `Enqueue (2,2), mark visited.`, 7, [{ label: "islands", value: 2 }]))
+    steps.push(frame(q, [0], `Dequeue (2,2). No '1' neighbors.`, 11, [{ label: "islands", value: 2 }], [0]))
+    steps.push(frame([], [], `BFS done. island 2 marked. No more '1' cells.`, 25, [{ label: "islands", value: 2 }]))
+    steps.push(frame([], [], `Return 2 islands ✓`, 37, [{ label: "result", value: 2 }]))
 
     return steps
   },
@@ -508,30 +508,30 @@ const rottingOranges: QueueProblem = {
   generateSteps() {
     const steps: QueueVisStep[] = []
 
-    steps.push(frame([], [], "grid=[[2,1,1],[1,1,0],[0,1,1]]. Count fresh=6, enqueue all rotten.", 1))
+    steps.push(frame([], [], "grid=[[2,1,1],[1,1,0],[0,1,1]]. Count fresh=6, enqueue all rotten.", 8))
     let q: { value: string | number; label?: string }[] = [{ value: "(0,0)", label: "rotten" }]
-    steps.push(frame(q, [0], "queue=[(0,0)]. fresh=6, minutes=0.", 5, [{ label: "fresh", value: 6 }, { label: "minutes", value: 0 }]))
+    steps.push(frame(q, [0], "queue=[(0,0)]. fresh=6, minutes=0.", 4, [{ label: "fresh", value: 6 }, { label: "minutes", value: 0 }]))
 
-    // Minute 1
-    steps.push(frame(q, [0], "Minute 1: wave size=1. Process (0,0).", 18, [{ label: "fresh", value: 6 }, { label: "minutes", value: 0 }]))
-    steps.push(frame(q, [], "Dequeue (0,0). Rot neighbors (0,1) and (1,0). fresh=4.", 22, [{ label: "fresh", value: 4 }, { label: "minutes", value: 0 }], [0]))
-    q = [{ value: "(0,1)", label: "newly rotten" }, { value: "(1,0)", label: "newly rotten" }]
-    steps.push(frame(q, [0, 1], "Enqueue (0,1),(1,0). minutes++ → 1.", 27, [{ label: "fresh", value: 4 }, { label: "minutes", value: 1 }]))
+    // Minute 1 — dirs order is down,up,right,left: (0,0) rots (1,0) [down] before (0,1) [right]
+    steps.push(frame(q, [0], "Minute 1: wave size=1. Process (0,0).", 17, [{ label: "fresh", value: 6 }, { label: "minutes", value: 0 }]))
+    steps.push(frame(q, [], "Dequeue (0,0). dirs order down,up,right,left → rot (1,0) then (0,1). fresh=4.", 22, [{ label: "fresh", value: 4 }, { label: "minutes", value: 0 }], [0]))
+    q = [{ value: "(1,0)", label: "newly rotten" }, { value: "(0,1)", label: "newly rotten" }]
+    steps.push(frame(q, [0, 1], "Enqueue (1,0),(0,1). minutes++ → 1.", 29, [{ label: "fresh", value: 4 }, { label: "minutes", value: 1 }]))
 
-    // Minute 2
-    steps.push(frame(q, [0, 1], "Minute 2: wave size=2.", 18, [{ label: "fresh", value: 4 }, { label: "minutes", value: 1 }]))
-    steps.push(frame(q, [], "Process (0,1): rot (0,2). Process (1,0): rot (1,1). fresh=2.", 22, [{ label: "fresh", value: 2 }, { label: "minutes", value: 1 }], [0, 1]))
-    q = [{ value: "(0,2)", label: "newly rotten" }, { value: "(1,1)", label: "newly rotten" }]
-    steps.push(frame(q, [0, 1], "Enqueue (0,2),(1,1). minutes++ → 2.", 27, [{ label: "fresh", value: 2 }, { label: "minutes", value: 2 }]))
+    // Minute 2 — queue front is (1,0), so it's processed before (0,1)
+    steps.push(frame(q, [0, 1], "Minute 2: wave size=2.", 17, [{ label: "fresh", value: 4 }, { label: "minutes", value: 1 }]))
+    steps.push(frame(q, [], "Process (1,0): rot (1,1). Process (0,1): rot (0,2). fresh=2.", 22, [{ label: "fresh", value: 2 }, { label: "minutes", value: 1 }], [0, 1]))
+    q = [{ value: "(1,1)", label: "newly rotten" }, { value: "(0,2)", label: "newly rotten" }]
+    steps.push(frame(q, [0, 1], "Enqueue (1,1),(0,2). minutes++ → 2.", 29, [{ label: "fresh", value: 2 }, { label: "minutes", value: 2 }]))
 
     // Minute 3
-    steps.push(frame(q, [], "Process (0,2),(1,1): rot (2,1). fresh=1. minutes→3.", 22, [{ label: "fresh", value: 1 }, { label: "minutes", value: 3 }], [0, 1]))
+    steps.push(frame(q, [], "Process (1,1): rot (2,1). Process (0,2): no fresh neighbors. fresh=1. minutes→3.", 22, [{ label: "fresh", value: 1 }, { label: "minutes", value: 3 }], [0, 1]))
     q = [{ value: "(2,1)", label: "newly rotten" }]
-    steps.push(frame(q, [0], "Enqueue (2,1). minutes++ → 3.", 27, [{ label: "fresh", value: 1 }, { label: "minutes", value: 3 }]))
+    steps.push(frame(q, [0], "Enqueue (2,1). minutes++ → 3.", 29, [{ label: "fresh", value: 1 }, { label: "minutes", value: 3 }]))
 
     // Minute 4
     steps.push(frame(q, [], "Process (2,1): rot (2,2). fresh=0. minutes→4.", 22, [{ label: "fresh", value: 0 }, { label: "minutes", value: 4 }], [0]))
-    steps.push(frame([], [], "fresh=0 → return minutes=4 ✓", 31, [{ label: "result", value: 4 }]))
+    steps.push(frame([], [], "fresh=0 → return minutes=4 ✓", 36, [{ label: "result", value: 4 }]))
 
     return steps
   },
@@ -609,21 +609,21 @@ const wallsAndGates: QueueProblem = {
   generateSteps() {
     const steps: QueueVisStep[] = []
 
-    steps.push(frame([], [], "Find all gates (value=0) and enqueue them.", 1))
+    steps.push(frame([], [], "Find all gates (value=0) and enqueue them.", 9))
     let q: { value: string | number; label?: string }[] = [{ value: "(0,2)", label: "gate" }, { value: "(3,0)", label: "gate" }]
-    steps.push(frame(q, [0, 1], "Enqueued 2 gates: (0,2) and (3,0). BFS starts.", 8, [{ label: "distance", value: 0 }]))
+    steps.push(frame(q, [0, 1], "Enqueued 2 gates: (0,2) and (3,0). BFS starts.", 13, [{ label: "distance", value: 0 }]))
 
-    steps.push(frame(q, [0], "Dequeue (0,2) [gate]. Spread to neighbors with dist=1.", 13, [{ label: "distance", value: 1 }]))
-    steps.push(frame(q, [], "Rot (0,3)=1, (1,2)=1 from gate at (0,2).", 19, [{ label: "distance", value: 1 }], [0]))
-    q = [{ value: "(3,0)", label: "gate" }, { value: "(0,3)", label: "dist=1" }, { value: "(1,2)", label: "dist=1" }]
-    steps.push(frame(q, [1, 2], "queue grows. Continue BFS wave.", 20, [{ label: "wave", value: "dist=1" }]))
+    steps.push(frame(q, [0], "Dequeue (0,2) [gate]. Spread to neighbors with dist=1.", 14, [{ label: "distance", value: 1 }]))
+    steps.push(frame(q, [], "dirs order down,up,right,left → rot (1,2)=1 then (0,3)=1 from gate at (0,2).", 20, [{ label: "distance", value: 1 }], [0]))
+    q = [{ value: "(3,0)", label: "gate" }, { value: "(1,2)", label: "dist=1" }, { value: "(0,3)", label: "dist=1" }]
+    steps.push(frame(q, [1, 2], "queue grows. Continue BFS wave.", 13, [{ label: "wave", value: "dist=1" }]))
 
-    steps.push(frame(q, [0], "Dequeue (3,0) [gate]. Spread to (2,0)=1.", 13, [{ label: "distance", value: 1 }]))
-    steps.push(frame(q, [], "Set (2,0)=1.", 19, [{ label: "distance", value: 1 }], [0]))
-    q = [{ value: "(0,3)", label: "dist=1" }, { value: "(1,2)", label: "dist=1" }, { value: "(2,0)", label: "dist=1" }]
+    steps.push(frame(q, [0], "Dequeue (3,0) [gate]. Spread to (2,0)=1.", 14, [{ label: "distance", value: 1 }]))
+    steps.push(frame(q, [], "Set (2,0)=1.", 20, [{ label: "distance", value: 1 }], [0]))
+    q = [{ value: "(1,2)", label: "dist=1" }, { value: "(0,3)", label: "dist=1" }, { value: "(2,0)", label: "dist=1" }]
     steps.push(frame(q, [0, 1, 2], "Process dist=1 nodes. Expand to dist=2...", 13, [{ label: "wave", value: "dist=2" }]))
 
-    steps.push(frame([], [], "BFS continues until all reachable INF cells are filled. ✓", 23, [{ label: "status", value: "complete" }]))
+    steps.push(frame([], [], "BFS continues until all reachable INF cells are filled. ✓", 25, [{ label: "status", value: "complete" }]))
 
     return steps
   },
@@ -709,18 +709,18 @@ const openTheLock: QueueProblem = {
   generateSteps() {
     const steps: QueueVisStep[] = []
 
-    steps.push(frame([], [], `Start at "0000". Target="0009". BFS each combination.`, 1))
+    steps.push(frame([], [], `Start at "0000". Target="0009". BFS each combination.`, 5))
     let q: { value: string | number; label?: string }[] = [{ value: '"0000"', label: "start" }]
-    steps.push(frame(q, [0], `queue=["0000"]. turns=0.`, 6, [{ label: "turns", value: 0 }]))
+    steps.push(frame(q, [0], `queue=["0000"]. turns=0.`, 7, [{ label: "turns", value: 0 }]))
 
-    steps.push(frame(q, [0], `turns=0: Process "0000". Check if target. Expand 8 neighbors.`, 10, [{ label: "turns", value: 0 }]))
-    steps.push(frame(q, [], `Dequeue "0000". Generate: "1000","9000","0100","0010","0001","0900","0090","0009"`, 12, [{ label: "turns", value: 0 }], [0]))
+    steps.push(frame(q, [0], `turns=0: Process "0000". Check if target. Expand 8 neighbors.`, 12, [{ label: "turns", value: 0 }]))
+    steps.push(frame(q, [], `Dequeue "0000". Generate: "1000","9000","0100","0010","0001","0900","0090","0009"`, 13, [{ label: "turns", value: 0 }], [0]))
     q = [{ value: '"0001"', label: "dial4+1" }, { value: '"0009"', label: "dial4-1" }, { value: '"..."' }]
-    steps.push(frame(q, [1], `Enqueue neighbors. "0009" is in the queue! turns++ → 1.`, 19, [{ label: "turns", value: 1 }]))
+    steps.push(frame(q, [1], `Enqueue neighbors. "0009" is in the queue! turns++ → 1.`, 23, [{ label: "turns", value: 1 }]))
 
-    steps.push(frame(q, [0], `turns=1: Process "0001" — not target.`, 10, [{ label: "turns", value: 1 }]))
-    steps.push(frame(q, [0], `Continue... Process "0009" — matches target!`, 10, [{ label: "turns", value: 1 }]))
-    steps.push(frame([], [], `Return turns=1 ✓`, 12, [{ label: "result", value: 1 }]))
+    steps.push(frame(q, [0], `turns=1: Process "0001" — not target.`, 13, [{ label: "turns", value: 1 }]))
+    steps.push(frame(q, [0], `Continue... Process "0009" — matches target!`, 13, [{ label: "turns", value: 1 }]))
+    steps.push(frame([], [], `Return turns=1 ✓`, 14, [{ label: "result", value: 1 }]))
 
     return steps
   },
@@ -801,22 +801,22 @@ const courseSchedule: QueueProblem = {
     // numCourses=4, prerequisites=[[1,0],[2,1],[3,1]] → no cycle
     const steps: QueueVisStep[] = []
 
-    steps.push(frame([], [], "Build graph: prereqs=[[1,0],[2,1],[3,1]]. Compute in-degrees.", 1))
-    steps.push(frame([], [], "inDegree=[0:0, 1:1, 2:1, 3:1]. Course 0 has in-degree 0.", 8, [
+    steps.push(frame([], [], "Build graph: prereqs=[[1,0],[2,1],[3,1]]. Compute in-degrees.", 5))
+    steps.push(frame([], [], "inDegree=[0:0, 1:1, 2:1, 3:1]. Course 0 has in-degree 0.", 7, [
       { label: "inDegree", value: "[0,1,1,1]" },
     ]))
 
     let q: { value: string | number; label?: string }[] = [{ value: "C0", label: "in=0" }]
-    steps.push(frame(q, [0], "Enqueue C0 (in-degree=0). taken=0.", 10, [{ label: "taken", value: 0 }]))
+    steps.push(frame(q, [0], "Enqueue C0 (in-degree=0). taken=0.", 12, [{ label: "taken", value: 0 }]))
 
-    steps.push(frame(q, [0], "Dequeue C0. taken=1. Decrement neighbors.", 14, [{ label: "taken", value: 1 }]))
-    steps.push(frame(q, [], "C1 in-degree: 1→0. Enqueue C1.", 18, [{ label: "taken", value: 1 }], [0]))
+    steps.push(frame(q, [0], "Dequeue C0. taken=1. Decrement neighbors.", 17, [{ label: "taken", value: 1 }]))
+    steps.push(frame(q, [], "C1 in-degree: 1→0. Enqueue C1.", 22, [{ label: "taken", value: 1 }], [0]))
     q = [{ value: "C1", label: "in=0" }]
-    steps.push(frame(q, [0], "Dequeue C1. taken=2. Decrement C2,C3.", 14, [{ label: "taken", value: 2 }]))
-    steps.push(frame(q, [], "C2 in=0, C3 in=0. Enqueue both.", 18, [{ label: "taken", value: 2 }], [0]))
+    steps.push(frame(q, [0], "Dequeue C1. taken=2. Decrement C2,C3.", 17, [{ label: "taken", value: 2 }]))
+    steps.push(frame(q, [], "C2 in=0, C3 in=0. Enqueue both.", 22, [{ label: "taken", value: 2 }], [0]))
     q = [{ value: "C2", label: "in=0" }, { value: "C3", label: "in=0" }]
-    steps.push(frame(q, [0, 1], "Dequeue C2 (taken=3), Dequeue C3 (taken=4). No more neighbors.", 14, [{ label: "taken", value: 4 }]))
-    steps.push(frame([], [], "taken=4 === numCourses=4 → return true ✓ (No cycle)", 22, [{ label: "result", value: "true" }]))
+    steps.push(frame(q, [0, 1], "Dequeue C2 (taken=3), Dequeue C3 (taken=4). No more neighbors.", 17, [{ label: "taken", value: 4 }]))
+    steps.push(frame([], [], "taken=4 === numCourses=4 → return true ✓ (No cycle)", 26, [{ label: "result", value: "true" }]))
 
     return steps
   },
@@ -925,28 +925,28 @@ Rear()→4`,
 
     // enQueue(1)
     data[tail] = 1; tail = (tail + 1) % cap; size++
-    snap([0], "enQueue(1): data[0]=1, tail→1, size=1.", 10)
+    snap([0], "enQueue(1): data[0]=1, tail→1, size=1.", 12)
 
     // enQueue(2)
     data[tail] = 2; tail = (tail + 1) % cap; size++
-    snap([1], "enQueue(2): data[1]=2, tail→2, size=2.", 10)
+    snap([1], "enQueue(2): data[1]=2, tail→2, size=2.", 12)
 
     // enQueue(3)
     data[tail] = 3; tail = (tail + 1) % cap; size++
-    snap([2], "enQueue(3): data[2]=3, tail→0 (wrap!), size=3.", 10)
+    snap([2], "enQueue(3): data[2]=3, tail→0 (wrap!), size=3.", 12)
 
-    snap([], "isFull(): size=3 === capacity=3 → true ✓", 26, [])
+    snap([], "isFull(): size=3 === capacity=3 → true ✓", 29, [])
 
     // deQueue
-    snap([head], "deQueue(): head=0 → advance head.", 18, [head])
+    snap([head], "deQueue(): head=0 → advance head.", 20, [head])
     head = (head + 1) % cap; size--
-    snap([], "head→1, size=2. Slot 0 is now reusable.", 19)
+    snap([], "head→1, size=2. Slot 0 is now reusable.", 20)
 
     // enQueue(4)
     data[tail] = 4; tail = (tail + 1) % cap; size++
-    snap([0], "enQueue(4): reuse slot 0! data[0]=4, tail→1, size=3.", 10)
+    snap([0], "enQueue(4): reuse slot 0! data[0]=4, tail→1, size=3.", 12)
 
-    snap([2], `Rear(): data[(tail-1+cap)%cap]=data[0]=4 → Rear=4 ✓`, 23)
+    snap([2], `Rear(): data[(tail-1+cap)%cap]=data[0]=4 → Rear=4 ✓`, 26)
 
     return steps
   },
@@ -1025,21 +1025,21 @@ const wordLadder: QueueProblem = {
   generateSteps() {
     const steps: QueueVisStep[] = []
 
-    steps.push(frame([], [], `beginWord="hit" endWord="cog". BFS shortest path.`, 1))
+    steps.push(frame([], [], `beginWord="hit" endWord="cog". BFS shortest path.`, 5))
     let q: { value: string | number; label?: string }[] = [{ value: '"hit"', label: "len=1" }]
-    steps.push(frame(q, [0], `Enqueue "hit" with length=1.`, 4, [{ label: "length", value: 1 }]))
+    steps.push(frame(q, [0], `Enqueue "hit" with length=1.`, 5, [{ label: "length", value: 1 }]))
 
-    steps.push(frame(q, [0], `Dequeue "hit". Try all 1-letter changes.`, 6, [{ label: "length", value: 1 }]))
-    steps.push(frame(q, [], `"hot" is in wordSet! Enqueue ["hot", 2].`, 15, [{ label: "length", value: 2 }], [0]))
+    steps.push(frame(q, [0], `Dequeue "hit". Try all 1-letter changes.`, 8, [{ label: "length", value: 1 }]))
+    steps.push(frame(q, [], `"hot" is in wordSet! Enqueue ["hot", 2].`, 18, [{ label: "length", value: 2 }], [0]))
     q = [{ value: '"hot"', label: "len=2" }]
-    steps.push(frame(q, [0], `Level 2: Dequeue "hot". Try changes.`, 6, [{ label: "length", value: 2 }]))
-    steps.push(frame(q, [], `"dot","lot" found. Enqueue both with len=3.`, 15, [{ label: "length", value: 3 }], [0]))
+    steps.push(frame(q, [0], `Level 2: Dequeue "hot". Try changes.`, 8, [{ label: "length", value: 2 }]))
+    steps.push(frame(q, [], `"dot","lot" found. Enqueue both with len=3.`, 18, [{ label: "length", value: 3 }], [0]))
     q = [{ value: '"dot"', label: "len=3" }, { value: '"lot"', label: "len=3" }]
-    steps.push(frame(q, [0, 1], `Level 3: Process "dot" → "dog". Process "lot" → "log".`, 6, [{ label: "length", value: 3 }]))
-    steps.push(frame(q, [], `Enqueue "dog","log" with len=4.`, 15, [{ label: "length", value: 4 }], [0, 1]))
+    steps.push(frame(q, [0, 1], `Level 3: Process "dot" → "dog". Process "lot" → "log".`, 8, [{ label: "length", value: 3 }]))
+    steps.push(frame(q, [], `Enqueue "dog","log" with len=4.`, 18, [{ label: "length", value: 4 }], [0, 1]))
     q = [{ value: '"dog"', label: "len=4" }, { value: '"log"', label: "len=4" }]
-    steps.push(frame(q, [0], `Level 4: Process "dog" → try "cog". "cog"===endWord!`, 13, [{ label: "length", value: 4 }]))
-    steps.push(frame([], [], `Return length+1 = 5 ✓ ("hit"→"hot"→"dot"→"dog"→"cog")`, 13, [{ label: "result", value: 5 }]))
+    steps.push(frame(q, [0], `Level 4: Process "dog" → try "cog". "cog"===endWord!`, 16, [{ label: "length", value: 4 }]))
+    steps.push(frame([], [], `Return length+1 = 5 ✓ ("hit"→"hot"→"dot"→"dog"→"cog")`, 16, [{ label: "result", value: 5 }]))
 
     return steps
   },
@@ -1140,18 +1140,18 @@ const slidingWindowMax: QueueProblem = {
         result.push(windowMax)
         steps.push(frame(q, [0],
           `i=${i}: window=[${nums.slice(i - k + 1, i + 1).join(",")}]. Max=${windowMax}. result=[${result.join(",")}]`,
-          15,
+          18,
           [{ label: "result", value: `[${result.join(",")}]` }]
         ))
       } else {
         steps.push(frame(q, [q.length - 1],
           `i=${i}: building window. deque=[${deque.map(ix => `${ix}(${nums[ix]})`).join(",")}]`,
-          12
+          16
         ))
       }
     }
 
-    steps.push(frame([], [], `Final result=[${result.join(",")}] ✓`, 19, [{ label: "result", value: `[${result.join(",")}]` }]))
+    steps.push(frame([], [], `Final result=[${result.join(",")}] ✓`, 23, [{ label: "result", value: `[${result.join(",")}]` }]))
     return steps
   },
 }
