@@ -123,7 +123,7 @@ const concatenationOfArray: ArrayProblem = {
         `ans[${i}] = ans[${i + n}] = nums[${i}] = ${arr[i]}`, 5,
         [{ label: "i", value: i }]))
     }
-    steps.push(astep(result, [], [], sorted, `Done! ans = [${result}] ✓`, 8,
+    steps.push(astep(result, [], [], sorted, `Done! ans = [${result}] ✓`, 9,
       [{ label: "result", value: `[${result}]` }]))
     return steps
   },
@@ -199,11 +199,11 @@ const containsDuplicate: ArrayProblem = {
       seen.add(arr[i])
       sorted.push(i)
       steps.push(astep(arr, [], [], sorted,
-        `${arr[i]} not in set → add it. set=${JSON.stringify([...seen])}`, 7,
+        `${arr[i]} not in set → add it. set=${JSON.stringify([...seen])}`, 8,
         [{ label: "set", value: JSON.stringify([...seen]) }]))
     }
     steps.push(astep(arr, [], [], sorted,
-      "All elements processed, no duplicates found → return false ✓", 10,
+      "All elements processed, no duplicates found → return false ✓", 11,
       [{ label: "result", value: "false" }]))
     return steps
   },
@@ -279,14 +279,14 @@ const twoSum: ArrayProblem = {
       if (map.has(complement)) {
         const j = map.get(complement)!
         steps.push(astep(arr, [], [j, i], sorted,
-          `Found! map[${complement}]=${j}. Return [${j}, ${i}] ✓`, 6,
+          `Found! map[${complement}]=${j}. Return [${j}, ${i}] ✓`, 8,
           [{ label: "result", value: `[${j}, ${i}]` }]))
         return steps
       }
       map.set(arr[i], i)
       sorted.push(i)
       steps.push(astep(arr, [], [], sorted,
-        `${complement} not in map. Add ${arr[i]}→${i} to map.`, 9,
+        `${complement} not in map. Add ${arr[i]}→${i} to map.`, 11,
         [{ label: "map size", value: map.size }]))
     }
     return steps
@@ -352,20 +352,20 @@ const removeElement: ArrayProblem = {
     steps.push(astep(arr, [], [], sorted, `val=${val}. k=0 (write pointer).`, 1))
     for (let i = 0; i < arr.length; i++) {
       steps.push(astep(arr, [i], [], sorted,
-        `i=${i}: nums[${i}]=${arr[i]}. Is it ${val}?`, 3,
+        `i=${i}: nums[${i}]=${arr[i]}. Is it ${val}?`, 5,
         [{ label: "k", value: k }]))
       if (arr[i] !== val) {
         arr[k] = arr[i]
         sorted.push(k)
         steps.push(astep(arr, [], [k], sorted,
-          `${arr[k]} ≠ ${val} → copy to nums[${k}]. k++=${k + 1}`, 4,
+          `${arr[k]} ≠ ${val} → copy to nums[${k}]. k++=${k + 1}`, 6,
           [{ label: "k", value: k + 1 }]))
         k++
       } else {
-        steps.push(astep(arr, [i], [], sorted, `${val} == val → skip`, 3))
+        steps.push(astep(arr, [i], [], sorted, `${val} == val → skip`, 5))
       }
     }
-    steps.push(astep(arr, [], [], sorted, `k=${k} elements kept ✓`, 8,
+    steps.push(astep(arr, [], [], sorted, `k=${k} elements kept ✓`, 11,
       [{ label: "result k", value: k }]))
     return steps
   },
@@ -432,27 +432,27 @@ const sortColors: ArrayProblem = {
     steps.push(astep(arr, [], [], sorted, `lo=0, mid=0, hi=${hi}. Dutch National Flag.`, 1))
     while (mid <= hi) {
       steps.push(astep(arr, [mid], [], sorted,
-        `nums[mid=${mid}]=${arr[mid]}. lo=${lo}, hi=${hi}`, 3,
+        `nums[mid=${mid}]=${arr[mid]}. lo=${lo}, hi=${hi}`, 4,
         [{ label: "lo", value: lo }, { label: "mid", value: mid }, { label: "hi", value: hi }]))
       if (arr[mid] === 0) {
         ;[arr[lo], arr[mid]] = [arr[mid], arr[lo]]
         sorted.push(lo)
         steps.push(astep(arr, [], [lo, mid], sorted,
-          `0 → swap arr[lo=${lo}] ↔ arr[mid=${mid}]. lo++, mid++`, 4))
+          `0 → swap arr[lo=${lo}] ↔ arr[mid=${mid}]. lo++, mid++`, 6))
         lo++; mid++
       } else if (arr[mid] === 2) {
         ;[arr[mid], arr[hi]] = [arr[hi], arr[mid]]
         sorted.push(hi)
         steps.push(astep(arr, [], [mid, hi], sorted,
-          `2 → swap arr[mid=${mid}] ↔ arr[hi=${hi}]. hi--`, 7))
+          `2 → swap arr[mid=${mid}] ↔ arr[hi=${hi}]. hi--`, 9))
         hi--
       } else {
         sorted.push(mid)
-        steps.push(astep(arr, [], [], sorted, `1 → already in place. mid++`, 9))
+        steps.push(astep(arr, [], [], sorted, `1 → already in place. mid++`, 12))
         mid++
       }
     }
-    steps.push(astep(arr, [], [], [0,1,2,3,4,5], `Sorted: [${arr}] ✓`, 11,
+    steps.push(astep(arr, [], [], [0,1,2,3,4,5], `Sorted: [${arr}] ✓`, 15,
       [{ label: "result", value: `[${arr}]` }]))
     return steps
   },
@@ -522,7 +522,7 @@ const bestTimeToBuy: ArrayProblem = {
         [{ label: "minPrice", value: minPrice === Infinity ? "∞" : minPrice }, { label: "maxProfit", value: maxProfit }]))
       if (arr[i] < minPrice) {
         minPrice = arr[i]
-        steps.push(astep(arr, [], [i], sorted, `New minPrice = ${minPrice}! (best buy day so far)`, 6,
+        steps.push(astep(arr, [], [i], sorted, `New minPrice = ${minPrice}! (best buy day so far)`, 7,
           [{ label: "minPrice", value: minPrice }]))
       } else {
         const profit = arr[i] - minPrice
@@ -533,7 +533,7 @@ const bestTimeToBuy: ArrayProblem = {
           [{ label: "profit today", value: profit }, { label: "maxProfit", value: maxProfit }]))
       }
     }
-    steps.push(astep(arr, [], [], sorted, `Done! maxProfit = ${maxProfit} ✓`, 12,
+    steps.push(astep(arr, [], [], sorted, `Done! maxProfit = ${maxProfit} ✓`, 14,
       [{ label: "result", value: maxProfit }]))
     return steps
   },
@@ -595,19 +595,19 @@ const bestTimeToBuyII: ArrayProblem = {
     for (let i = 1; i < arr.length; i++) {
       const gain = arr[i] - arr[i - 1]
       steps.push(astep(arr, [i - 1, i], [], sorted,
-        `prices[${i}]=${arr[i]} - prices[${i-1}]=${arr[i-1]} = ${gain}`, 3,
+        `prices[${i}]=${arr[i]} - prices[${i-1}]=${arr[i-1]} = ${gain}`, 4,
         [{ label: "daily gain", value: gain }, { label: "profit", value: profit }]))
       if (gain > 0) {
         profit += gain
         sorted.push(i)
         steps.push(astep(arr, [], [i], sorted,
-          `Gain ${gain} > 0 → profit += ${gain} = ${profit}`, 4,
+          `Gain ${gain} > 0 → profit += ${gain} = ${profit}`, 6,
           [{ label: "profit", value: profit }]))
       } else {
-        steps.push(astep(arr, [i], [], sorted, `No gain (${gain} ≤ 0) → skip`, 3))
+        steps.push(astep(arr, [i], [], sorted, `No gain (${gain} ≤ 0) → skip`, 5))
       }
     }
-    steps.push(astep(arr, [], [], sorted, `maxProfit = ${profit} ✓`, 7,
+    steps.push(astep(arr, [], [], sorted, `maxProfit = ${profit} ✓`, 10,
       [{ label: "result", value: profit }]))
     return steps
   },
@@ -677,22 +677,22 @@ const mergeSortedArray: ArrayProblem = {
     steps.push(astep(arr, [], [], sorted, `p1=${p1}, p2=${p2}, p=${p}. Fill from back.`, 1))
     while (p2 >= 0) {
       steps.push(astep(arr, [p1, p], [], sorted,
-        `nums1[p1=${p1}]=${arr[p1]} vs nums2[p2=${p2}]=${nums2[p2]}`, 5,
+        `nums1[p1=${p1}]=${arr[p1]} vs nums2[p2=${p2}]=${nums2[p2]}`, 6,
         [{ label: "p1", value: p1 }, { label: "p2", value: p2 }, { label: "p", value: p }]))
       if (p1 >= 0 && arr[p1] > nums2[p2]) {
         arr[p] = arr[p1]
         sorted.push(p)
-        steps.push(astep(arr, [], [p], sorted, `Place nums1[${p1}]=${arr[p]} at p=${p}. p1--, p--`, 6))
+        steps.push(astep(arr, [], [p], sorted, `Place nums1[${p1}]=${arr[p]} at p=${p}. p1--, p--`, 8))
         p1--
       } else {
         arr[p] = nums2[p2]
         sorted.push(p)
-        steps.push(astep(arr, [], [p], sorted, `Place nums2[${p2}]=${arr[p]} at p=${p}. p2--, p--`, 8))
+        steps.push(astep(arr, [], [p], sorted, `Place nums2[${p2}]=${arr[p]} at p=${p}. p2--, p--`, 11))
         p2--
       }
       p--
     }
-    steps.push(astep(arr, [], [], [0,1,2,3,4,5], `Merged: [${arr}] ✓`, 12,
+    steps.push(astep(arr, [], [], [0,1,2,3,4,5], `Merged: [${arr}] ✓`, 16,
       [{ label: "result", value: `[${arr}]` }]))
     return steps
   },
@@ -761,27 +761,27 @@ const productExceptSelf: ArrayProblem = {
     const result = new Array(arr.length).fill(1)
     const sorted: number[] = []
 
-    steps.push(astep(arr, [], [], sorted, "Pass 1: build prefix products in result[].", 4))
+    steps.push(astep(arr, [], [], sorted, "Pass 1: build prefix products in result[].", 5))
     let prefix = 1
     for (let i = 0; i < arr.length; i++) {
       result[i] = prefix
       steps.push(astep(arr, [i], [], sorted,
-        `result[${i}] = prefix = ${prefix}. Then prefix *= ${arr[i]} → ${prefix * arr[i]}`, 6,
+        `result[${i}] = prefix = ${prefix}. Then prefix *= ${arr[i]} → ${prefix * arr[i]}`, 8,
         [{ label: "prefix", value: prefix }, { label: `result[${i}]`, value: result[i] }]))
       prefix *= arr[i]
     }
     steps.push(astep(arr, [], [], sorted,
-      `After pass 1: result = [${result.join(",")}]. Now pass 2: multiply by suffix.`, 10))
+      `After pass 1: result = [${result.join(",")}]. Now pass 2: multiply by suffix.`, 12))
     let suffix = 1
     for (let i = arr.length - 1; i >= 0; i--) {
       result[i] *= suffix
       sorted.push(i)
       steps.push(astep(arr, [i], [], sorted,
-        `result[${i}] *= suffix=${suffix} → ${result[i]}. suffix *= ${arr[i]} → ${suffix * arr[i]}`, 13,
+        `result[${i}] *= suffix=${suffix} → ${result[i]}. suffix *= ${arr[i]} → ${suffix * arr[i]}`, 15,
         [{ label: "suffix", value: suffix }, { label: `result[${i}]`, value: result[i] }]))
       suffix *= arr[i]
     }
-    steps.push(astep(arr, [], [], sorted, `result = [${result.join(",")}] ✓`, 16,
+    steps.push(astep(arr, [], [], sorted, `result = [${result.join(",")}] ✓`, 19,
       [{ label: "result", value: `[${result.join(",")}]` }]))
     return steps
   },
@@ -850,25 +850,25 @@ const longestConsecutiveSequence: ArrayProblem = {
 
     steps.push(astep(arr, [], [], sorted, `Set = {${[...numSet].sort((a,b)=>a-b).join(",")}}. Find sequences.`, 1))
     let idx = 0
-    for (const num of [100, 4, 200, 1]) {
+    for (const num of numSet) {
       if (!numSet.has(num - 1)) {
         let cur = num, length = 1
         steps.push(astep(arr, [idx], [], sorted,
-          `num=${num}: no predecessor (${num-1} not in set) → start sequence`, 4,
+          `num=${num}: no predecessor (${num-1} not in set) → start sequence`, 6,
           [{ label: "start", value: num }]))
         while (numSet.has(cur + 1)) { cur++; length++ }
         best = Math.max(best, length)
         sorted.push(idx)
         steps.push(astep(arr, [], [idx], sorted,
-          `Sequence from ${num}: length=${length}. best=${best}`, 7,
+          `Sequence from ${num}: length=${length}. best=${best}`, 13,
           [{ label: "sequence length", value: length }, { label: "best", value: best }]))
       } else {
         steps.push(astep(arr, [idx], [], sorted,
-          `num=${num}: ${num-1} exists in set → not a start. Skip.`, 3))
+          `num=${num}: ${num-1} exists in set → not a start. Skip.`, 6))
       }
       idx++
     }
-    steps.push(astep(arr, [], [], sorted, `Longest consecutive = ${best} ✓`, 12,
+    steps.push(astep(arr, [], [], sorted, `Longest consecutive = ${best} ✓`, 17,
       [{ label: "result", value: best }]))
     return steps
   },
@@ -946,15 +946,15 @@ const subarraySumEqualsK: ArrayProblem = {
         count += map.get(need)!
         sorted.push(i)
         steps.push(astep(arr, [], [i], sorted,
-          `Found! count += map[${need}]=${map.get(need)} → count=${count}`, 6,
+          `Found! count += map[${need}]=${map.get(need)} → count=${count}`, 9,
           [{ label: "count", value: count }]))
       }
       map.set(sum, (map.get(sum) || 0) + 1)
       steps.push(astep(arr, [], [], sorted,
-        `Add sum=${sum} to map. map size=${map.size}`, 9,
+        `Add sum=${sum} to map. map size=${map.size}`, 12,
         [{ label: "map[sum]", value: map.get(sum)! }]))
     }
-    steps.push(astep(arr, [], [], sorted, `Total subarrays = ${count} ✓`, 12,
+    steps.push(astep(arr, [], [], sorted, `Total subarrays = ${count} ✓`, 15,
       [{ label: "result", value: count }]))
     return steps
   },
@@ -1030,7 +1030,7 @@ const maxSubarray: ArrayProblem = {
         [{ label: "current", value: current }, { label: "maxSum", value: maxSum }]))
       if (current > 0) sorted.push(i)
     }
-    steps.push(astep(arr, [], [], sorted, `maxSum = ${maxSum} ✓`, 8,
+    steps.push(astep(arr, [], [], sorted, `maxSum = ${maxSum} ✓`, 11,
       [{ label: "result", value: maxSum }]))
     return steps
   },
@@ -1101,23 +1101,46 @@ const threeSum: ArrayProblem = {
     const arr = [-4, -1, -1, 0, 1, 2]
     const steps: ArrayVisStep[] = []
     const sorted: number[] = []
+    const result: number[][] = []
 
     steps.push(astep(arr, [], [], sorted, `Sorted: [${arr}]. Fix i, two-pointer for pair.`, 1))
-    steps.push(astep(arr, [0], [], sorted, `i=0, nums[0]=${arr[0]}. lo=1, hi=${arr.length-1}`, 4,
-      [{ label: "target", value: -arr[0] }]))
-    steps.push(astep(arr, [1, arr.length-1], [], sorted,
-      `sum=${arr[0]}+${arr[1]}+${arr[arr.length-1]}=${arr[0]+arr[1]+arr[arr.length-1]}. sum < 0 → lo++`, 9))
-    steps.push(astep(arr, [1, 2, arr.length-1], [], sorted, `i=1, nums[1]=${arr[1]}. lo=2, hi=${arr.length-1}`, 4))
-    const s = arr[1] + arr[2] + arr[arr.length-1]
-    steps.push(astep(arr, [2, arr.length-1], [], sorted,
-      `sum=${arr[1]}+${arr[2]}+${arr[arr.length-1]}=${s}. Found triplet!`, 8,
-      [{ label: "triplet", value: `[${arr[1]},${arr[2]},${arr[arr.length-1]}]` }]))
-    sorted.push(2, arr.length-1)
-    steps.push(astep(arr, [2, 3, arr.length-2], sorted, sorted,
-      `sum=${arr[1]}+${arr[3]}+${arr[arr.length-2]}=${arr[1]+arr[3]+arr[arr.length-2]}. Found triplet!`, 8,
-      [{ label: "triplet", value: `[${arr[1]},${arr[3]},${arr[arr.length-2]}]` }]))
-    steps.push(astep(arr, [], [], [0,1,2,3,4,5], `Result: [[-1,-1,2],[-1,0,1]] ✓`, 20,
-      [{ label: "triplets", value: 2 }]))
+    for (let i = 0; i < arr.length - 2; i++) {
+      if (i > 0 && arr[i] === arr[i - 1]) {
+        steps.push(astep(arr, [i], [], sorted,
+          `i=${i}: nums[${i}]=${arr[i]} equals nums[${i - 1}] → skip duplicate`, 6))
+        continue
+      }
+      let lo = i + 1, hi = arr.length - 1
+      steps.push(astep(arr, [i], [], sorted,
+        `i=${i}, nums[${i}]=${arr[i]}. lo=${lo}, hi=${hi}`, 8,
+        [{ label: "target", value: -arr[i] }]))
+      while (lo < hi) {
+        const sum = arr[i] + arr[lo] + arr[hi]
+        steps.push(astep(arr, [i, lo, hi], [], sorted,
+          `sum = ${arr[i]}+${arr[lo]}+${arr[hi]} = ${sum}`, 10,
+          [{ label: "lo", value: lo }, { label: "hi", value: hi }]))
+        if (sum === 0) {
+          result.push([arr[i], arr[lo], arr[hi]])
+          sorted.push(lo, hi)
+          steps.push(astep(arr, [], [lo, hi], sorted,
+            `sum == 0 → Found triplet! [${arr[i]},${arr[lo]},${arr[hi]}]`, 12,
+            [{ label: "triplet", value: `[${arr[i]},${arr[lo]},${arr[hi]}]` }]))
+          while (lo < hi && arr[lo] === arr[lo + 1]) lo++
+          while (lo < hi && arr[hi] === arr[hi - 1]) hi--
+          lo++; hi--
+        } else if (sum < 0) {
+          steps.push(astep(arr, [lo], [], sorted, `sum < 0 → lo++`, 17))
+          lo++
+        } else {
+          steps.push(astep(arr, [hi], [], sorted, `sum > 0 → hi--`, 19))
+          hi--
+        }
+      }
+    }
+    const allIdx = arr.map((_, i) => i)
+    steps.push(astep(arr, [], [], allIdx,
+      `Result: [${result.map(t => `[${t}]`).join(",")}] ✓`, 24,
+      [{ label: "triplets", value: result.length }]))
     return steps
   },
 }
@@ -1181,7 +1204,7 @@ const jumpGame: ArrayProblem = {
     for (let i = 0; i < arr.length; i++) {
       if (i > maxReach) {
         steps.push(astep(arr, [i], [], sorted,
-          `i=${i} > maxReach=${maxReach} → CANNOT REACH → return false`, 4,
+          `i=${i} > maxReach=${maxReach} → CANNOT REACH → return false`, 5,
           [{ label: "result", value: "false" }]))
         return steps
       }
@@ -1189,15 +1212,15 @@ const jumpGame: ArrayProblem = {
       maxReach = Math.max(maxReach, newReach)
       sorted.push(i)
       steps.push(astep(arr, [i], [], sorted,
-        `i=${i}: i+nums[i]=${newReach}. maxReach=max(${maxReach}, ${newReach})=${maxReach}`, 5,
+        `i=${i}: i+nums[i]=${newReach}. maxReach=max(${maxReach}, ${newReach})=${maxReach}`, 7,
         [{ label: "maxReach", value: maxReach }]))
       if (maxReach >= arr.length - 1) {
-        steps.push(astep(arr, [], [], sorted, `maxReach=${maxReach} ≥ last index → return true ✓`, 7,
+        steps.push(astep(arr, [], [], sorted, `maxReach=${maxReach} ≥ last index → return true ✓`, 9,
           [{ label: "result", value: "true" }]))
         return steps
       }
     }
-    steps.push(astep(arr, [], [], sorted, `Reached end → true ✓`, 9, [{ label: "result", value: "true" }]))
+    steps.push(astep(arr, [], [], sorted, `Reached end → true ✓`, 12, [{ label: "result", value: "true" }]))
     return steps
   },
 }
@@ -1265,18 +1288,18 @@ const jumpGameII: ArrayProblem = {
     for (let i = 0; i < arr.length - 1; i++) {
       farthest = Math.max(farthest, i + arr[i])
       steps.push(astep(arr, [i], [], sorted,
-        `i=${i}: farthest=max(${farthest}, ${i}+${arr[i]})=${farthest}`, 5,
+        `i=${i}: farthest=max(${farthest}, ${i}+${arr[i]})=${farthest}`, 7,
         [{ label: "farthest", value: farthest }, { label: "curEnd", value: curEnd }]))
       if (i === curEnd) {
         jumps++
         curEnd = farthest
         sorted.push(i)
         steps.push(astep(arr, [], [i], sorted,
-          `i==curEnd → jump! jumps=${jumps}, curEnd=${curEnd}`, 8,
+          `i==curEnd → jump! jumps=${jumps}, curEnd=${curEnd}`, 10,
           [{ label: "jumps", value: jumps }, { label: "curEnd", value: curEnd }]))
       }
     }
-    steps.push(astep(arr, [], [], sorted, `Min jumps = ${jumps} ✓`, 12,
+    steps.push(astep(arr, [], [], sorted, `Min jumps = ${jumps} ✓`, 15,
       [{ label: "result", value: jumps }]))
     return steps
   },
@@ -1349,19 +1372,19 @@ const twoSumII: ArrayProblem = {
     while (left < right) {
       const sum = arr[left] + arr[right]
       steps.push(astep(arr, [left, right], [], sorted,
-        `sum = ${arr[left]}+${arr[right]} = ${sum}. target=${target}`, 4,
+        `sum = ${arr[left]}+${arr[right]} = ${sum}. target=${target}`, 5,
         [{ label: "sum", value: sum }, { label: "left", value: left }, { label: "right", value: right }]))
       if (sum === target) {
         sorted.push(left, right)
         steps.push(astep(arr, [], [left, right], sorted,
-          `Found! Return [${left+1}, ${right+1}] ✓`, 5,
+          `Found! Return [${left+1}, ${right+1}] ✓`, 8,
           [{ label: "result", value: `[${left+1},${right+1}]` }]))
         return steps
       } else if (sum < target) {
-        steps.push(astep(arr, [left], [], sorted, `sum < target → left++`, 7))
+        steps.push(astep(arr, [left], [], sorted, `sum < target → left++`, 10))
         left++
       } else {
-        steps.push(astep(arr, [right], [], sorted, `sum > target → right--`, 9))
+        steps.push(astep(arr, [right], [], sorted, `sum > target → right--`, 12))
         right--
       }
     }
@@ -1430,21 +1453,21 @@ const boatsToSavePeople: ArrayProblem = {
     steps.push(astep(arr, [], [], sorted, `Sorted: [${arr}]. limit=${limit}. lo=0, hi=${hi}.`, 1))
     while (lo <= hi) {
       steps.push(astep(arr, [lo, hi], [], sorted,
-        `people[lo=${lo}]=${arr[lo]} + people[hi=${hi}]=${arr[hi]} = ${arr[lo]+arr[hi]}. limit=${limit}`, 4,
+        `people[lo=${lo}]=${arr[lo]} + people[hi=${hi}]=${arr[hi]} = ${arr[lo]+arr[hi]}. limit=${limit}`, 7,
         [{ label: "boats", value: boats }]))
       if (arr[lo] + arr[hi] <= limit) {
         sorted.push(lo)
         steps.push(astep(arr, [], [lo, hi], sorted,
-          `${arr[lo]+arr[hi]} ≤ limit → pair together! lo++, hi--, boats++`, 5))
+          `${arr[lo]+arr[hi]} ≤ limit → pair together! lo++, hi--, boats++`, 8))
         lo++
       } else {
         sorted.push(hi)
         steps.push(astep(arr, [], [hi], sorted,
-          `${arr[lo]+arr[hi]} > limit → heaviest alone. hi--, boats++`, 7))
+          `${arr[lo]+arr[hi]} > limit → heaviest alone. hi--, boats++`, 10))
       }
       hi--; boats++
     }
-    steps.push(astep(arr, [], [], sorted, `Min boats = ${boats} ✓`, 11,
+    steps.push(astep(arr, [], [], sorted, `Min boats = ${boats} ✓`, 14,
       [{ label: "result", value: boats }]))
     return steps
   },
@@ -1509,19 +1532,19 @@ const containsDuplicateII: ArrayProblem = {
     steps.push(astep(arr, [], [], sorted, `k=${k}. HashMap: val → last index.`, 1))
     for (let i = 0; i < arr.length; i++) {
       steps.push(astep(arr, [i], [], sorted,
-        `i=${i}, nums[i]=${arr[i]}. In map? Last index=${map.get(arr[i]) ?? 'N/A'}`, 3,
+        `i=${i}, nums[i]=${arr[i]}. In map? Last index=${map.get(arr[i]) ?? 'N/A'}`, 5,
         [{ label: "val", value: arr[i] }]))
       if (map.has(arr[i]) && i - map.get(arr[i])! <= k) {
         sorted.push(i)
         steps.push(astep(arr, [], [i], sorted,
-          `Duplicate found! dist=${i - map.get(arr[i])!} ≤ k=${k} → return true ✓`, 4,
+          `Duplicate found! dist=${i - map.get(arr[i])!} ≤ k=${k} → return true ✓`, 6,
           [{ label: "result", value: "true" }]))
         return steps
       }
       map.set(arr[i], i)
-      steps.push(astep(arr, [], [], sorted, `Map[${arr[i]}] = ${i}`, 6))
+      steps.push(astep(arr, [], [], sorted, `Map[${arr[i]}] = ${i}`, 8))
     }
-    steps.push(astep(arr, [], [], sorted, "No nearby duplicate → return false ✓", 9,
+    steps.push(astep(arr, [], [], sorted, "No nearby duplicate → return false ✓", 11,
       [{ label: "result", value: "false" }]))
     return steps
   },
@@ -1589,28 +1612,28 @@ const firstMissingPositive: ArrayProblem = {
     const steps: ArrayVisStep[] = []
     const sorted: number[] = []
 
-    steps.push(astep(arr, [], [], sorted, "Cyclic sort: place each num at index num-1.", 3))
+    steps.push(astep(arr, [], [], sorted, "Cyclic sort: place each num at index num-1.", 4))
     for (let i = 0; i < n; i++) {
       steps.push(astep(arr, [i], [], sorted,
-        `i=${i}, nums[i]=${arr[i]}. Place at correct index?`, 4))
+        `i=${i}, nums[i]=${arr[i]}. Place at correct index?`, 5))
       while (arr[i] > 0 && arr[i] <= n && arr[arr[i] - 1] !== arr[i]) {
         const j = arr[i] - 1
         ;[arr[i], arr[j]] = [arr[j], arr[i]]
-        steps.push(astep(arr, [], [i, j], sorted, `Swap: nums[${i}] ↔ nums[${j}]`, 6))
+        steps.push(astep(arr, [], [i, j], sorted, `Swap: nums[${i}] ↔ nums[${j}]`, 9))
       }
     }
-    steps.push(astep(arr, [], [], sorted, `After sort: [${arr}]. Scan for mismatch.`, 9))
+    steps.push(astep(arr, [], [], sorted, `After sort: [${arr}]. Scan for mismatch.`, 13))
     for (let i = 0; i < n; i++) {
       if (arr[i] !== i + 1) {
         sorted.push(i)
         steps.push(astep(arr, [], [i], sorted,
-          `nums[${i}]=${arr[i]} ≠ ${i+1} → first missing = ${i+1} ✓`, 11,
+          `nums[${i}]=${arr[i]} ≠ ${i+1} → first missing = ${i+1} ✓`, 15,
           [{ label: "result", value: i + 1 }]))
         return steps
       }
       sorted.push(i)
     }
-    steps.push(astep(arr, [], [], sorted, `All placed → missing = ${n+1} ✓`, 14,
+    steps.push(astep(arr, [], [], sorted, `All placed → missing = ${n+1} ✓`, 18,
       [{ label: "result", value: n + 1 }]))
     return steps
   },
@@ -1689,7 +1712,7 @@ const majorityElementII: ArrayProblem = {
     for (let i = 0; i < arr.length; i++) {
       const num = arr[i]
       steps.push(astep(arr, [i], [], sorted,
-        `num=${num}. cand1=${cand1}(${cnt1}), cand2=${cand2}(${cnt2})`, 4,
+        `num=${num}. cand1=${cand1}(${cnt1}), cand2=${cand2}(${cnt2})`, 5,
         [{ label: "cand1", value: `${cand1}(${cnt1})` }, { label: "cand2", value: `${cand2}(${cnt2})` }]))
       if (num === cand1) { cnt1++; sorted.push(i) }
       else if (num === cand2) { cnt2++; sorted.push(i) }
@@ -1700,7 +1723,7 @@ const majorityElementII: ArrayProblem = {
     steps.push(astep(arr, [], [], sorted,
       `Candidates: ${cand1}, ${cand2}. Verifying...`, 13))
     steps.push(astep(arr, [], [], sorted,
-      `Result: [1, 2] ✓ (both appear > n/3 times)`, 20,
+      `Result: [1, 2] ✓ (both appear > n/3 times)`, 24,
       [{ label: "result", value: "[1, 2]" }]))
     return steps
   },
@@ -1772,25 +1795,25 @@ const majorityElement: ArrayProblem = {
       [{ label: "candidate", value: candidate }, { label: "count", value: count }]))
     for (let i = 1; i < arr.length; i++) {
       steps.push(astep(arr, [i], [], sorted,
-        `nums[${i}]=${arr[i]}. count=${count}. candidate=${candidate}`, 4,
+        `nums[${i}]=${arr[i]}. count=${count}. candidate=${candidate}`, 5,
         [{ label: "candidate", value: candidate }, { label: "count", value: count }]))
       if (count === 0) {
         candidate = arr[i]; count = 1
-        steps.push(astep(arr, [], [i], sorted, `count=0 → reset. New candidate=${candidate}`, 6,
+        steps.push(astep(arr, [], [i], sorted, `count=0 → reset. New candidate=${candidate}`, 7,
           [{ label: "candidate", value: candidate }]))
       } else if (arr[i] === candidate) {
         count++
         sorted.push(i)
-        steps.push(astep(arr, [], [], sorted, `${arr[i]} == candidate → count=${count}`, 9,
+        steps.push(astep(arr, [], [], sorted, `${arr[i]} == candidate → count=${count}`, 10,
           [{ label: "count", value: count }]))
       } else {
         count--
-        steps.push(astep(arr, [], [i], sorted, `${arr[i]} != candidate → count=${count}`, 11,
+        steps.push(astep(arr, [], [i], sorted, `${arr[i]} != candidate → count=${count}`, 12,
           [{ label: "count", value: count }]))
       }
     }
     steps.push(astep(arr, [], [], sorted,
-      `Majority element = ${candidate} ✓`, 14, [{ label: "result", value: candidate }]))
+      `Majority element = ${candidate} ✓`, 16, [{ label: "result", value: candidate }]))
     return steps
   },
 }
@@ -1852,21 +1875,21 @@ const removeDuplicates: ArrayProblem = {
     steps.push(astep(arr, [], [], sorted, "k=1 (write head). i=1 (read head). Array is sorted.", 2))
     for (let i = 1; i < arr.length; i++) {
       steps.push(astep(arr, [i], [], sorted,
-        `i=${i}: nums[${i}]=${arr[i]} vs nums[k-1]=${arr[k-1]}. Same?`, 4,
+        `i=${i}: nums[${i}]=${arr[i]} vs nums[k-1]=${arr[k-1]}. Same?`, 5,
         [{ label: "k", value: k }, { label: "i", value: i }], k))
       if (arr[i] !== arr[k - 1]) {
         arr[k] = arr[i]
         sorted.push(k)
         steps.push(astep(arr, [], [k], sorted,
-          `Different! Copy ${arr[i]} to position k=${k}. k++=${k + 1}`, 5,
+          `Different! Copy ${arr[i]} to position k=${k}. k++=${k + 1}`, 6,
           [{ label: "unique count", value: k + 1 }]))
         k++
       } else {
-        steps.push(astep(arr, [i], [], sorted, `Duplicate ${arr[i]} — skip`, 3))
+        steps.push(astep(arr, [i], [], sorted, `Duplicate ${arr[i]} — skip`, 5))
       }
     }
     steps.push(astep(arr, [], [], sorted,
-      `Done! k=${k} unique elements ✓`, 8, [{ label: "result k", value: k }]))
+      `Done! k=${k} unique elements ✓`, 11, [{ label: "result k", value: k }]))
     return steps
   },
 }
@@ -1933,25 +1956,25 @@ function reverse(nums, left, right) {
     let lo = 0, hi = n - 1
     while (lo < hi) {
       ;[arr[lo], arr[hi]] = [arr[hi], arr[lo]]
-      steps.push(astep(arr, [], [lo, hi], sorted, `Swap arr[${lo}]↔arr[${hi}]`, 9))
+      steps.push(astep(arr, [], [lo, hi], sorted, `Swap arr[${lo}]↔arr[${hi}]`, 11))
       lo++; hi--
     }
-    steps.push(astep(arr, [], [], sorted, `After full reverse: [${arr}]. Step 2: reverse [0..k-1].`, 3))
+    steps.push(astep(arr, [], [], sorted, `After full reverse: [${arr}]. Step 2: reverse [0..k-1].`, 5))
     lo = 0; hi = k - 1
     while (lo < hi) {
       ;[arr[lo], arr[hi]] = [arr[hi], arr[lo]]
-      steps.push(astep(arr, [], [lo, hi], sorted, `Swap arr[${lo}]↔arr[${hi}]`, 9))
+      steps.push(astep(arr, [], [lo, hi], sorted, `Swap arr[${lo}]↔arr[${hi}]`, 11))
       lo++; hi--
     }
-    steps.push(astep(arr, [], [], sorted, `Step 3: reverse [k..n-1].`, 4))
+    steps.push(astep(arr, [], [], sorted, `Step 3: reverse [k..n-1].`, 6))
     lo = k; hi = n - 1
     while (lo < hi) {
       ;[arr[lo], arr[hi]] = [arr[hi], arr[lo]]
-      steps.push(astep(arr, [], [lo, hi], sorted, `Swap arr[${lo}]↔arr[${hi}]`, 9))
+      steps.push(astep(arr, [], [lo, hi], sorted, `Swap arr[${lo}]↔arr[${hi}]`, 11))
       lo++; hi--
     }
     for (let i = 0; i < n; i++) sorted.push(i)
-    steps.push(astep(arr, [], [], sorted, `Rotated by ${k}: [${arr}] ✓`, 4,
+    steps.push(astep(arr, [], [], sorted, `Rotated by ${k}: [${arr}] ✓`, 7,
       [{ label: "result", value: `[${arr}]` }]))
     return steps
   },
@@ -2024,7 +2047,7 @@ const containerWithMostWater: ArrayProblem = {
       const water = Math.min(arr[left], arr[right]) * (right - left)
       if (water > max) { max = water; sorted.push(left, right) }
       steps.push(astep(arr, [left, right], [], sorted,
-        `water = min(${arr[left]},${arr[right]}) × (${right}-${left}) = ${water}. max=${max}`, 5,
+        `water = min(${arr[left]},${arr[right]}) × (${right}-${left}) = ${water}. max=${max}`, 7,
         [{ label: "water", value: water }, { label: "max", value: max }]))
       if (arr[left] < arr[right]) {
         left++
@@ -2032,7 +2055,7 @@ const containerWithMostWater: ArrayProblem = {
         right--
       }
     }
-    steps.push(astep(arr, [], [], sorted, `maxArea = ${max} ✓`, 15, [{ label: "result", value: max }]))
+    steps.push(astep(arr, [], [], sorted, `maxArea = ${max} ✓`, 18, [{ label: "result", value: max }]))
     return steps
   },
 }
@@ -2116,32 +2139,32 @@ const trappingRainWater: ArrayProblem = {
       if (arr[left] < arr[right]) {
         if (arr[left] >= leftMax) {
           leftMax = arr[left]
-          steps.push(astep(arr, [left], [], sorted, `New leftMax = ${leftMax}`, 8,
+          steps.push(astep(arr, [left], [], sorted, `New leftMax = ${leftMax}`, 9,
             [{ label: "leftMax", value: leftMax }]))
         } else {
           water += leftMax - arr[left]
           sorted.push(left)
           steps.push(astep(arr, [], [left], sorted,
-            `water += ${leftMax}-${arr[left]} = ${leftMax - arr[left]}. Total=${water}`, 10,
+            `water += ${leftMax}-${arr[left]} = ${leftMax - arr[left]}. Total=${water}`, 11,
             [{ label: "water", value: water }]))
         }
         left++
       } else {
         if (arr[right] >= rightMax) {
           rightMax = arr[right]
-          steps.push(astep(arr, [right], [], sorted, `New rightMax = ${rightMax}`, 13,
+          steps.push(astep(arr, [right], [], sorted, `New rightMax = ${rightMax}`, 16,
             [{ label: "rightMax", value: rightMax }]))
         } else {
           water += rightMax - arr[right]
           sorted.push(right)
           steps.push(astep(arr, [], [right], sorted,
-            `water += ${rightMax}-${arr[right]} = ${rightMax - arr[right]}. Total=${water}`, 15,
+            `water += ${rightMax}-${arr[right]} = ${rightMax - arr[right]}. Total=${water}`, 18,
             [{ label: "water", value: water }]))
         }
         right--
       }
     }
-    steps.push(astep(arr, [], [], sorted, `Total water trapped = ${water} ✓`, 20,
+    steps.push(astep(arr, [], [], sorted, `Total water trapped = ${water} ✓`, 24,
       [{ label: "result", value: water }]))
     return steps
   },
@@ -2208,19 +2231,30 @@ const setMatrixZeroes: ArrayProblem = {
   if (firstColZero) for (let i = 0; i < m; i++) matrix[i][0] = 0;
 }`,
   generateSteps() {
-    const arr = [1, 0, 1, 0, 0, 0, 1, 0, 1]
+    // matrix = [[1,1,1],[1,0,1],[1,1,1]] flattened row-major (3×3)
+    const arr = [1, 1, 1, 1, 0, 1, 1, 1, 1]
     const steps: ArrayVisStep[] = []
     const sorted: number[] = []
 
-    steps.push(astep(arr, [], [], sorted, "Flattened 3×3 matrix. Mark zero positions first.", 1))
-    steps.push(astep(arr, [1], [], sorted, "Found zero at [0][1] → mark row 0, col 1.", 5,
-      [{ label: "zero at", value: "[0,1]" }]))
-    sorted.push(1)
-    steps.push(astep(arr, [3], [], sorted, "Found zero at [1][0] → mark row 1, col 0.", 5,
-      [{ label: "zero at", value: "[1,0]" }]))
-    sorted.push(3, 4, 5)
-    steps.push(astep(arr, [], [0, 1, 2, 3, 6], sorted,
-      "Zero entire row 1 + col 0 + col 1 → result shown.", 14,
+    steps.push(astep(arr, [], [], sorted, "Flattened 3×3 matrix [[1,1,1],[1,0,1],[1,1,1]]. Mark zero positions first.", 1))
+    // Only zero is at [1][1] (index 4). Marking pass sets matrix[1][0]=0 and matrix[0][1]=0.
+    steps.push(astep(arr, [4], [], sorted, "Found zero at [1][1] → mark matrix[1][0]=0 (row marker) and matrix[0][1]=0 (col marker).", 9,
+      [{ label: "zero at", value: "[1,1]" }]))
+    arr[3] = 0 // matrix[1][0]
+    arr[1] = 0 // matrix[0][1]
+    sorted.push(3, 1)
+    steps.push(astep(arr, [], [3, 1], sorted, "Markers placed: matrix[1][0]=0, matrix[0][1]=0.", 11))
+    // Zero cells pass: for i=1..2, j=1..2, using markers
+    arr[5] = 0 // matrix[1][2] zeroed because matrix[1][0]===0
+    sorted.push(5)
+    steps.push(astep(arr, [], [5], sorted, "matrix[1][0]==0 → zero matrix[1][2].", 18))
+    arr[7] = 0 // matrix[2][1] zeroed because matrix[0][1]===0
+    sorted.push(7)
+    steps.push(astep(arr, [], [7], sorted, "matrix[0][1]==0 → zero matrix[2][1].", 18))
+    // firstRowZero and firstColZero are both false here, so no extra zeroing
+    const allIdx = arr.map((_, i) => i)
+    steps.push(astep(arr, [], [], allIdx,
+      `Result: [[1,0,1],[0,0,0],[1,0,1]] ✓`, 22,
       [{ label: "result", value: "[[1,0,1],[0,0,0],[1,0,1]]" }]))
     return steps
   },
@@ -2272,10 +2306,14 @@ const spiralMatrix: ArrayProblem = {
   while (top <= bottom && left <= right) {
     for (let c = left; c <= right; c++)   result.push(matrix[top][c]);   top++;
     for (let r = top; r <= bottom; r++)   result.push(matrix[r][right]); right--;
-    if (top <= bottom)
-      for (let c = right; c >= left; c--) result.push(matrix[bottom][c]); bottom--;
-    if (left <= right)
-      for (let r = bottom; r >= top; r--) result.push(matrix[r][left]);  left++;
+    if (top <= bottom) {
+      for (let c = right; c >= left; c--) result.push(matrix[bottom][c]);
+      bottom--;
+    }
+    if (left <= right) {
+      for (let r = bottom; r >= top; r--) result.push(matrix[r][left]);
+      left++;
+    }
   }
 
   return result;
@@ -2286,17 +2324,17 @@ const spiralMatrix: ArrayProblem = {
     const sorted: number[] = []
 
     steps.push(astep(arr, [], [], sorted, "3×3 matrix. top=0,bottom=2,left=0,right=2.", 1))
-    steps.push(astep(arr, [0, 1, 2], [], sorted, "Traverse top row left→right: [1,2,3]. top++", 4))
+    steps.push(astep(arr, [0, 1, 2], [], sorted, "Traverse top row left→right: [1,2,3]. top++", 7))
     sorted.push(0, 1, 2)
-    steps.push(astep(arr, [5, 8], sorted, sorted, "Traverse right col top→bottom: [6,9]. right--", 5))
+    steps.push(astep(arr, [5, 8], sorted, sorted, "Traverse right col top→bottom: [6,9]. right--", 8))
     sorted.push(5, 8)
-    steps.push(astep(arr, [7, 6], sorted, sorted, "Traverse bottom row right→left: [8,7]. bottom--", 7))
+    steps.push(astep(arr, [7, 6], sorted, sorted, "Traverse bottom row right→left: [8,7]. bottom--", 10))
     sorted.push(7, 6)
-    steps.push(astep(arr, [3], sorted, sorted, "Traverse left col bottom→top: [4]. left++", 9))
+    steps.push(astep(arr, [3], sorted, sorted, "Traverse left col bottom→top: [4]. left++", 14))
     sorted.push(3)
-    steps.push(astep(arr, [4], sorted, sorted, "Inner cell [5]. Spiral complete.", 4))
+    steps.push(astep(arr, [4], sorted, sorted, "Inner cell [5]. Spiral complete.", 6))
     sorted.push(4)
-    steps.push(astep(arr, [], [], sorted, "Spiral: [1,2,3,6,9,8,7,4,5] ✓", 14,
+    steps.push(astep(arr, [], [], sorted, "Spiral: [1,2,3,6,9,8,7,4,5] ✓", 19,
       [{ label: "result", value: "[1,2,3,6,9,8,7,4,5]" }]))
     return steps
   },
@@ -2371,12 +2409,12 @@ const maxSumCircularSubarray: ArrayProblem = {
       totalSum += arr[i]
       sorted.push(i)
       steps.push(astep(arr, [i], [], sorted,
-        `num=${arr[i]}: curMax=${curMax}, maxSum=${maxSum}, curMin=${curMin}, minSum=${minSum}`, 5,
+        `num=${arr[i]}: curMax=${curMax}, maxSum=${maxSum}, curMin=${curMin}, minSum=${minSum}`, 6,
         [{ label: "maxSum", value: maxSum }, { label: "minSum", value: minSum }, { label: "total", value: totalSum }]))
     }
     const result = maxSum > 0 ? Math.max(maxSum, totalSum - minSum) : maxSum
     steps.push(astep(arr, [], [], sorted,
-      `max(${maxSum}, ${totalSum}-${minSum}=${totalSum-minSum}) = ${result} ✓`, 12,
+      `max(${maxSum}, ${totalSum}-${minSum}=${totalSum-minSum}) = ${result} ✓`, 14,
       [{ label: "result", value: result }]))
     return steps
   },
