@@ -610,37 +610,37 @@ const validateBST: BinaryTreeProblem = {
     const n2 = findId(2), n4 = findId(4), n6 = findId(6), n8 = findId(8)
 
     steps.push(tframe(nodes, rootId, [n5], visited, [], [],
-      "Start: validate(5, -∞, +∞). Check -∞ < 5 < +∞ ✓", 4,
+      "Start: validate(5, -∞, +∞). Check -∞ < 5 < +∞ ✓", 5,
       [{ label: "min", value: "-∞" }, { label: "max", value: "+∞" }]))
     visited.push(n5)
 
     steps.push(tframe(nodes, rootId, [n3], visited, [], [],
-      "Go left: validate(3, -∞, 5). Check -∞ < 3 < 5 ✓", 4,
+      "Go left: validate(3, -∞, 5). Check -∞ < 3 < 5 ✓", 5,
       [{ label: "min", value: "-∞" }, { label: "max", value: 5 }]))
     visited.push(n3)
 
     steps.push(tframe(nodes, rootId, [n2], visited, [], [],
-      "Go left: validate(2, -∞, 3). Check -∞ < 2 < 3 ✓", 4,
+      "Go left: validate(2, -∞, 3). Check -∞ < 2 < 3 ✓", 5,
       [{ label: "min", value: "-∞" }, { label: "max", value: 3 }]))
     visited.push(n2)
 
     steps.push(tframe(nodes, rootId, [n4], visited, [], [],
-      "Go right of 3: validate(4, 3, 5). Check 3 < 4 < 5 ✓", 4,
+      "Go right of 3: validate(4, 3, 5). Check 3 < 4 < 5 ✓", 5,
       [{ label: "min", value: 3 }, { label: "max", value: 5 }]))
     visited.push(n4)
 
     steps.push(tframe(nodes, rootId, [n7], visited, [], [],
-      "Go right of root: validate(7, 5, +∞). Check 5 < 7 < +∞ ✓", 4,
+      "Go right of root: validate(7, 5, +∞). Check 5 < 7 < +∞ ✓", 5,
       [{ label: "min", value: 5 }, { label: "max", value: "+∞" }]))
     visited.push(n7)
 
     steps.push(tframe(nodes, rootId, [n6], visited, [], [],
-      "Go left of 7: validate(6, 5, 7). Check 5 < 6 < 7 ✓", 4,
+      "Go left of 7: validate(6, 5, 7). Check 5 < 6 < 7 ✓", 5,
       [{ label: "min", value: 5 }, { label: "max", value: 7 }]))
     visited.push(n6)
 
     steps.push(tframe(nodes, rootId, [n8], visited, [], [],
-      "Go right of 7: validate(8, 7, +∞). Check 7 < 8 < +∞ ✓", 4,
+      "Go right of 7: validate(8, 7, +∞). Check 7 < 8 < +∞ ✓", 5,
       [{ label: "min", value: 7 }, { label: "max", value: "+∞" }]))
     visited.push(n8)
 
@@ -736,7 +736,7 @@ const diameterOfBinaryTree: BinaryTreeProblem = {
       [{ label: "leftH", value: 2 }, { label: "rightH", value: 1 }, { label: "diameter", value: 3 }]))
     visited.push(n1)
     steps.push(tframe(nodes, rootId, [], visited, [], [],
-      "Diameter = 3 (path: 4→2→1→3 or 5→2→1→3) ✓", 12, [], [3]))
+      "Diameter = 3 (path: 4→2→1→3 or 5→2→1→3) ✓", 17, [], [3]))
     return steps
   },
 }
@@ -831,7 +831,7 @@ const balancedBinaryTree: BinaryTreeProblem = {
       [{ label: "leftH", value: 1 }, { label: "rightH", value: 2 }, { label: "diff", value: 1 }]))
     visited.push(n3)
     steps.push(tframe(nodes, rootId, [], visited, [], [],
-      "dfs(root) = 3 ≠ -1 → isBalanced = true ✓", 13, [], ["true"]))
+      "dfs(root) = 3 ≠ -1 → isBalanced = true ✓", 16, [], ["true"]))
     return steps
   },
 }
@@ -909,19 +909,19 @@ const lcaBST: BinaryTreeProblem = {
     const n6 = findId(6), n2 = findId(2), n8 = findId(8)
     const n0 = findId(0), n4 = findId(4)
 
-    steps.push(tframe(nodes, rootId, [n6], visited, [], [], "Find LCA of p=2, q=4. Start at root (6).", 3))
+    steps.push(tframe(nodes, rootId, [n6], visited, [], [], "Find LCA of p=2, q=4. Start at root (6).", 2))
     steps.push(tframe(nodes, rootId, [n6], visited, [], [],
-      "At 6: p=2 < 6 AND q=4 < 6 → both in LEFT subtree. Go left.", 4,
+      "At 6: p=2 < 6 AND q=4 < 6 → both in LEFT subtree. Go left.", 5,
       [{ label: "p", value: 2 }, { label: "q", value: 4 }, { label: "node", value: 6 }]))
     visited.push(n6)
 
     steps.push(tframe(nodes, rootId, [n2], visited, [], [],
-      "At 2: p=2 == node=2, q=4 > node=2 → they SPLIT here. Current node is LCA!", 8,
+      "At 2: p=2 == node=2, q=4 > node=2 → they SPLIT here. Current node is LCA!", 10,
       [{ label: "p", value: 2 }, { label: "q", value: 4 }, { label: "node", value: 2 }]))
     visited.push(n2)
 
     steps.push(tframe(nodes, rootId, [], visited, [n2], [],
-      "LCA(2, 4) = node 2 ✓  (2 is ancestor of itself and 4 is in its right subtree)", 9,
+      "LCA(2, 4) = node 2 ✓  (2 is ancestor of itself and 4 is in its right subtree)", 10,
       [], [2]))
     return steps
   },
@@ -1025,7 +1025,7 @@ const maxPathSum: BinaryTreeProblem = {
     visited.push(nm10)
 
     steps.push(tframe(nodes, rootId, [], visited, [], [],
-      "Maximum path sum = 42 (path: 15→20→7) ✓", 13, [], [42]))
+      "Maximum path sum = 42 (path: 15→20→7) ✓", 19, [], [42]))
     return steps
   },
 }
@@ -1117,31 +1117,31 @@ function deserialize(data) {
 
     steps.push(tframe(nodes, rootId, [n1], visited, [], [], "SERIALIZE: Preorder DFS. Emit each value, 'N' for null.", 3))
 
-    steps.push(tframe(nodes, rootId, [n1], visited, [], [], "Visit 1 → emit '1'. Go left.", 5,
+    steps.push(tframe(nodes, rootId, [n1], visited, [], [], "Visit 1 → emit '1'. Go left.", 6,
       [{ label: "output so far", value: "1" }]))
     visited.push(n1)
 
-    steps.push(tframe(nodes, rootId, [n2], visited, [], [], "Visit 2 → emit '2'. Go left (null).", 5,
+    steps.push(tframe(nodes, rootId, [n2], visited, [], [], "Visit 2 → emit '2'. Go left (null).", 6,
       [{ label: "output so far", value: "1,2" }]))
     visited.push(n2)
 
-    steps.push(tframe(nodes, rootId, [], visited, [], [], "2.left = null → emit 'N'. 2.right = null → emit 'N'. Back up.", 4,
+    steps.push(tframe(nodes, rootId, [], visited, [], [], "2.left = null → emit 'N'. 2.right = null → emit 'N'. Back up.", 5,
       [{ label: "output so far", value: "1,2,N,N" }]))
 
-    steps.push(tframe(nodes, rootId, [n3], visited, [], [], "Visit 3 → emit '3'. Go left.", 5,
+    steps.push(tframe(nodes, rootId, [n3], visited, [], [], "Visit 3 → emit '3'. Go left.", 6,
       [{ label: "output so far", value: "1,2,N,N,3" }]))
     visited.push(n3)
 
-    steps.push(tframe(nodes, rootId, [n4], visited, [], [], "Visit 4 → emit '4'. 4 is leaf → emit 'N','N'.", 5,
+    steps.push(tframe(nodes, rootId, [n4], visited, [], [], "Visit 4 → emit '4'. 4 is leaf → emit 'N','N'.", 6,
       [{ label: "output so far", value: "1,2,N,N,3,4,N,N" }]))
     visited.push(n4)
 
-    steps.push(tframe(nodes, rootId, [n5], visited, [], [], "Visit 5 → emit '5'. 5 is leaf → emit 'N','N'.", 5,
+    steps.push(tframe(nodes, rootId, [n5], visited, [], [], "Visit 5 → emit '5'. 5 is leaf → emit 'N','N'.", 6,
       [{ label: "serialized", value: "1,2,N,N,3,4,N,N,5,N,N" }]))
     visited.push(n5)
 
     steps.push(tframe(nodes, rootId, [], visited, [], [],
-      "DESERIALIZE: Split by ',' → consume tokens left-to-right, rebuild tree. ✓", 18,
+      "DESERIALIZE: Split by ',' → consume tokens left-to-right, rebuild tree. ✓", 16,
       [{ label: "tokens", value: "1,2,N,N,3,4,N,N,5,N,N" }],
       ["1,2,N,N,3,4,N,N,5,N,N"]))
     return steps

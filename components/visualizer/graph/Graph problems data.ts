@@ -484,22 +484,22 @@ const courseSchedule: GraphProblem = {
       if (!isDone) inPath.push(id)
       else done.push(id)
       steps.push(gstep(nodes, edges, isDone ? [] : [id], done, isDone ? [] : inPath, [],
-        msg, isDone ? 14 : 8,
+        msg, isDone ? 16 : 12,
         [{ label: "state", value: `[${inPath.join(",")} in-path | ${done.join(",")} done]` }]))
     }
 
     inPath.pop() // 1 done
     done.push("1")
     steps.push(gstep(nodes, edges, [], done, inPath, [],
-      "Back at 1: all neighbors done. Mark 1 done (state=2).", 14))
+      "Back at 1: all neighbors done. Mark 1 done (state=2).", 16))
 
     done.push("3")
     steps.push(gstep(nodes, edges, ["3"], done, [], [],
-      "DFS(3): leaf. Mark done.", 14))
+      "DFS(3): leaf. Mark done.", 16))
 
     done.push("0")
     steps.push(gstep(nodes, edges, [], done, [], done,
-      "All nodes processed, no cycle found → return true ✓", 18,
+      "All nodes processed, no cycle found → return true ✓", 23,
       [{ label: "result", value: "true (can finish all courses)" }]))
     return steps
   },
@@ -585,11 +585,11 @@ const courseScheduleII: GraphProblem = {
     for (const [id, msg] of seq) {
       done.push(id)
       steps.push(gstep(nodes, edges, [id], [...done], [], [],
-        msg, 16, [{ label: "result so far (reversed)", value: `[${[...done].reverse().join(",")}]` }]))
+        msg, 17, [{ label: "result so far (reversed)", value: `[${[...done].reverse().join(",")}]` }]))
     }
 
     steps.push(gstep(nodes, edges, [], done, [], done,
-      "Reverse postorder → [0,2,1,3] or [0,1,2,3]. Valid topological order ✓", 18,
+      "Reverse postorder → [0,2,1,3] or [0,1,2,3]. Valid topological order ✓", 24,
       [{ label: "result", value: "[0,2,1,3]" }]))
     return steps
   },
@@ -670,30 +670,30 @@ const connectedComponents: GraphProblem = {
     // Component 1: 0,1,2
     components++
     steps.push(gstep(nodes, edges, ["0"], [], ["0"], [],
-      `Node 0 unvisited → components++ = ${components}. Start DFS.`, 13,
+      `Node 0 unvisited → components++ = ${components}. Start DFS.`, 20,
       [{ label: "components", value: components }]))
 
     for (const id of ["0","1","2"]) {
       visited.push(id)
       steps.push(gstep(nodes, edges, [id], [...visited], [], [],
-        `DFS visits ${id}. Mark visited.`, 10,
+        `DFS visits ${id}. Mark visited.`, 12,
         [{ label: "visited", value: visited.join(",") }]))
     }
 
     // Component 2: 3,4
     components++
     steps.push(gstep(nodes, edges, ["3"], [...visited], ["3"], [],
-      `Node 3 unvisited → components++ = ${components}. Start DFS.`, 13,
+      `Node 3 unvisited → components++ = ${components}. Start DFS.`, 20,
       [{ label: "components", value: components }]))
 
     for (const id of ["3","4"]) {
       visited.push(id)
       steps.push(gstep(nodes, edges, [id], [...visited], [], [],
-        `DFS visits ${id}. Mark visited.`, 10))
+        `DFS visits ${id}. Mark visited.`, 12))
     }
 
     steps.push(gstep(nodes, edges, [], [...visited], [], [...visited],
-      `All nodes visited. Components = ${components} ✓`, 18,
+      `All nodes visited. Components = ${components} ✓`, 25,
       [{ label: "result", value: components }]))
     return steps
   },
@@ -768,11 +768,11 @@ const graphValidTree: GraphProblem = {
     for (const id of ["0","1","3","4","2"]) {
       visited.push(id)
       steps.push(gstep(nodes, edges, [id], [...visited], [], [],
-        `DFS visits ${id}`, 9))
+        `DFS visits ${id}`, 11))
     }
 
     steps.push(gstep(nodes, edges, [], [...visited], [], [...visited],
-      `visited.size=${visited.length} === n=5. Connected, no cycle → true ✓`, 13,
+      `visited.size=${visited.length} === n=5. Connected, no cycle → true ✓`, 18,
       [{ label: "result", value: "true" }]))
     return steps
   },
@@ -854,7 +854,7 @@ const redundantConnection: GraphProblem = {
     for (const [f, t, isCycle, msg] of edgeSeq) {
       if (!isCycle) { visited.push(f, t); edgeObjs.push({ id: `e${f}${t}`, from: f, to: t }) }
       steps.push(gstep(nodes, edgeObjs, isCycle ? [f, t] : [], [...new Set(visited)], [], isCycle ? [f,t] : [],
-        msg, isCycle ? 19 : 18, [{ label: "action", value: isCycle ? "REDUNDANT EDGE!" : "union OK" }]))
+        msg, isCycle ? 20 : 16, [{ label: "action", value: isCycle ? "REDUNDANT EDGE!" : "union OK" }]))
     }
     return steps
   },
@@ -945,18 +945,19 @@ const pacificAtlantic: GraphProblem = {
     }
 
     const steps: GraphVisStep[] = []
-    const pacReach = ["0,0","0,1","0,2","1,0","2,0"]
-    const atlReach = ["2,2","2,1","2,0","1,2","0,2"]
+    // Reverse-BFS uphill from each ocean's borders on h = [[1,2,3],[8,9,4],[7,6,5]]
+    const pacReach = ["0,0","0,1","0,2","1,0","2,0","1,1","1,2","2,2","2,1"]
+    const atlReach = ["0,2","1,2","2,2","2,0","2,1","1,1","1,0"]
     const both = pacReach.filter(id => atlReach.includes(id))
 
     steps.push(gstep(nodes, edges, [], [], [], [],
-      "BFS uphill from Pacific borders (top + left).", 2))
+      "BFS uphill from Pacific borders (top + left).", 23))
     steps.push(gstep(nodes, edges, pacReach, pacReach, [], [],
-      `Pacific reachable: ${pacReach.join(",")}`, 7, [{ label: "pacific BFS", value: "done" }]))
+      `Pacific reachable: ${pacReach.join(",")}`, 32, [{ label: "pacific BFS", value: "done" }]))
     steps.push(gstep(nodes, edges, atlReach, [...pacReach, ...atlReach.filter(a => !pacReach.includes(a))], [], [],
-      `Atlantic reachable: ${atlReach.join(",")}`, 7, [{ label: "atlantic BFS", value: "done" }]))
+      `Atlantic reachable: ${atlReach.join(",")}`, 33, [{ label: "atlantic BFS", value: "done" }]))
     steps.push(gstep(nodes, edges, both, [...new Set([...pacReach,...atlReach])], [], both,
-      `Intersection (both oceans): ${both.join(",")} ✓`, 30, [{ label: "result cells", value: both.length }]))
+      `Intersection (both oceans): ${both.join(",")} ✓`, 39, [{ label: "result cells", value: both.length }]))
     return steps
   },
 }
@@ -1040,7 +1041,7 @@ const wordLadder: GraphProblem = {
     const visited: string[] = []
 
     steps.push(gstep(nodes, edges, ["hit"], [], ["hit"], [],
-      "BFS from 'hit'. Try all 1-letter changes.", 4, [{ label: "steps", value: 1 }]))
+      "BFS from 'hit'. Try all 1-letter changes.", 11, [{ label: "steps", value: 1 }]))
 
     const bfsOrder: [string, string, number][] = [
       ["hit",  "hot", 2],
@@ -1053,11 +1054,11 @@ const wordLadder: GraphProblem = {
     for (const [from, to, steps_n] of bfsOrder) {
       visited.push(from)
       steps.push(gstep(nodes, edges, [to], [...visited], [to], [],
-        `${from} → ${to} (1 char diff). Step ${steps_n}.`, 11,
+        `${from} → ${to} (1 char diff). Step ${steps_n}.`, 21,
         [{ label: "steps", value: steps_n }, { label: "current word", value: to }]))
       if (to === "cog") {
         steps.push(gstep(nodes, edges, [], [...visited, to], [], [...visited, to],
-          `Reached endWord 'cog'! Return ${steps_n} ✓`, 13,
+          `Reached endWord 'cog'! Return ${steps_n} ✓`, 17,
           [{ label: "result", value: steps_n }]))
         break
       }

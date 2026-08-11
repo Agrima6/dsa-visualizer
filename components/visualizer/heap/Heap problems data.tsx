@@ -149,32 +149,32 @@ const lastStoneWeight: HeapProblem = {
 
     // Round 1: pop 8 and 7, push 1
     steps.push(hframe(heap, [heap[0].id, heap[1].id], [], [],
-      "Pop y=8 and x=7. y≠x → smash! Remainder = 8−7 = 1. Push back.", 9,
+      "Pop y=8 and x=7. y≠x → smash! Remainder = 8−7 = 1. Push back.", 10,
       [{ label: "y", value: 8 }, { label: "x", value: 7 }, { label: "y−x", value: 1 }]))
 
     heap = makeHeap([4, 2, 1, 1, 1])
     steps.push(hframe(heap, [], [heap[0].id], [],
-      "Heap after round 1: [4,2,1,1,1]. New root = 4.", 12,
+      "Heap after round 1: [4,2,1,1,1]. New root = 4.", 14,
       [{ label: "heap", value: "4,2,1,1,1" }]))
 
     // Round 2: pop 4 and 2, push 2
     steps.push(hframe(heap, [heap[0].id, heap[1].id], [], [],
-      "Pop y=4 and x=2. y≠x → smash! Remainder = 4−2 = 2. Push back.", 9,
+      "Pop y=4 and x=2. y≠x → smash! Remainder = 4−2 = 2. Push back.", 10,
       [{ label: "y", value: 4 }, { label: "x", value: 2 }, { label: "y−x", value: 2 }]))
 
     heap = makeHeap([2, 1, 1, 1])
     steps.push(hframe(heap, [], [heap[0].id], [],
-      "Heap after round 2: [2,1,1,1]. New root = 2.", 12,
+      "Heap after round 2: [2,1,1,1]. New root = 2.", 14,
       [{ label: "heap", value: "2,1,1,1" }]))
 
     // Round 3: pop 2 and 1, push 1
     steps.push(hframe(heap, [heap[0].id, heap[1].id], [], [],
-      "Pop y=2 and x=1. y≠x → smash! Remainder = 2−1 = 1. Push back.", 9,
+      "Pop y=2 and x=1. y≠x → smash! Remainder = 2−1 = 1. Push back.", 10,
       [{ label: "y", value: 2 }, { label: "x", value: 1 }, { label: "y−x", value: 1 }]))
 
     heap = makeHeap([1, 1, 1])
     steps.push(hframe(heap, [], [heap[0].id], [],
-      "Heap after round 3: [1,1,1].", 12,
+      "Heap after round 3: [1,1,1].", 14,
       [{ label: "heap", value: "1,1,1" }]))
 
     // Round 4: pop 1 and 1 — equal, both destroyed
@@ -184,7 +184,7 @@ const lastStoneWeight: HeapProblem = {
 
     const finalHeap = makeHeap([1])
     steps.push(hframe(finalHeap, [], [], finalHeap.map(n => n.id),
-      "One stone remains: 1 ✓", 17,
+      "One stone remains: 1 ✓", 18,
       [{ label: "result", value: 1 }]))
 
     return steps
@@ -274,13 +274,13 @@ const kthLargestStream: HeapProblem = {
       if (heapVals.length > k) heapVals.shift()
       const heap = makeHeap(heapVals)
       steps.push(hframe(heap, [heap[0].id], [], [],
-        `add(${val}) → heap=[${heapVals.join(",")}]. kth largest = ${heapVals[0]}`, 9,
+        `add(${val}) → heap=[${heapVals.join(",")}]. kth largest = ${heapVals[0]}`, 20,
         [{ label: `add(${val})`, value: heapVals[0] }, { label: "heap top", value: heapVals[0] }]))
     }
 
     const finalHeap = makeHeap(heapVals)
     steps.push(hframe(finalHeap, [], [], finalHeap.map(n => n.id),
-      `Final min-heap of size k=${k}. Root = ${heapVals[0]} = kth largest ✓`, 17,
+      `Final min-heap of size k=${k}. Root = ${heapVals[0]} = kth largest ✓`, 20,
       [{ label: "kth largest", value: heapVals[0] }]))
 
     return steps
@@ -376,7 +376,7 @@ const kClosestPoints: HeapProblem = {
       const labels = held.map(h => `[${h.point}] d²=${h.d}`)
       const heap = makeHeap(held.map(h => `d²=${h.d}`))
       steps.push(hframe(heap, [heap[0].id], [], [],
-        `Push [${p}] (d²=${dist(p)}). Heap size=${held.length}.`, 6,
+        `Push [${p}] (d²=${dist(p)}). Heap size=${held.length}.`, 8,
         [{ label: "added", value: `[${p}]` }, { label: "d²", value: dist(p) }]))
 
       if (held.length > k) {
@@ -390,7 +390,7 @@ const kClosestPoints: HeapProblem = {
 
     const finalHeap = makeHeap(held.map(h => `[${h.point}]`))
     steps.push(hframe(finalHeap, [], [], finalHeap.map(n => n.id),
-      `${k} closest points: ${held.map(h => `[${h.point}]`).join(", ")} ✓`, 16,
+      `${k} closest points: ${held.map(h => `[${h.point}]`).join(", ")} ✓`, 17,
       [{ label: "result", value: held.map(h => `[${h.point}]`).join(", ") }]))
 
     return steps
@@ -479,21 +479,21 @@ const kthLargestArray: HeapProblem = {
       heap.sort((a, b) => a - b)
       const heapNodes = makeHeap(heap)
       steps.push(hframe(heapNodes, [heapNodes[heapNodes.length - 1].id], [], [],
-        `Push ${n}. Heap = [${heap.join(",")}], size=${heap.length}`, 4,
+        `Push ${n}. Heap = [${heap.join(",")}], size=${heap.length}`, 5,
         [{ label: "pushed", value: n }]))
 
       if (heap.length > k) {
         const removed = heap.shift()!
         const trimNodes = makeHeap(heap)
         steps.push(hframe(trimNodes, [], [trimNodes[0].id], [],
-          `Size > ${k}. Pop minimum (${removed}). Heap = [${heap.join(",")}]`, 7,
+          `Size > ${k}. Pop minimum (${removed}). Heap = [${heap.join(",")}]`, 9,
           [{ label: "popped (min)", value: removed }, { label: "heap top", value: heap[0] }]))
       }
     }
 
     const finalNodes = makeHeap(heap)
     steps.push(hframe(finalNodes, [], [], finalNodes.map(n => n.id),
-      `${k}nd largest = heap root = ${heap[0]} ✓`, 12,
+      `${k}nd largest = heap root = ${heap[0]} ✓`, 14,
       [{ label: "result", value: heap[0] }]))
 
     return steps
@@ -585,30 +585,30 @@ const taskScheduler: HeapProblem = {
 
     const heap1 = makeHeap([3, 3])
     steps.push(hframe(heap1, [heap1[0].id], [], [],
-      "Max-heap of frequencies: [3, 3]. Top = 3.", 7,
+      "Max-heap of frequencies: [3, 3]. Top = 3.", 8,
       [{ label: "heap", value: "freq: 3, 3" }]))
 
     // Cycle 1: A, B, idle
     const heap2 = makeHeap([2, 2])
     steps.push(hframe(heap2, [heap2[0].id], [], [],
-      "Cycle 1: Run task A (freq→2), run task B (freq→2), idle. Time += 3.", 11,
+      "Cycle 1: Run task A (freq→2), run task B (freq→2), idle. Time += 3.", 17,
       [{ label: "time", value: 3 }, { label: "schedule", value: "A→B→idle" }]))
 
     // Cycle 2: A, B, idle
     const heap3 = makeHeap([1, 1])
     steps.push(hframe(heap3, [heap3[0].id], [], [],
-      "Cycle 2: Run task A (freq→1), run task B (freq→1), idle. Time += 3.", 11,
+      "Cycle 2: Run task A (freq→1), run task B (freq→1), idle. Time += 3.", 17,
       [{ label: "time", value: 6 }, { label: "schedule", value: "A→B→idle" }]))
 
     // Cycle 3: A, B — no idle needed
-    const heap4 = makeHeap([0])
-    steps.push(hframe(makeHeap([1, 1]), [makeHeap([1, 1])[0].id], [], [],
+    const heap4Nodes = makeHeap([1, 1])
+    steps.push(hframe(heap4Nodes, [heap4Nodes[0].id], [], [],
       "Cycle 3: Run A (freq→0), run B (freq→0). No idle needed. Time += 2.", 14,
       [{ label: "time", value: 8 }, { label: "schedule", value: "A→B" }]))
 
     const finalNodes = makeHeap(["done"])
     steps.push(hframe(finalNodes, [], [], finalNodes.map(n => n.id),
-      "Heap empty. Total time = 8 ✓", 20,
+      "Heap empty. Total time = 8 ✓", 26,
       [{ label: "result", value: 8 }]))
 
     return steps
@@ -691,26 +691,26 @@ const reorganizeString: HeapProblem = {
     const steps: HeapVisStep[] = []
     const heap1 = makeHeap(["a:3", "b:1"])
     steps.push(hframe(heap1, [heap1[0].id], [], [],
-      's="aaab". Frequencies: a=3, b=1. Max-heap by freq.', 4,
+      's="aaab". Frequencies: a=3, b=1. Max-heap by freq.', 3,
       [{ label: "a", value: 3 }, { label: "b", value: 1 }]))
 
     steps.push(hframe(heap1, [heap1[0].id, heap1[1].id], [], [],
-      "Pop top two: c1=a(3), c2=b(1). Append 'ab'. Decrement freqs.", 10,
+      "Pop top two: c1=a(3), c2=b(1). Append 'ab'. Decrement freqs.", 14,
       [{ label: "result", value: "ab" }, { label: "a freq", value: 2 }, { label: "b freq", value: 0 }]))
 
     const heap2 = makeHeap(["a:2"])
     steps.push(hframe(heap2, [heap2[0].id], [], [],
-      "Re-push a(2). b exhausted. Only one char left in heap.", 14,
+      "Re-push a(2). b exhausted. Only one char left in heap.", 17,
       [{ label: "heap", value: "a:2" }]))
 
-    const heap3 = makeHeap(["a:1"])
+    const heap3 = makeHeap(["a:2"])
     steps.push(hframe(heap3, [], [heap3[0].id], [],
-      "Single item: a(2). freq=2 > 1 → impossible! Return ''.", 21,
+      "Single item: a(2). freq=2 > 1 → impossible! Return ''.", 23,
       [{ label: "result", value: '""' }]))
 
     const goodHeap = makeHeap(["result"])
     steps.push(hframe(goodHeap, [], [], goodHeap.map(n => n.id),
-      'For s="aab": heap=[a:2,b:1] → append "ab", re-push a:1 → append "a" → "aba" ✓', 23,
+      'For s="aab": heap=[a:2,b:1] → append "ab", re-push a:1 → append "a" → "aba" ✓', 27,
       [{ label: "example result", value: '"aba"' }]))
 
     return steps
@@ -786,31 +786,31 @@ const longestHappyString: HeapProblem = {
     const steps: HeapVisStep[] = []
     const h1 = makeHeap(["c:7", "b:1", "a:1"])
     steps.push(hframe(h1, [h1[0].id], [], [],
-      "a=1,b=1,c=7. Max-heap: [c:7, b:1, a:1]. Start building.", 1,
+      "a=1,b=1,c=7. Max-heap: [c:7, b:1, a:1]. Start building.", 5,
       [{ label: "a", value: 1 }, { label: "b", value: 1 }, { label: "c", value: 7 }]))
 
     steps.push(hframe(h1, [h1[0].id], [], [],
-      "Append c. result='c'. Re-push c:6.", 14,
+      "Append c. result='c'. Re-push c:6.", 21,
       [{ label: "result", value: "c" }]))
 
     const h2 = makeHeap(["c:6", "b:1", "a:1"])
     steps.push(hframe(h2, [h2[0].id], [], [],
-      "Append c. result='cc'. Re-push c:5.", 14,
+      "Append c. result='cc'. Re-push c:5.", 21,
       [{ label: "result", value: "cc" }]))
 
     const h3 = makeHeap(["c:5", "b:1", "a:1"])
     steps.push(hframe(h3, [h3[1].id], [h3[0].id], [],
-      "result ends in 'cc' → can't use c! Use 2nd: b. result='ccb'.", 9,
+      "result ends in 'cc' → can't use c! Use 2nd: b. result='ccb'.", 17,
       [{ label: "result", value: "ccb" }, { label: "skipped", value: "c (would make 'ccc')" }]))
 
-    const h4 = makeHeap(["c:5", "a:1"])
+    const h4 = makeHeap(["c:3", "a:1"])
     steps.push(hframe(h4, [h4[0].id], [], [],
-      "Append c,c. result='ccbcc'. Use b again. Continue...", 14,
+      "Append c,c. result='ccbcc' (c: 5→3). b exhausted; a remains. Continue...", 21,
       [{ label: "result so far", value: "ccbcc" }]))
 
     const finalNodes = makeHeap(["ccbccacc"])
     steps.push(hframe(finalNodes, [], [], finalNodes.map(n => n.id),
-      'Final result: "ccbccacc" ✓', 23,
+      'Final result: "ccbccacc" ✓', 26,
       [{ label: "result", value: '"ccbccacc"' }]))
 
     return steps
@@ -900,26 +900,26 @@ const carPooling: HeapProblem = {
     const capacity = 4
 
     steps.push(hframe([], [], [], [],
-      `capacity=${capacity}. Sort trips by pickup. trips=[[2,1,5],[3,3,7],[1,5,9]]`, 2))
+      `capacity=${capacity}. Sort trips by pickup. trips=[[2,1,5],[3,3,7],[1,5,9]]`, 3))
 
     const h1 = makeHeap(["[5,2]"])
     steps.push(hframe(h1, [h1[0].id], [], [],
-      "Trip [2,1,5]: from=1. No dropoffs yet. Board 2. current=2. Push [dropOff=5, num=2].", 8,
+      "Trip [2,1,5]: from=1. No dropoffs yet. Board 2. current=2. Push [dropOff=5, num=2].", 21,
       [{ label: "current", value: 2 }, { label: "capacity", value: 4 }]))
 
     const h2 = makeHeap(["[5,2]", "[7,3]"])
     steps.push(hframe(h2, [h2[1].id], [], [],
-      "Trip [3,3,7]: from=3. No dropoffs (heap.top=5 > 3). Board 3. current=5 > capacity=4!", 8,
+      "Trip [3,3,7]: from=3. No dropoffs (heap.top=5 > 3). Board 3. current=5 > capacity=4!", 23,
       [{ label: "current", value: 5 }, { label: "capacity", value: 4 }]))
 
     const failNode = makeHeap(["FAIL"])
     steps.push(hframe(failNode, [], [failNode[0].id], [],
-      "current=5 > capacity=4 → return false ✗", 18,
+      "current=5 > capacity=4 → return false ✗", 23,
       [{ label: "result", value: "false" }]))
 
     const okNode = makeHeap(["OK: capacity=5"])
     steps.push(hframe(okNode, [], [], okNode.map(n => n.id),
-      "With capacity=5: 2+3=5 ≤ 5 → continue. Drop 2 at stop 5. Board 1. current=4 ≤ 5 → true ✓", 20,
+      "With capacity=5: 2+3=5 ≤ 5 → continue. Drop 2 at stop 5. Board 1. current=4 ≤ 5 → true ✓", 26,
       [{ label: "result (capacity=5)", value: "true" }]))
 
     return steps
@@ -1021,30 +1021,30 @@ const findMedianDataStream: HeapProblem = {
     const lo1 = makeHeap([1])
     const hi1 = makeHeap([])
     steps.push(hframe(lo1, [lo1[0].id], [], [],
-      "addNum(1): push to lo. lo=[1], hi=[]. lo.size=1, hi.size=0. Balanced.", 9,
+      "addNum(1): push to lo. lo=[1], hi=[]. lo.size=1, hi.size=0. Balanced.", 11,
       [{ label: "lo (max-heap)", value: "[1]" }, { label: "hi (min-heap)", value: "[]" }]))
 
     // addNum(2)
     const lo2 = makeHeap([1])
     const hi2 = makeHeap([2])
     steps.push(hframe([...lo2, ...hi2], [hi2[0].id], [], [],
-      "addNum(2): push 2 to lo→lo.top=2 > hi.top? hi empty → move 2 to hi. lo=[1], hi=[2].", 13,
+      "addNum(2): push 2 to lo. hi is empty so the lo.top>hi.top check is skipped. Size check: lo.size(2) > hi.size(0)+1 → move lo's max (2) to hi. lo=[1], hi=[2].", 21,
       [{ label: "lo (max-heap)", value: "[1]" }, { label: "hi (min-heap)", value: "[2]" }]))
 
     // findMedian
     steps.push(hframe([...lo2, ...hi2], [], [], [...lo2, ...hi2].map(n => n.id),
-      "findMedian(): sizes equal → (lo.top + hi.top)/2 = (1+2)/2 = 1.5 ✓", 28,
+      "findMedian(): sizes equal → (lo.top + hi.top)/2 = (1+2)/2 = 1.5 ✓", 31,
       [{ label: "median", value: 1.5 }]))
 
     // addNum(3)
     const lo3 = makeHeap([2, 1])
     const hi3 = makeHeap([3])
     steps.push(hframe([...lo3, ...hi3], [lo3[0].id], [], [],
-      "addNum(3): push to lo. lo.top=3 > hi.top=2 → swap. lo=[2,1], hi=[3]. Balanced.", 13,
+      "addNum(3): push to lo. lo.top=3 > hi.top=2 → move 3 into hi (lo=[1], hi=[2,3]). Now hi.size(2) > lo.size(1) → rebalance: move hi's min (2) back to lo. lo=[2,1], hi=[3].", 23,
       [{ label: "lo (max-heap)", value: "[2,1]" }, { label: "hi (min-heap)", value: "[3]" }]))
 
     steps.push(hframe([...lo3, ...hi3], [], [], [...lo3, ...hi3].map(n => n.id),
-      "findMedian(): lo.size=2 > hi.size=1 → median = lo.top = 2 ✓", 28,
+      "findMedian(): lo.size=2 > hi.size=1 → median = lo.top = 2 ✓", 29,
       [{ label: "median", value: 2 }]))
 
     return steps
@@ -1140,26 +1140,26 @@ const ipo: HeapProblem = {
 
     const minH = makeHeap(["[0,1]", "[1,2]", "[1,3]"])
     steps.push(hframe(minH, [minH[0].id], [], [],
-      "Min-heap by capital: [0→p1, 1→p2, 1→p3]. Max-heap of profits: [].", 7,
+      "Min-heap by capital: [0→p1, 1→p2, 1→p3]. Max-heap of profits: [].", 10,
       [{ label: "w", value: 0 }, { label: "locked", value: "[0,1],[1,2],[1,3]" }]))
 
     // Round 1
     const maxH1 = makeHeap(["p=1"])
     steps.push(hframe(maxH1, [maxH1[0].id], [], [],
-      "Round 1: w=0. Unlock cap≤0: project [cap=0,profit=1]. max-profit-heap=[1]. Pick profit=1.", 13,
+      "Round 1: w=0. Unlock cap≤0: project [cap=0,profit=1]. max-profit-heap=[1]. Pick profit=1.", 29,
       [{ label: "w before", value: 0 }, { label: "profit picked", value: 1 }, { label: "w after", value: 1 }]))
     w = 1
 
     // Round 2
     const maxH2 = makeHeap(["p=3", "p=2"])
     steps.push(hframe(maxH2, [maxH2[0].id], [], [],
-      "Round 2: w=1. Unlock cap≤1: projects [p=2] and [p=3]. max-heap=[3,2]. Pick profit=3.", 13,
+      "Round 2: w=1. Unlock cap≤1: projects [p=2] and [p=3]. max-heap=[3,2]. Pick profit=3.", 29,
       [{ label: "w before", value: 1 }, { label: "profit picked", value: 3 }, { label: "w after", value: 4 }]))
     w = 4
 
     const finalNodes = makeHeap([`w=${w}`])
     steps.push(hframe(finalNodes, [], [], finalNodes.map(n => n.id),
-      `${k} projects done. Maximized capital = ${w} ✓`, 28,
+      `${k} projects done. Maximized capital = ${w} ✓`, 32,
       [{ label: "result", value: w }]))
 
     return steps
