@@ -482,12 +482,12 @@ companies: ["Google", "Amazon", "Meta", "Microsoft", "Adobe", "Uber", "Atlassian
     const steps: VisStep[] = []
 
     steps.push(step(arr, [], [], [], "Build a HashSet from all numbers", 2))
-    steps.push(step(arr, [], [], [], "For each num: skip if num-1 is in set (not a start)", 5))
+    steps.push(step(arr, [], [], [], "For each num: skip if num-1 is in set (not a start)", 7))
     steps.push(step(arr, [3], [], [], "num=1 → 1-1=0 not in set → sequence start!", 7))
-    steps.push(step(arr, [3, 2], [], [], "Check 1→2: 2 in set ✓, streak=2", 10))
-    steps.push(step(arr, [3, 2, 1], [], [], "Check 2→3: 3 in set ✓, streak=3", 10))
-    steps.push(step(arr, [3, 2, 1, 4], [], [], "Check 3→4: 4 in set ✓, streak=4", 10))
-    steps.push(step(arr, [], [], [3, 2, 1, 4], "Longest = 4 ([1,2,3,4]) ✓", 15))
+    steps.push(step(arr, [3, 2], [], [], "Check 1→2: 2 in set ✓, streak=2", 11))
+    steps.push(step(arr, [3, 2, 1], [], [], "Check 2→3: 3 in set ✓, streak=3", 11))
+    steps.push(step(arr, [3, 2, 1, 4], [], [], "Check 3→4: 4 in set ✓, streak=4", 11))
+    steps.push(step(arr, [], [], [3, 2, 1, 4], "Longest = 4 ([1,2,3,4]) ✓", 16))
     return steps
   },
 }
@@ -576,31 +576,44 @@ companies: ["Amazon", "Google", "Meta", "Microsoft", "Apple", "Uber", "LinkedIn"
     const k = 2
     const target = arr.length - k
 
-    steps.push(step(arr, [], [], [], `Find k=${k}th largest. Target index = ${target} in sorted order`, 2))
+    steps.push(step(arr, [], [], [], `Find k=${k}th largest. Target index = ${target} in sorted order`, 3))
 
-    const pivotIdx = arr.length - 1
-    steps.push(step(arr, [pivotIdx], [], [], `Pivot = arr[${pivotIdx}] = ${arr[pivotIdx]}`, 5, pivotIdx))
+    function partition(lo: number, hi: number): number {
+      const pivot = arr[hi]
+      steps.push(step(arr, [hi], [], [], `Pivot = arr[${hi}] = ${pivot}`, 6, hi))
+      let i = lo
+      for (let j = lo; j < hi; j++) {
+        steps.push(step(arr, [j], [], [], `arr[${j}]=${arr[j]} vs pivot=${pivot}`, 10, hi))
+        if (arr[j] <= pivot) {
+          ;[arr[i], arr[j]] = [arr[j], arr[i]]
+          if (i !== j) steps.push(step(arr, [], [i, j], [], `Swap arr[${i}] and arr[${j}]`, 11))
+          i++
+        }
+      }
+      ;[arr[i], arr[hi]] = [arr[hi], arr[i]]
+      steps.push(step(arr, [], [i, hi], [], `Pivot ${pivot} placed at index ${i}`, 16, i))
+      return i
+    }
 
-    const pivotVal = arr[pivotIdx]
-    let i = 0
-    for (let j = 0; j < arr.length - 1; j++) {
-      steps.push(step(arr, [j], [], [], `arr[${j}]=${arr[j]} vs pivot=${pivotVal}`, 7, pivotIdx))
-      if (arr[j] <= pivotVal) {
-        ;[arr[i], arr[j]] = [arr[j], arr[i]]
-        if (i !== j) steps.push(step(arr, [], [i, j], [], `Swap arr[${i}] and arr[${j}]`, 8))
-        i++
+    function quickSelect(lo: number, hi: number): number {
+      if (lo === hi) {
+        steps.push(step(arr, [lo], [], [], `lo === hi: single element arr[${lo}] = ${arr[lo]}`, 21))
+        return arr[lo]
+      }
+      const p = partition(lo, hi)
+      if (p === target) {
+        steps.push(step(arr, [], [], [p], `Pivot at target index ${target} → answer is ${arr[p]} ✓`, 23))
+        return arr[p]
+      } else if (p < target) {
+        steps.push(step(arr, [], [], [], `Pivot at ${p} < target ${target} → recurse into right half [${p + 1},${hi}]`, 24))
+        return quickSelect(p + 1, hi)
+      } else {
+        steps.push(step(arr, [], [], [], `Pivot at ${p} > target ${target} → recurse into left half [${lo},${p - 1}]`, 25))
+        return quickSelect(lo, p - 1)
       }
     }
-    ;[arr[i], arr[pivotIdx]] = [arr[pivotIdx], arr[i]]
-    steps.push(step(arr, [], [i, pivotIdx], [], `Pivot ${pivotVal} placed at index ${i}`, 12, i))
 
-    if (i === target) {
-      steps.push(step(arr, [], [], [i], `Pivot at target index ${target} → answer is ${arr[i]} ✓`, 15))
-    } else {
-      steps.push(step(arr, [], [], [i], `Pivot at ${i}, target is ${target} → recurse into right half`, 16))
-      const sorted = [...arr].sort((a, b) => a - b)
-      steps.push(step(sorted, [], [], [target], `After full QuickSelect: answer = ${sorted[target]} ✓`, 17))
-    }
+    quickSelect(0, arr.length - 1)
 
     return steps
   },
@@ -669,12 +682,12 @@ companies: ["Google", "Amazon", "Meta", "Microsoft", "Apple", "LinkedIn", "Twitt
 
     steps.push(step(arr, [], [], [], "Sort intervals by start time → [[1,3],[2,6],[8,10],[15,18]]", 2))
     steps.push(step(arr, [0], [], [], "result = [[1,3]]. Compare next interval [2,6]", 4))
-    steps.push(step(arr, [0, 1], [], [], "2 ≤ 3 → overlapping! Merge to [1, max(3,6)] = [1,6]", 9))
-    steps.push(step(arr, [], [0, 1], [], "Merged: result = [[1,6]]", 10))
-    steps.push(step(arr, [1, 2], [], [], "Compare [1,6] with [8,10]: 8 > 6 → no overlap", 13))
+    steps.push(step(arr, [0, 1], [], [], "2 ≤ 3 → overlapping! Merge to [1, max(3,6)] = [1,6]", 10))
+    steps.push(step(arr, [], [0, 1], [], "Merged: result = [[1,6]]", 12))
+    steps.push(step(arr, [1, 2], [], [], "Compare [1,6] with [8,10]: 8 > 6 → no overlap", 10))
     steps.push(step(arr, [], [], [0, 1], "Append [8,10]. result = [[1,6],[8,10]]", 14))
-    steps.push(step(arr, [2, 3], [], [0, 1], "Compare [8,10] with [15,18]: 15 > 10 → no overlap", 13))
-    steps.push(step(arr, [], [], [0, 1, 2, 3], "Final: [[1,6],[8,10],[15,18]] ✓", 16))
+    steps.push(step(arr, [2, 3], [], [0, 1], "Compare [8,10] with [15,18]: 15 > 10 → no overlap", 10))
+    steps.push(step(arr, [], [], [0, 1, 2, 3], "Final: [[1,6],[8,10],[15,18]] ✓", 18))
     return steps
   },
 }
@@ -741,9 +754,9 @@ companies: ["Google", "Amazon", "Microsoft", "Meta", "Adobe", "Atlassian", "Serv
 
     steps.push(step(arr, [], [], [], "Sort by end time: [[1,2],[2,3],[1,3],[3,4]]", 2))
     steps.push(step(arr, [0], [], [], "Keep [1,2]. prevEnd=2", 5))
-    steps.push(step(arr, [1], [], [0], "[2,3]: start=2 ≥ prevEnd=2 → no overlap, keep. prevEnd=3", 10))
-    steps.push(step(arr, [2], [], [0, 1], "[1,3]: start=1 < prevEnd=3 → overlap! Remove. removals=1", 8))
-    steps.push(step(arr, [3], [], [0, 1, 2], "[3,4]: start=3 ≥ prevEnd=3 → keep. prevEnd=4", 10))
+    steps.push(step(arr, [1], [], [0], "[2,3]: start=2 ≥ prevEnd=2 → no overlap, keep. prevEnd=3", 14))
+    steps.push(step(arr, [2], [], [0, 1], "[1,3]: start=1 < prevEnd=3 → overlap! Remove. removals=1", 12))
+    steps.push(step(arr, [3], [], [0, 1, 2], "[3,4]: start=3 ≥ prevEnd=3 → keep. prevEnd=4", 14))
     steps.push(step(arr, [], [], [0, 1, 2, 3], "Answer = 1 removal ✓", 13))
     return steps
   },
@@ -801,8 +814,8 @@ companies: ["Amazon", "Meta", "Microsoft", "Google", "Uber", "LinkedIn", "Zomato
     const steps: VisStep[] = []
 
     steps.push(step(arr, [], [], [], "Sort by start: [[0,30],[5,10],[15,20]]", 2))
-    steps.push(step(arr, [0, 1], [], [], "Compare [0,30] and [5,10]: start=5 < end=30 → OVERLAP!", 5))
-    steps.push(step(arr, [], [0, 1], [], "Return false — can't attend all meetings ✓", 6))
+    steps.push(step(arr, [0, 1], [], [], "Compare [0,30] and [5,10]: start=5 < end=30 → OVERLAP!", 8))
+    steps.push(step(arr, [], [0, 1], [], "Return false — can't attend all meetings ✓", 8))
     return steps
   },
 }
@@ -874,10 +887,27 @@ companies: ["Google", "Amazon", "Meta", "Microsoft", "Apple", "Uber", "Salesforc
     const steps: VisStep[] = []
 
     steps.push(step(arr, [], [], [], "starts=[0,5,15] ends=[10,20,30]", 2))
-    steps.push(step(arr, [0], [], [], "start=0 < end=10 → new room. rooms=1", 9))
-    steps.push(step(arr, [0, 1], [], [], "start=5 < end=10 → new room. rooms=2", 9))
-    steps.push(step(arr, [0, 2], [], [1], "start=15 ≥ end=10 → free a room. rooms=1", 12))
-    steps.push(step(arr, [], [], [0, 1, 2], "Max rooms needed = 2 ✓", 17))
+
+    const starts = [0, 5, 15]
+    const ends = [10, 20, 30]
+    const n = starts.length
+    let rooms = 0, maxRooms = 0
+    let s = 0, e = 0
+
+    while (s < n) {
+      if (starts[s] < ends[e]) {
+        rooms++
+        steps.push(step(arr, [s], [], [], `start=${starts[s]} < end=${ends[e]} → new room. rooms=${rooms}`, 9))
+        s++
+      } else {
+        rooms--
+        steps.push(step(arr, [], [], [e], `start=${starts[s]} ≥ end=${ends[e]} → free a room. rooms=${rooms}`, 12))
+        e++
+      }
+      maxRooms = Math.max(maxRooms, rooms)
+    }
+
+    steps.push(step(arr, [], [], [0, 1, 2], `Max rooms needed = ${maxRooms} ✓`, 19))
     return steps
   },
 }
@@ -949,10 +979,10 @@ companies: ["Google", "LinkedIn", "Amazon", "Microsoft", "Meta", "Apple", "Servi
     steps.push(step(arr, [], [], [], "intervals=[[1,3],[6,9]] newInterval=[2,5]", 1))
     steps.push(step(arr, [0], [], [], "Phase 1: [1,3] ends at 3 ≥ newStart=2 → skip phase 1", 7))
     steps.push(step(arr, [0], [], [], "Phase 2: [1,3] overlaps [2,5]. Merge → [1,5]", 11))
-    steps.push(step(arr, [], [0], [], "newInterval updated to [1,5]", 12))
-    steps.push(step(arr, [1], [0], [], "Phase 2: [6,9] start=6 > newEnd=5 → stop merging", 10))
-    steps.push(step(arr, [], [], [0], "Push merged [1,5]", 14))
-    steps.push(step(arr, [], [], [0, 1], "Phase 3: push [6,9]. Result = [[1,5],[6,9]] ✓", 17))
+    steps.push(step(arr, [], [0], [], "newInterval updated to [1,5]", 14))
+    steps.push(step(arr, [1], [0], [], "Phase 2: [6,9] start=6 > newEnd=5 → stop merging", 12))
+    steps.push(step(arr, [], [], [0], "Push merged [1,5]", 17))
+    steps.push(step(arr, [], [], [0, 1], "Phase 3: push [6,9]. Result = [[1,5],[6,9]] ✓", 20))
     return steps
   },
 }
