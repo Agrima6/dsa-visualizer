@@ -11,14 +11,23 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, "..")
 
 const FILES = [
-  { slug: "arrays", file: "components/visualizer/array/Array problems data.ts" },
-  { slug: "sorting", file: "components/visualizer/sorting/sorting-problems-data.ts" },
-  { slug: "linked-lists", file: "components/visualizer/linked-list/linked-list-problems-data.ts" },
-  { slug: "stacks", file: "components/visualizer/stack/stack-problems-data.ts" },
-  { slug: "queues", file: "components/visualizer/queue/queue-problems-data.ts" },
-  { slug: "binary-tree", file: "components/visualizer/binary-tree/Binary tree problems data.tsx" },
-  { slug: "heaps", file: "components/visualizer/heap/Heap problems data.tsx" },
-  { slug: "graphs", file: "components/visualizer/graph/Graph problems data.ts" },
+  { slug: "arrays", files: ["components/visualizer/array/Array problems data.ts"] },
+  { slug: "sorting", files: ["components/visualizer/sorting/sorting-problems-data.ts"] },
+  { slug: "linked-lists", files: ["components/visualizer/linked-list/linked-list-problems-data.ts"] },
+  { slug: "stacks", files: ["components/visualizer/stack/stack-problems-data.ts"] },
+  { slug: "queues", files: ["components/visualizer/queue/queue-problems-data.ts"] },
+  { slug: "binary-tree", files: ["components/visualizer/binary-tree/Binary tree problems data.tsx"] },
+  { slug: "heaps", files: ["components/visualizer/heap/Heap problems data.tsx"] },
+  { slug: "graphs", files: ["components/visualizer/graph/Graph problems data.ts"] },
+  {
+    slug: "recursion",
+    files: [
+      "components/visualizer/recursion/recursion-problems-core.ts",
+      "components/visualizer/recursion/recursion-problems-beginner.ts",
+      "components/visualizer/recursion/recursion-problems-intermediate.ts",
+      "components/visualizer/recursion/recursion-problems-advanced.ts",
+    ],
+  },
 ]
 
 const EXPECTED = {
@@ -30,18 +39,21 @@ const EXPECTED = {
   "binary-tree": 10,
   heaps: 10,
   graphs: 10,
+  recursion: 20,
 }
 
 let drifted = false
 
-for (const { slug, file } of FILES) {
-  const content = readFileSync(join(root, file), "utf8")
-  const matches = content.match(/^\s{2}slug: "/gm) ?? []
-  const actual = matches.length
+for (const { slug, files } of FILES) {
+  const actual = files.reduce((sum, file) => {
+    const content = readFileSync(join(root, file), "utf8")
+    const matches = content.match(/^\s{2}slug: "/gm) ?? []
+    return sum + matches.length
+  }, 0)
   const expected = EXPECTED[slug]
   if (actual !== expected) {
     drifted = true
-    console.error(`✗ ${slug}: lib/topics.ts says ${expected}, but ${file} actually has ${actual}. Update lib/topics.ts.`)
+    console.error(`✗ ${slug}: lib/topics.ts says ${expected}, but source file(s) actually have ${actual}. Update lib/topics.ts.`)
   } else {
     console.log(`✓ ${slug}: ${actual}`)
   }

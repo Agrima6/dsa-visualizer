@@ -98,6 +98,11 @@ const featureList: FeatureProps[] = [
     url: "/visualizer/heap",
   },
   {
+    title: "Recursion",
+    description: "20 interview questions with a real call-stack visualization.",
+    url: "/visualizer/recursion",
+  },
+  {
     title: "Infix to Postfix",
     description: "Convert expressions using stack logic.",
     url: "/visualizer/stack-applications",

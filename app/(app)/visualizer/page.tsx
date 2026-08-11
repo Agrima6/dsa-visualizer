@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BrainCircuit, Binary, TreePine, Box, List, ArrowLeftRight, Calculator, MessageSquare, Hash, ArrowRightLeft, Gauge, Parentheses } from "lucide-react"
+import { BrainCircuit, Binary, TreePine, Box, List, ArrowLeftRight, Calculator, MessageSquare, Hash, ArrowRightLeft, Gauge, Parentheses, Repeat } from "lucide-react"
 import Link from "next/link"
 
 const sections = {
@@ -54,6 +54,12 @@ const sections = {
       description: "Complete binary tree with heap property. Switch between min and max heaps.",
       href: "/visualizer/heap",
       icon: Box,
+    },
+    {
+      name: "Recursion",
+      description: "20 interview questions from base cases to backtracking, with a real call-stack visualization.",
+      href: "/visualizer/recursion",
+      icon: Repeat,
     },
   ],
   applications: [

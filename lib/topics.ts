@@ -28,6 +28,7 @@ export const TOPIC_REGISTRY: TopicMeta[] = [
   { slug: "binary-tree", label: "Binary Tree", total: 10 },
   { slug: "heaps", label: "Heaps", total: 10 },
   { slug: "graphs", label: "Graphs", total: 10 },
+  { slug: "recursion", label: "Recursion", total: 20 },
 ]
 
 export const TOPIC_SLUGS = new Set(TOPIC_REGISTRY.map((t) => t.slug))

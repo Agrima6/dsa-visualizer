@@ -93,6 +93,14 @@ const topics: Topic[] = [
     url: "/visualizer/graph?mode=code",
     tag: "Hot",
   },
+  {
+    title: "Recursion",
+    questions: 20,
+    companies: ["Google", "Amazon", "Meta", "Microsoft"],
+    difficulty: "Medium",
+    url: "/visualizer/recursion?mode=code",
+    tag: "Must Do",
+  },
 ];
 
 const difficultyConfig = {

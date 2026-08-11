@@ -1,6 +1,6 @@
 "use client"
 
-import { Binary, Home, Database, BrainCircuit, TreePine, List, SquareStack, SquareChevronLeft, Equal, MessageSquare, X, Hash, ArrowRightLeft, Gauge, Parentheses } from "lucide-react"
+import { Binary, Home, Database, BrainCircuit, TreePine, List, SquareStack, SquareChevronLeft, Equal, MessageSquare, X, Hash, ArrowRightLeft, Gauge, Parentheses, Repeat } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -77,6 +77,12 @@ const dataStructures = [
     url: "/visualizer/heap",
     icon: Database,
     description: "Binary heap implementation with max/min heap variants",
+  },
+  {
+    name: "Recursion",
+    url: "/visualizer/recursion",
+    icon: Repeat,
+    description: "20 interview questions from base cases to backtracking, with a real call-stack visualization",
   },
 ]
 
