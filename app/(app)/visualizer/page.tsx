@@ -1,5 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BrainCircuit, Binary, TreePine, Box, List, ArrowLeftRight, Calculator, MessageSquare, Hash, ArrowRightLeft, Gauge, Parentheses, Repeat } from "lucide-react"
+import { BrainCircuit, Binary, Box, List, ArrowLeftRight, Calculator, MessageSquare, Hash, ArrowRightLeft, Gauge, Parentheses, Repeat, Sparkles, ArrowUpRight } from "lucide-react"
 import Link from "next/link"
 
 const sections = {
@@ -18,7 +17,7 @@ const sections = {
     },
   ],
   dataStructures: [
-       {
+    {
       name: "Linked List",
       description: "Dynamic data structure with nodes connected through references. Explore different types of linked lists.",
       href: "/visualizer/linked-list",
@@ -26,7 +25,7 @@ const sections = {
     },
     {
       name: "Sorting",
-      description: "Do Sorting in an interactive way.",
+      description: "Watch sorting algorithms run step by step — bubble, merge, quick, insertion, and more.",
       href: "/visualizer/sorting",
       icon: List,
     },
@@ -48,7 +47,6 @@ const sections = {
       href: "/visualizer/binary-tree",
       icon: Binary,
     },
-  
     {
       name: "Heap",
       description: "Complete binary tree with heap property. Switch between min and max heaps.",
@@ -83,7 +81,7 @@ const sections = {
     },
     {
       name: "Huffman Coding",
-      description: "Huffman coding is a popular data compression technique that creates variable-length prefix codes based on the frequency of characters in the input text.",
+      description: "A popular data compression technique that creates variable-length prefix codes based on character frequency.",
       href: "/visualizer/huffman",
       icon: Hash,
     },
@@ -93,96 +91,116 @@ const sections = {
       href: "/visualizer/dijkstra",
       icon: ArrowRightLeft,
     },
-  ]
+  ],
+}
+
+const stats = [
+  { label: "Topics", value: `${sections.concepts.length + sections.dataStructures.length + sections.applications.length}` },
+  { label: "Practice questions", value: "100+" },
+  { label: "Companies covered", value: "10+" },
+]
+
+function TopicCard({
+  name,
+  description,
+  href,
+  icon: Icon,
+  accent = false,
+}: {
+  name: string
+  description: string
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  accent?: boolean
+}) {
+  return (
+    <Link
+      href={href}
+      className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border p-6 transition-all duration-200 ${
+        accent
+          ? "border-violet-500/20 bg-gradient-to-br from-violet-500/8 via-background to-blue-500/8 hover:border-violet-500/40 hover:from-violet-500/12 hover:to-blue-500/12"
+          : "border-border/60 bg-card hover:border-violet-500/30 hover:bg-muted/40"
+      }`}
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-violet-500/15 bg-violet-500/10 text-violet-500 transition-colors group-hover:bg-violet-500/20">
+          <Icon className="h-5 w-5" />
+        </div>
+        <ArrowUpRight className="h-4 w-4 text-muted-foreground/50 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100" />
+      </div>
+      <h3 className="mt-4 text-base font-semibold tracking-tight">{name}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+    </Link>
+  )
 }
 
 export default function HomePage() {
   return (
-    <div className="container py-8 max-w-7xl mx-auto">
-      <div className="flex flex-col items-center text-center mb-12">
-        <div className="flex items-center gap-3 mb-6">
-          <BrainCircuit className="h-10 w-10" />
-          <h1 className="text-3xl font-bold tracking-tight">AlgoMaitri </h1>
+    <div className="relative">
+      {/* Hero */}
+      <section className="relative -mx-3 -mt-3 overflow-hidden px-3 pb-10 pt-8 sm:-mx-10 sm:-mt-10 sm:px-10 sm:pt-10">
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute left-1/4 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-violet-600/15 blur-[100px]" />
+          <div className="absolute right-1/4 top-10 h-60 w-60 rounded-full bg-blue-500/10 blur-[80px]" />
         </div>
-        <p className="text-muted-foreground text-lg max-w-2xl">
-          Interactive visualizations to help you understand data structures and algorithms.
-          Explore, learn, and see how they work in real-time.
-        </p>
-      </div>
 
-      <div className="space-y-12">
+        <span className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-violet-500">
+          <BrainCircuit className="h-3.5 w-3.5" />
+          Interactive DSA Visualizer
+        </span>
+
+        <h1 className="mt-5 max-w-2xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
+          <span className="hero-gradient-text">Pick a topic,</span>
+          <br />
+          <span className="text-foreground">watch it run.</span>
+        </h1>
+
+        <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
+          Every data structure and algorithm here is a real, step-by-step animation —
+          not a diagram. Explore concepts, core data structures, and classic applications.
+        </p>
+
+        <div className="mt-8 flex flex-wrap items-center gap-6">
+          {stats.map(({ label, value }) => (
+            <div key={label} className="flex items-baseline gap-1.5">
+              <span className="text-2xl font-bold hero-gradient-text">{value}</span>
+              <span className="text-sm text-muted-foreground">{label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="space-y-14 pb-4">
         {/* Concepts Section */}
         <section>
-          <h2 className="text-2xl font-semibold mb-6">Concepts</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sections.concepts.map((c) => {
-              const Icon = c.icon
-              return (
-                <Link key={c.href} href={c.href}>
-                  <Card className="h-full border-violet-500/20 bg-gradient-to-br from-violet-500/5 to-blue-500/5 hover:from-violet-500/10 hover:to-blue-500/10 transition-colors">
-                    <CardHeader>
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-6 w-6" />
-                        <CardTitle>{c.name}</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-base">{c.description}</CardDescription>
-                    </CardContent>
-                  </Card>
-                </Link>
-              )
-            })}
+          <div className="mb-6 flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-violet-500" />
+            <h2 className="text-xl font-semibold tracking-tight">Concepts</h2>
+          </div>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            {sections.concepts.map((c) => (
+              <TopicCard key={c.href} {...c} accent />
+            ))}
           </div>
         </section>
 
         {/* Data Structures Section */}
         <section>
-          <h2 className="text-2xl font-semibold mb-6">Data Structures</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sections.dataStructures.map((ds) => {
-              const Icon = ds.icon
-              return (
-                <Link key={ds.href} href={ds.href}>
-                  <Card className="h-full hover:bg-muted/50 transition-colors">
-                    <CardHeader>
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-6 w-6" />
-                        <CardTitle>{ds.name}</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-base">{ds.description}</CardDescription>
-                    </CardContent>
-                  </Card>
-                </Link>
-              )
-            })}
+          <h2 className="mb-6 text-xl font-semibold tracking-tight">Data Structures</h2>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {sections.dataStructures.map((ds) => (
+              <TopicCard key={ds.href} {...ds} />
+            ))}
           </div>
         </section>
 
         {/* Applications Section */}
         <section>
-          <h2 className="text-2xl font-semibold mb-6">Applications</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sections.applications.map((app) => {
-              const Icon = app.icon
-              return (
-                <Link key={app.href} href={app.href}>
-                  <Card className="h-full hover:bg-muted/50 transition-colors">
-                    <CardHeader>
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-6 w-6" />
-                        <CardTitle>{app.name}</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-base">{app.description}</CardDescription>
-                    </CardContent>
-                  </Card>
-                </Link>
-              )
-            })}
+          <h2 className="mb-6 text-xl font-semibold tracking-tight">Applications</h2>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {sections.applications.map((app) => (
+              <TopicCard key={app.href} {...app} />
+            ))}
           </div>
         </section>
       </div>
