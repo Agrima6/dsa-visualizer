@@ -4,6 +4,11 @@ import { CTA } from "@/components/landing/cta";
 import { Navbar } from "@/components/navigation/navbar";
 import InteractiveDots from "@/components/interactive-dots";
 
+export const metadata = {
+  title: "AlgoMaitri — Visual DSA Studio",
+  description: "Interactive visualizations for data structures and algorithms — learn by watching real code execute.",
+}
+
 export default function Home() {
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-background">

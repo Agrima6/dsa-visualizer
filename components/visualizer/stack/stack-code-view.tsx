@@ -2,6 +2,7 @@
 // components/visualizer/stack/stack-code-view.tsx
 
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import {
   STACK_PROBLEMS,
@@ -98,9 +99,11 @@ function CompanyLogoBadge({
       title={logo?.label || company}
     >
       {logo?.src ? (
-        <img
+        <Image
           src={logo.src}
           alt={logo.label}
+          width={compact ? 14 : 16}
+          height={compact ? 14 : 16}
           className={cn(
             "block w-auto object-contain",
             compact ? "h-3.5 max-w-[14px]" : "h-4 max-w-[16px]"

@@ -168,7 +168,7 @@ export function CallStackWalkthrough() {
             )}
 
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" onClick={() => { setStepIdx(0); setPlaying(false) }} title="Restart">
+              <Button variant="outline" size="icon" onClick={() => { setStepIdx(0); setPlaying(false) }} title="Restart" aria-label="Restart">
                 <RotateCcw className="h-4 w-4" />
               </Button>
               <Button
@@ -176,6 +176,7 @@ export function CallStackWalkthrough() {
                 size="icon"
                 onClick={() => { setPlaying(false); setStepIdx((i) => Math.max(0, i - 1)) }}
                 disabled={stepIdx === 0}
+                aria-label="Previous step"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -192,6 +193,7 @@ export function CallStackWalkthrough() {
                 size="icon"
                 onClick={() => { setPlaying(false); setStepIdx((i) => Math.min(steps.length - 1, i + 1)) }}
                 disabled={stepIdx >= steps.length - 1}
+                aria-label="Next step"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>

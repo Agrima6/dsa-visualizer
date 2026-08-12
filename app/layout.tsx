@@ -7,11 +7,27 @@ import { ClerkProvider } from "@clerk/nextjs"
 import { ProgressProvider } from "@/hooks/use-progress"
 
 export const metadata: Metadata = {
-  title: "AlgoMaitri",
-  description: "AlgoMaitri is a tool for visualizing data structures",
+  metadataBase: new URL("https://algomaitri.com"),
+  title: "AlgoMaitri — Visual DSA Studio",
+  description:
+    "Interactive visualizations for data structures and algorithms — learn arrays, trees, graphs, sorting, recursion, and more by watching real code execute.",
   icons: {
     icon: "/algomaitri-logo.svg",
     shortcut: "/algomaitri-logo.svg",
+  },
+  openGraph: {
+    title: "AlgoMaitri — Visual DSA Studio",
+    description:
+      "Interactive visualizations for data structures and algorithms — learn by watching real code execute.",
+    url: "https://algomaitri.com",
+    siteName: "AlgoMaitri",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AlgoMaitri — Visual DSA Studio",
+    description:
+      "Interactive visualizations for data structures and algorithms — learn by watching real code execute.",
   },
 }
 

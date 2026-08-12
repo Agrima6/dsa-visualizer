@@ -78,7 +78,7 @@ const binarySearch: AlgorithmDemo = {
     const input = range(n, (i) => i * 2)
     const target = -1
     const steps: AlgoStep[] = []
-    let lo = 0
+    const lo = 0
     let hi = input.length - 1
     let ops = 0
 

@@ -805,8 +805,8 @@ empty() → false`,
 }`,
   generateSteps() {
     const steps: StackVisStep[] = []
-    let inbox: number[] = []
-    let outbox: number[] = []
+    const inbox: number[] = []
+    const outbox: number[] = []
 
     const snap = (hl: number[], msg: string, line: number) => {
       const stackFrames = [

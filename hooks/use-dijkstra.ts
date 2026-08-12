@@ -77,10 +77,7 @@ export function useDijkstra() {
   }
 
   const findShortestPath = async () => {
-    console.log("Starting pathfinding:", { startNodeId, endNodeId, isAnimating })
-    
     if (!startNodeId || !endNodeId || isAnimating) {
-      console.log("Cannot find path:", { startNodeId, endNodeId, isAnimating })
       return
     }
 
@@ -101,8 +98,6 @@ export function useDijkstra() {
       }
     })
 
-    console.log("Initial distances:", Object.fromEntries(distances))
-
     const steps: Step[] = []
     
     // Add initial step
@@ -117,15 +112,11 @@ export function useDijkstra() {
     let current: string | null = startNodeId
     
     while (unvisited.size > 0 && current) {
-      const currentDistance = distances.get(current) || Infinity
-      console.log(`Processing node ${current} with distance ${currentDistance}`)
-
       // Mark as visited
       unvisited.delete(current)
       const visited = new Set(graph.nodes.map(n => n.id).filter(id => !unvisited.has(id)))
 
       if (current === endNodeId) {
-        console.log("Found end node!")
         break
       }
 
@@ -137,15 +128,12 @@ export function useDijkstra() {
           weight: e.weight
         }))
 
-      console.log("Checking neighbors:", neighbors)
-
       for (const { node: neighbor, weight } of neighbors) {
         if (unvisited.has(neighbor)) {
           const newDistance = (distances.get(current) || 0) + weight
           const currentDistance = distances.get(neighbor) || Infinity
-          
+
           if (newDistance < currentDistance) {
-            console.log(`Updating distance to ${neighbor}: ${currentDistance} -> ${newDistance}`)
             distances.set(neighbor, newDistance)
             previous.set(neighbor, current)
           }
@@ -201,9 +189,6 @@ export function useDijkstra() {
       })
     }
 
-    console.log("Final distances:", Object.fromEntries(distances))
-    console.log("Final steps:", steps)
-    
     setSteps(steps)
     setCurrentStep(0)
     

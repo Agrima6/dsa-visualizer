@@ -267,7 +267,7 @@ const kthLargestStream: HeapProblem = {
     steps.push(hframe([], [], [], [],
       `k=3. Min-heap of size ≤ 3. Root will always be the 3rd largest.`, 1))
 
-    let heapVals: number[] = []
+    const heapVals: number[] = []
     for (const val of adds) {
       heapVals.push(val)
       heapVals.sort((a, b) => a - b)
@@ -368,7 +368,7 @@ const kClosestPoints: HeapProblem = {
       `k=${k}. Process each point. Max-heap stores k closest (farthest at root).`, 1))
 
     const dist = (p: number[]) => p[0] * p[0] + p[1] * p[1]
-    let held: { point: number[]; d: number }[] = []
+    const held: { point: number[]; d: number }[] = []
 
     for (const p of points) {
       held.push({ point: p, d: dist(p) })
@@ -473,7 +473,7 @@ const kthLargestArray: HeapProblem = {
     steps.push(hframe([], [], [], [],
       `k=${k}. Build min-heap of size k. Root will be the ${k}nd largest.`, 1))
 
-    let heap: number[] = []
+    const heap: number[] = []
     for (const n of nums) {
       heap.push(n)
       heap.sort((a, b) => a - b)

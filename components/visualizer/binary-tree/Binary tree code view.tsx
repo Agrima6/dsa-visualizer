@@ -2,6 +2,7 @@
 // components/visualizer/binary-tree/binary-tree-code-view.tsx
 
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useUser, SignInButton } from "@clerk/nextjs"
 import { Zap } from "lucide-react"
@@ -88,7 +89,7 @@ function CompanyLogoBadge({ company, compact = false }: { company: Company; comp
     <div className={cn("inline-flex shrink-0 items-center justify-center rounded-full border border-violet-500/10 bg-white/85 shadow-sm dark:bg-white/[0.04]",
       compact ? "h-7 w-7" : "h-8 w-8")} title={logo?.label || company}>
       {logo?.src ? (
-        <img src={logo.src} alt={logo.label}
+        <Image src={logo.src} alt={logo.label} width={compact ? 14 : 16} height={compact ? 14 : 16}
           className={cn("block w-auto object-contain", compact ? "h-3.5 max-w-[14px]" : "h-4 max-w-[16px]")}
           onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none" }} />
       ) : (

@@ -2,6 +2,7 @@
 // components/visualizer/graph/graph-code-view.tsx
 
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import { useUser, SignInButton } from "@clerk/nextjs"
 import {
   GRAPH_PROBLEMS,
@@ -59,7 +60,7 @@ function Badge({ company, compact=false }:{ company:Company; compact?:boolean })
   const l = LOGO[company]
   return (
     <div className={cn("inline-flex shrink-0 items-center justify-center rounded-full border border-violet-500/10 bg-white/85 shadow-sm dark:bg-white/[0.04]", compact?"h-7 w-7":"h-8 w-8")} title={l?.label}>
-      {l?.src?<img src={l.src} alt={l.label} className={cn("block w-auto object-contain",compact?"h-3.5 max-w-[14px]":"h-4 max-w-[16px]")} onError={e=>{(e.currentTarget as HTMLImageElement).style.display="none"}}/>
+      {l?.src?<Image src={l.src} alt={l.label} width={compact?14:16} height={compact?14:16} className={cn("block w-auto object-contain",compact?"h-3.5 max-w-[14px]":"h-4 max-w-[16px]")} onError={e=>{(e.currentTarget as HTMLImageElement).style.display="none"}}/>
              :<span className={cn("font-medium text-muted-foreground",compact?"text-[7px]":"text-[8px]")}>{company.slice(0,2)}</span>}
     </div>
   )

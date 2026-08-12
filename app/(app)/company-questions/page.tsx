@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Building2, CheckCircle2, Code2, ChevronRight, Flame, Star, Zap } from "lucide-react";
 import { useProgress } from "@/hooks/use-progress";
@@ -223,7 +224,7 @@ export default function CompanyQuestionsPage() {
                 >
                   {/* ✅ Fix: use src for image, fall back to logo text */}
                   {src ? (
-                    <img src={src} alt={name} className="h-3.5 w-3.5 object-contain" />
+                    <Image src={src} alt={name} width={14} height={14} className="h-3.5 w-3.5 object-contain" />
                   ) : (
                     logo
                   )}

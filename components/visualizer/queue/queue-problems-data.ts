@@ -168,7 +168,7 @@ empty() → false`,
 }`,
   generateSteps() {
     const steps: QueueVisStep[] = []
-    let q: number[] = []
+    const q: number[] = []
 
     const snap = (hl: number[], msg: string, line: number, aux: { label: string; value: string | number }[] = []) => {
       steps.push(frame(q.map((v, i) => ({ value: v, label: i === 0 ? "FRONT (top)" : undefined })), hl, msg, line, aux))

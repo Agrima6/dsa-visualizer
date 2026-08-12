@@ -2,6 +2,7 @@
 // components/visualizer/heap/heap-code-view.tsx
 
 import { useState, useEffect, useRef } from "react"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useUser, SignInButton } from "@clerk/nextjs"
 import {
@@ -101,8 +102,8 @@ function CompanyLogoBadge({ company, compact = false }: { company: Company; comp
       title={logo?.label || company}
     >
       {logo?.src ? (
-        <img
-          src={logo.src} alt={logo.label}
+        <Image
+          src={logo.src} alt={logo.label} width={compact ? 14 : 16} height={compact ? 14 : 16}
           className={cn("block w-auto object-contain", compact ? "h-3.5 max-w-[14px]" : "h-4 max-w-[16px]")}
           onError={(e) => { ;(e.currentTarget as HTMLImageElement).style.display = "none" }}
         />

@@ -157,9 +157,7 @@ export function useBinaryTree() {
     try {
       await traverseWithAnimation(
         tree,
-        (node) => {
-          console.log("Visiting:", node.value)
-        },
+        () => {},
         "inorder"
       )
     } finally {
@@ -185,9 +183,7 @@ export function useBinaryTree() {
     try {
       await traverseWithAnimation(
         tree,
-        (node) => {
-          console.log("Visiting:", node.value)
-        },
+        () => {},
         "preorder"
       )
     } finally {
@@ -213,9 +209,7 @@ export function useBinaryTree() {
     try {
       await traverseWithAnimation(
         tree,
-        (node) => {
-          console.log("Visiting:", node.value)
-        },
+        () => {},
         "postorder"
       )
     } finally {

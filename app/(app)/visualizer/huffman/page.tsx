@@ -1,5 +1,10 @@
 import { HuffmanVisualizer } from "@/components/visualizer/huffman/huffman-visualizer"
 
+export const metadata = {
+  title: "Huffman Coding Visualizer | AlgoMaitri",
+  description: "Visualize Huffman coding — a data compression technique that creates variable-length prefix codes based on character frequency.",
+}
+
 const content = `
 # Huffman Coding
 

@@ -1,14 +1,31 @@
 import { NextRequest } from "next/server"
 
+// Auth here is the pre-launch gate-password cookie enforced globally by
+// middleware.ts for every non-public route — not Clerk. Narration is used
+// by anyone who's passed the gate, whether or not they have a Clerk
+// account, so this route intentionally doesn't require a Clerk session.
+const MAX_TEXT_LENGTH = 500
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const text = body.text
 
-    if (!text) {
+    if (!text || typeof text !== "string") {
       return Response.json(
         {
           error: "Text is required",
+        },
+        {
+          status: 400,
+        }
+      )
+    }
+
+    if (text.length > MAX_TEXT_LENGTH) {
+      return Response.json(
+        {
+          error: `Text must be ${MAX_TEXT_LENGTH} characters or fewer.`,
         },
         {
           status: 400,
