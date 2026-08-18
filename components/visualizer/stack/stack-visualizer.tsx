@@ -10,6 +10,7 @@ import { StackOperations } from "@/components/visualizer/stack/stack-operations"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MarkdownContent } from "@/components/shared/markdown-content"
 import { useStack } from "@/hooks/use-stack"
+import { StackAnalogy } from "./stack-analogy"
 import StackCodeView from "./stack-code-view"
 
 interface StackVisualizerProps {
@@ -61,8 +62,14 @@ function StackVisualizerOriginal({ content }: StackVisualizerProps) {
       </div>
 
       {/* TABS */}
-      <Tabs defaultValue="visualization" className="w-full space-y-6">
-        <TabsList className="grid w-full grid-cols-2 rounded-xl bg-white/60 backdrop-blur-lg border border-violet-500/10 dark:bg-white/[0.05]">
+      <Tabs defaultValue="understand" className="w-full space-y-6">
+        <TabsList className="grid w-full grid-cols-3 rounded-xl bg-white/60 backdrop-blur-lg border border-violet-500/10 dark:bg-white/[0.05]">
+          <TabsTrigger
+            value="understand"
+            className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
+          >
+            Understand
+          </TabsTrigger>
           <TabsTrigger
             value="visualization"
             className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
@@ -76,6 +83,11 @@ function StackVisualizerOriginal({ content }: StackVisualizerProps) {
             Explanation
           </TabsTrigger>
         </TabsList>
+
+        {/* UNDERSTAND TAB */}
+        <TabsContent value="understand">
+          <StackAnalogy />
+        </TabsContent>
 
         {/* VISUALIZATION TAB */}
         <TabsContent value="visualization" className="space-y-6">

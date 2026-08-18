@@ -12,10 +12,10 @@ import {
 } from "react"
 import { useUser } from "@clerk/nextjs"
 import {
-  type UserProgress, type ProblemEntry,
+  type UserProgress, type ProblemEntry, type BugSpotEntry,
   EMPTY_PROGRESS,
   applyMarkSolved, applyMarkMultipleSolved, applyUnmarkSolved,
-  applySetDailyGoal, applyUpdateNotes,
+  applySetDailyGoal, applyUpdateNotes, applySpotBug,
 } from "@/lib/user-progress"
 
 interface ProgressCtx {
@@ -28,6 +28,8 @@ interface ProgressCtx {
   isSolved: (slug: string) => boolean
   setDailyGoal: (n: number) => Promise<void>
   updateNotes: (slug: string, notes: string) => Promise<void>
+  spotBug: (entry: Omit<BugSpotEntry, "spottedAt">) => Promise<void>
+  getBugSpotResult: (slug: string) => BugSpotEntry | undefined
   refresh: () => Promise<void>
 }
 
@@ -139,8 +141,19 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     await mutate(optimistic, previous, { action: "updateNotes", slug, notes })
   }, [user, progress, mutate])
 
+  const spotBug = useCallback(async (entry: Omit<BugSpotEntry, "spottedAt">) => {
+    if (!user) return
+    const previous = progress
+    const optimistic = applySpotBug(progress, entry)
+    if (optimistic === previous) return // already attempted
+    await mutate(optimistic, previous, { action: "spotBug", entry })
+  }, [user, progress, mutate])
+
+  const getBugSpotResult = useCallback((slug: string) =>
+    progress.bugsSpotted.find((b) => b.slug === slug), [progress])
+
   return (
-    <Ctx.Provider value={{ progress, loading, error, markSolved, markMultipleSolved, unmarkSolved, isSolved, setDailyGoal, updateNotes, refresh }}>
+    <Ctx.Provider value={{ progress, loading, error, markSolved, markMultipleSolved, unmarkSolved, isSolved, setDailyGoal, updateNotes, spotBug, getBugSpotResult, refresh }}>
       {children}
     </Ctx.Provider>
   )

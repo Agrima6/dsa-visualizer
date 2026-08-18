@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { AlertTriangle, Sparkles } from "lucide-react"
+import { AlertTriangle, Sparkles, Bug } from "lucide-react"
 import { useProgress } from "@/hooks/use-progress"
-import { getDailyProgress, getTopicStats } from "@/lib/user-progress"
+import { getDailyProgress, getTopicStats, getBugSpotStats } from "@/lib/user-progress"
 import { useUser } from "@clerk/nextjs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Navbar } from "@/components/navigation/navbar"
@@ -55,6 +55,7 @@ export default function DashboardClient() {
   const today = getDailyProgress(progress)
   const calendarDays = getCalendarDays()
   const topics = getTopicStats(progress)
+  const bugStats = getBugSpotStats(progress)
   const solved = progress.solvedProblems.length
   const firstName = user?.firstName || user?.username || "there"
   const isFirstVisit = solved === 0
@@ -102,7 +103,7 @@ export default function DashboardClient() {
           </section>
         )}
 
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <Metric label="Topics opened" value={solved} note="Saved to your account" />
           <Metric
             label="Current streak"
@@ -111,6 +112,12 @@ export default function DashboardClient() {
           />
           <Metric label="Today" value={`${today} / ${progress.dailyGoal}`} note="Practice goal" />
           <Metric label="XP" value={progress.xp} note="10 / 25 / 50 per Easy / Medium / Hard" />
+          <Metric
+            icon={<Bug className="h-3.5 w-3.5" />}
+            label="Bugs spotted"
+            value={bugStats.attempts ? `${bugStats.correct}/${bugStats.attempts}` : "—"}
+            note={bugStats.attempts ? `${bugStats.accuracy}% accuracy` : "Try it on a Sorting problem"}
+          />
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_.8fr]">
@@ -201,10 +208,23 @@ export default function DashboardClient() {
   )
 }
 
-function Metric({ label, value, note }: { label: string; value: string | number; note: string }) {
+function Metric({
+  label,
+  value,
+  note,
+  icon,
+}: {
+  label: string
+  value: string | number
+  note: string
+  icon?: React.ReactNode
+}) {
   return (
     <div className="rounded-3xl border bg-card p-5">
-      <p className="text-sm text-muted-foreground">{label}</p>
+      <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        {icon}
+        {label}
+      </p>
       <p className="mt-2 text-3xl font-bold">{value}</p>
       <p className="mt-1 text-xs text-muted-foreground">{note}</p>
     </div>

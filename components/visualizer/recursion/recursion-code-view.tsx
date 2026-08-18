@@ -9,6 +9,7 @@ import {
   type RecursionProblem,
 } from "./recursion-problems-data"
 import type { Difficulty, Company, StackFrame } from "./recursion-problem-types"
+import { HanoiPegsViz } from "./hanoi-pegs-viz"
 
 declare global {
   interface Window {
@@ -83,6 +84,9 @@ function cn(...classes: (string | false | null | undefined)[]) {
 }
 
 function isProblemLocked(problem: RecursionProblem, unlockedTopics: string[]) {
+  // Dev-only bypass so Tower of Hanoi's new peg animation can be tested
+  // locally without a real payment. Never active in production builds.
+  if (process.env.NODE_ENV !== "production" && problem.slug === "tower-of-hanoi") return false
   return LOCKED_IDS.has(problem.slug) && !unlockedTopics.includes(problem.slug)
 }
 
@@ -809,6 +813,15 @@ function ProblemDetail({
               </div>
 
               <div className="px-4 py-4 space-y-3">
+                {problem.slug === "tower-of-hanoi" && (
+                  <div>
+                    <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-fuchsia-400">Pegs</p>
+                    <div className="rounded-2xl border border-violet-500/8 bg-white/45 dark:bg-white/[0.02]">
+                      <HanoiPegsViz n={3} movesSoFar={current?.result ?? []} />
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-violet-400">Call Stack</p>
                   <CallStackViz stack={current?.stack ?? []} />

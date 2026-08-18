@@ -33,7 +33,7 @@ const constantAccess: AlgorithmDemo = {
   id: "constant",
   label: "Array Access",
   complexityId: "o1",
-  code: `function getFirst(arr) {
+  code: `function algoMaitriGetFirst(arr) {
   return arr[0];
 }`,
   inputHint: (n) => `arr has ${n} elements`,
@@ -60,7 +60,7 @@ const binarySearch: AlgorithmDemo = {
   id: "binary-search",
   label: "Binary Search",
   complexityId: "ologn",
-  code: `function binarySearch(arr, target) {
+  code: `function algoMaitriBinarySearch(arr, target) {
   let lo = 0, hi = arr.length - 1;
 
   while (lo <= hi) {
@@ -114,7 +114,7 @@ const linearSearch: AlgorithmDemo = {
   id: "linear-search",
   label: "Linear Search",
   complexityId: "on",
-  code: `function linearSearch(arr, target) {
+  code: `function algoMaitriLinearSearch(arr, target) {
   for (let i = 0; i < arr.length; i++) {
     if (arr[i] === target) return i;
   }
@@ -158,7 +158,7 @@ const bubbleSort: AlgorithmDemo = {
   id: "bubble-sort",
   label: "Bubble Sort",
   complexityId: "on2",
-  code: `function bubbleSort(arr) {
+  code: `function algoMaitriBubbleSort(arr) {
   for (let i = 0; i < arr.length - 1; i++) {
     for (let j = 0; j < arr.length - 1 - i; j++) {
       if (arr[j] > arr[j + 1]) {
@@ -221,12 +221,12 @@ const mergeSortDemo: AlgorithmDemo = {
   id: "merge-sort",
   label: "Merge Sort",
   complexityId: "onlogn",
-  code: `function mergeSort(arr) {
+  code: `function algoMaitriMergeSort(arr) {
   if (arr.length <= 1) return arr;
 
   const mid = Math.floor(arr.length / 2);
-  const left = mergeSort(arr.slice(0, mid));
-  const right = mergeSort(arr.slice(mid));
+  const left = algoMaitriMergeSort(arr.slice(0, mid));
+  const right = algoMaitriMergeSort(arr.slice(mid));
 
   return merge(left, right);
 }

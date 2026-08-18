@@ -121,7 +121,7 @@ export function CallStackWalkthrough() {
                     backgroundColor: i === step.stack.length - 1 ? `${concept.color}14` : "transparent",
                   }}
                 >
-                  <p className="font-mono font-semibold">{frame.label}</p>
+                  <p className="font-mono font-semibold break-words">{frame.label}</p>
                   {frame.vars.length > 0 && (
                     <div className="mt-1 space-y-0.5">
                       {frame.vars.map((v) => (

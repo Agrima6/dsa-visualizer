@@ -10,6 +10,9 @@ import {
   type Difficulty,
   type Company,
 } from "./sorting-problems-data"
+import { Bug } from "lucide-react"
+import { SORTING_BUG_BY_SLUG } from "./sorting-bug-registry"
+import { SpotTheBugPanel } from "./spot-the-bug-panel"
 
 declare global {
   interface Window {
@@ -879,7 +882,8 @@ function ProblemDetail({
   const [currentStep, setCurrentStep] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [speed, setSpeed] = useState(700)
-  const [activeTab, setActiveTab] = useState<"description" | "approaches" | "pitfalls">("description")
+  const [activeTab, setActiveTab] = useState<"description" | "approaches" | "pitfalls" | "bug">("description")
+  const bugVariant = SORTING_BUG_BY_SLUG[problem.slug]
   const [vizMode, setVizMode] = useState<"both" | "boxes" | "bars">("both")
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const codeRef = useRef<HTMLDivElement>(null)
@@ -1231,18 +1235,22 @@ function ProblemDetail({
 
         <div className={cn(PANEL, "overflow-hidden")}>
           <div className="flex border-b border-violet-500/10 px-2">
-            {(["description", "approaches", "pitfalls"] as const).map((tab) => (
+            {([
+              "description", "approaches", "pitfalls",
+              ...(bugVariant ? ["bug"] as const : []),
+            ] satisfies Array<"description" | "approaches" | "pitfalls" | "bug">).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  "px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] transition-all",
+                  "flex items-center gap-1.5 px-5 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] transition-all",
                   activeTab === tab
-                    ? "text-violet-500 border-b-2 border-violet-500"
+                    ? tab === "bug" ? "text-rose-500 border-b-2 border-rose-500" : "text-violet-500 border-b-2 border-violet-500"
                     : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                {tab}
+                {tab === "bug" && <Bug className="h-3.5 w-3.5" />}
+                {tab === "bug" ? "Spot the Bug" : tab}
               </button>
             ))}
           </div>
@@ -1324,6 +1332,10 @@ function ProblemDetail({
                   </div>
                 ))}
               </div>
+            )}
+
+            {activeTab === "bug" && bugVariant && (
+              <SpotTheBugPanel problem={problem} variant={bugVariant} />
             )}
           </div>
         </div>

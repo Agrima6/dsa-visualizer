@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MarkdownContent } from "@/components/shared/markdown-content"
 import { useQueue } from "@/hooks/use-queue"
 import { Sparkles } from "lucide-react"
+import { QueueAnalogy } from "./queue-analogy"
 import QueueCodeView from "./queue-code-view"
 
 interface QueueVisualizerProps {
@@ -69,8 +70,14 @@ function QueueVisualizerOriginal({ content }: QueueVisualizerProps) {
       </div>
 
       {/* TABS */}
-      <Tabs defaultValue="visualization" className="w-full space-y-6">
-        <TabsList className="grid w-full grid-cols-2 rounded-2xl border border-violet-500/12 bg-white/65 p-1 backdrop-blur-lg dark:bg-white/[0.04]">
+      <Tabs defaultValue="understand" className="w-full space-y-6">
+        <TabsList className="grid w-full grid-cols-3 rounded-2xl border border-violet-500/12 bg-white/65 p-1 backdrop-blur-lg dark:bg-white/[0.04]">
+          <TabsTrigger
+            value="understand"
+            className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
+          >
+            Understand
+          </TabsTrigger>
           <TabsTrigger
             value="visualization"
             className="rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white"
@@ -84,6 +91,11 @@ function QueueVisualizerOriginal({ content }: QueueVisualizerProps) {
             Explanation
           </TabsTrigger>
         </TabsList>
+
+        {/* UNDERSTAND */}
+        <TabsContent value="understand">
+          <QueueAnalogy />
+        </TabsContent>
 
         {/* VISUALIZATION */}
         <TabsContent value="visualization" className="space-y-6">

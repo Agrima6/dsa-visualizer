@@ -10,7 +10,7 @@ export interface QuizQuestion {
 export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: "q1",
-    code: `function first(arr) {
+    code: `function algoMaitriFirst(arr) {
   return arr[0];
 }`,
     answer: "o1",
@@ -18,7 +18,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: "q2",
-    code: `function sum(arr) {
+    code: `function algoMaitriSum(arr) {
   let total = 0;
   for (let i = 0; i < arr.length; i++) {
     total += arr[i];
@@ -30,7 +30,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: "q3",
-    code: `function hasDuplicate(arr) {
+    code: `function algoMaitriHasDuplicate(arr) {
   for (let i = 0; i < arr.length; i++) {
     for (let j = 0; j < arr.length; j++) {
       if (i !== j && arr[i] === arr[j]) return true;
@@ -43,7 +43,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: "q4",
-    code: `function countDigits(n) {
+    code: `function algoMaitriCountDigits(n) {
   let count = 0;
   while (n > 0) {
     n = Math.floor(n / 10);
@@ -56,7 +56,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: "q5",
-    code: `function printTwice(arr) {
+    code: `function algoMaitriPrintTwice(arr) {
   for (let i = 0; i < arr.length; i++) console.log(arr[i]);
   for (let j = 0; j < arr.length; j++) console.log(arr[j]);
 }`,
@@ -65,7 +65,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: "q6",
-    code: `function search(matrix, target) {
+    code: `function algoMaitriSearch(matrix, target) {
   for (const row of matrix) {
     for (let k = 0; k < 3; k++) {
       if (row[k] === target) return true;
@@ -78,11 +78,11 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: "q7",
-    code: `function mergeSort(arr) {
+    code: `function algoMaitriMergeSort(arr) {
   if (arr.length <= 1) return arr;
   const mid = arr.length >> 1;
-  const left = mergeSort(arr.slice(0, mid));
-  const right = mergeSort(arr.slice(mid));
+  const left = algoMaitriMergeSort(arr.slice(0, mid));
+  const right = algoMaitriMergeSort(arr.slice(mid));
   return merge(left, right);
 }`,
     answer: "onlogn",
@@ -90,9 +90,9 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   },
   {
     id: "q8",
-    code: `function fib(n) {
+    code: `function algoMaitriFib(n) {
   if (n <= 1) return n;
-  return fib(n - 1) + fib(n - 2);
+  return algoMaitriFib(n - 1) + algoMaitriFib(n - 2);
 }`,
     answer: "o2n",
     explanation: "Every call branches into two more calls until the base case — the number of calls roughly doubles with each increase in n.",

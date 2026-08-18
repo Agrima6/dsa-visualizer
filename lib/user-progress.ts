@@ -15,6 +15,13 @@ export interface ProblemEntry {
   notes?: string
 }
 
+export interface BugSpotEntry {
+  slug: string           // the parent problem's slug
+  topic: string
+  correct: boolean       // whether the user's guess matched the divergence step
+  spottedAt: string      // ISO date string
+}
+
 export interface StreakData {
   current: number
   longest: number
@@ -30,6 +37,7 @@ export interface TopicStat {
 
 export interface UserProgress {
   solvedProblems: ProblemEntry[]
+  bugsSpotted: BugSpotEntry[]
   streak: StreakData
   joinedAt: string        // ISO date
   dailyGoal: number       // problems per day target
@@ -38,6 +46,7 @@ export interface UserProgress {
 
 export const EMPTY_PROGRESS: UserProgress = {
   solvedProblems: [],
+  bugsSpotted: [],
   streak: { current: 0, longest: 0, lastActiveDate: "" },
   joinedAt: new Date().toISOString(),
   dailyGoal: 3,
@@ -46,6 +55,8 @@ export const EMPTY_PROGRESS: UserProgress = {
 
 // XP awarded per difficulty
 export const XP_TABLE = { Easy: 10, Medium: 25, Hard: 50 } as const
+// Flat XP bonus for correctly spotting a bug's divergence step the first time
+export const BUG_SPOT_XP = 15
 
 // ── Derived stats helpers ──────────────────────────────────────
 
@@ -93,6 +104,18 @@ export function getRecentActivity(p: UserProgress, days = 7): { date: string; co
 export function getDailyProgress(p: UserProgress): number {
   const today = new Date().toISOString().split("T")[0]
   return p.solvedProblems.filter((s) => s.solvedAt.startsWith(today)).length
+}
+
+export interface BugSpotStats {
+  attempts: number
+  correct: number
+  accuracy: number // 0-100, rounded
+}
+
+export function getBugSpotStats(p: UserProgress): BugSpotStats {
+  const attempts = p.bugsSpotted.length
+  const correct = p.bugsSpotted.filter((b) => b.correct).length
+  return { attempts, correct, accuracy: attempts ? Math.round((correct / attempts) * 100) : 0 }
 }
 
 // ── Streak calculation ─────────────────────────────────────────
@@ -183,4 +206,15 @@ export function applyUpdateNotes(progress: UserProgress, slug: string, notes: st
   const trimmed = notes.slice(0, 2000)
   const solvedProblems = progress.solvedProblems.map((s) => (s.slug === slug ? { ...s, notes: trimmed } : s))
   return { ...progress, solvedProblems }
+}
+
+// Only the first attempt at a given problem's bug counts for XP/history —
+// replaying "Spot the Bug" after already attempting it doesn't re-award XP
+// or overwrite the original result, so a user can't farm XP by retrying.
+export function applySpotBug(progress: UserProgress, entry: Omit<BugSpotEntry, "spottedAt">): UserProgress {
+  if (progress.bugsSpotted.some((b) => b.slug === entry.slug)) return progress
+  const newEntry: BugSpotEntry = { ...entry, spottedAt: new Date().toISOString() }
+  const bugsSpotted = [newEntry, ...progress.bugsSpotted]
+  const xp = progress.xp + (entry.correct ? BUG_SPOT_XP : 0)
+  return { ...progress, bugsSpotted, xp }
 }

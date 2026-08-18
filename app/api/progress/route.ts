@@ -7,12 +7,24 @@ import {
   applyUnmarkSolved,
   applySetDailyGoal,
   applyUpdateNotes,
+  applySpotBug,
   type UserProgress,
   type ProblemEntry,
+  type BugSpotEntry,
 } from "@/lib/user-progress"
 import { TOPIC_SLUGS } from "@/lib/topics"
 
 const DIFFICULTIES = new Set(["Easy", "Medium", "Hard"])
+
+function isValidBugSpotEntry(entry: unknown): entry is Omit<BugSpotEntry, "spottedAt"> {
+  if (!entry || typeof entry !== "object") return false
+  const e = entry as Record<string, unknown>
+  return (
+    typeof e.slug === "string" && e.slug.length > 0 && e.slug.length < 200 &&
+    typeof e.topic === "string" && TOPIC_SLUGS.has(e.topic) &&
+    typeof e.correct === "boolean"
+  )
+}
 
 async function loadProgress(userId: string) {
   const client = await clerkClient()
@@ -109,6 +121,13 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Invalid notes payload" }, { status: 400 })
       }
       next = applyUpdateNotes(progress, slug, notes)
+      break
+    }
+    case "spotBug": {
+      if (!isValidBugSpotEntry(body?.entry)) {
+        return NextResponse.json({ error: "Invalid entry" }, { status: 400 })
+      }
+      next = applySpotBug(progress, body.entry)
       break
     }
     default:

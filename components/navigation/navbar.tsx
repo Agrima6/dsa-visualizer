@@ -51,80 +51,90 @@ const routeList: RouteProps[] = [
   },
 ];
 
+// Ordered as a learning roadmap — position in this array IS the step
+// number shown in the nav (01, 02, 03...), so don't reorder casually.
+// Descriptions here are deliberately short (~35 chars) — this list renders
+// in a narrow two-column nav dropdown with a 1-line clamp, so anything
+// longer just truncates mid-word.
 const featureList: FeatureProps[] = [
   {
     title: "Time Complexity",
-    description: "Learn Big-O by experimenting with live graphs, real code, and quizzes.",
+    description: "Big-O through live graphs and quizzes.",
     url: "/visualizer/time-complexity",
   },
   {
     title: "Functions",
-    description: "Learn functions by watching real call stacks, closures, and recursion in action.",
+    description: "Real call stacks, closures, recursion.",
     url: "/visualizer/functions",
   },
   {
-    title: "Array",
-    description: "Learn Arrays through interactive visualizations.",
+    title: "Arrays",
+    description: "Interactive array visualizations.",
+    url: "/visualizer/array",
+  },
+  {
+    title: "Searching",
+    description: "Linear and binary search, step by step.",
     url: "/visualizer/array",
   },
   {
     title: "Sorting",
-    description: "Learn sorting through interactive visualizations.",
+    description: "Watch sorting algorithms run live.",
     url: "/visualizer/sorting",
   },
   {
-    title: "Stacks",
-    description: "Understand stack operations with animated learning.",
+    title: "Recursion",
+    description: "Real call-stack visualizations.",
+    url: "/visualizer/recursion",
+  },
+  {
+    title: "Stack",
+    description: "LIFO, animated push and pop.",
     url: "/visualizer/stack",
   },
   {
-    title: "Queues",
-    description: "Visualize enqueue, dequeue, and queue behavior.",
+    title: "Queue",
+    description: "FIFO, animated enqueue and dequeue.",
     url: "/visualizer/queue",
   },
   {
     title: "Linked Lists",
-    description: "Explore node-based structures step by step.",
+    description: "Node-based structures, step by step.",
     url: "/visualizer/linked-list",
   },
   {
     title: "Binary Tree",
-    description: "See insertions, traversals, and structure clearly.",
+    description: "Insertions and traversals, clearly shown.",
     url: "/visualizer/binary-tree",
   },
   {
     title: "Heaps",
-    description: "Understand heap operations and ordering.",
+    description: "Heap operations and ordering.",
     url: "/visualizer/heap",
   },
   {
-    title: "Recursion",
-    description: "20 interview questions with a real call-stack visualization.",
-    url: "/visualizer/recursion",
-  },
-  {
     title: "Infix to Postfix",
-    description: "Convert expressions using stack logic.",
+    description: "Expression conversion with a stack.",
     url: "/visualizer/stack-applications",
   },
   {
     title: "Message Queue",
-    description: "Simulate producer-consumer queue systems.",
+    description: "Producer-consumer queue systems.",
     url: "/visualizer/queue-applications",
   },
   {
     title: "Polynomial Multiplication",
-    description: "Visualize polynomial operations in action.",
+    description: "Polynomial operations, visualized.",
     url: "/visualizer/polynomial",
   },
   {
     title: "Huffman Coding",
-    description: "Encode and decode using tree-based compression.",
+    description: "Tree-based compression, encode/decode.",
     url: "/visualizer/huffman",
   },
   {
     title: "Dijkstra's Algorithm",
-    description: "Find shortest paths through graph visualization.",
+    description: "Shortest paths through a graph.",
     url: "/visualizer/dijkstra",
   },
 ];
@@ -223,16 +233,19 @@ export const Navbar = () => {
 
                 <div className="mt-6">
                   <p className="mb-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                    Learn Visually
+                    Learning Roadmap
                   </p>
-                  <div className="grid grid-cols-1 gap-2">
-                    {featureList.slice(0, 8).map(({ title, url }) => (
+                  <div className="flex flex-col">
+                    {featureList.slice(0, 8).map(({ title, url }, i) => (
                       <Link
                         key={title}
                         href={url}
                         onClick={() => setIsOpen(false)}
-                        className="rounded-xl border border-border/60 bg-background/60 px-3 py-2 text-sm hover:bg-muted transition"
+                        className="group flex items-center gap-3 border-l-2 border-border/60 py-2 pl-3 text-sm transition hover:border-violet-500 hover:text-violet-500"
                       >
+                        <span className="font-mono text-[10px] text-muted-foreground/60 group-hover:text-violet-500">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
                         {title}
                       </Link>
                     ))}
@@ -257,27 +270,43 @@ export const Navbar = () => {
                 What You Can Learn
               </NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid w-[560px] gap-3 p-4 md:grid-cols-2">
-                  {featureList.map(({ title, description, url }) => (
-                    <li key={title}>
-                      <NavigationMenuLink asChild>
-                        <Link href={url} className="nav-feature-card">
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="mb-1 font-semibold leading-none text-foreground">
-                                {title}
-                              </p>
-                              <p className="line-clamp-2 text-sm text-muted-foreground">
-                                {description}
-                              </p>
-                            </div>
-                            <ChevronRight className="h-4 w-4 mt-1 text-muted-foreground" />
-                          </div>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                  ))}
-                </ul>
+                <div className="w-[640px] p-4">
+                  <p className="mb-3 px-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                    The AlgoMaitri learning roadmap
+                  </p>
+                  <div className="grid grid-cols-2 gap-x-6">
+                    {[featureList.slice(0, Math.ceil(featureList.length / 2)), featureList.slice(Math.ceil(featureList.length / 2))].map(
+                      (column, colIdx) => (
+                        <ul key={colIdx} className="relative flex flex-col">
+                          <span className="absolute left-[15px] top-2 bottom-2 w-px bg-violet-500/25" aria-hidden />
+                          {column.map(({ title, description, url }, i) => {
+                            const step = colIdx * Math.ceil(featureList.length / 2) + i + 1
+                            return (
+                              <li key={title} className="relative">
+                                <NavigationMenuLink asChild>
+                                  <Link href={url} className="nav-roadmap-row group flex items-start gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-violet-500/[0.06]">
+                                    <span className="relative z-10 flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-violet-500/25 bg-background font-mono text-[11px] font-semibold text-violet-500 transition-colors group-hover:border-violet-500 group-hover:bg-violet-500 group-hover:text-white">
+                                      {String(step).padStart(2, "0")}
+                                    </span>
+                                    <div className="min-w-0 pt-0.5">
+                                      <p className="mb-0.5 text-sm font-semibold leading-none text-foreground">
+                                        {title}
+                                      </p>
+                                      <p className="line-clamp-1 text-xs text-muted-foreground">
+                                        {description}
+                                      </p>
+                                    </div>
+                                    <ChevronRight className="ml-auto h-4 w-4 shrink-0 self-center text-muted-foreground/50 opacity-0 transition-opacity group-hover:opacity-100" />
+                                  </Link>
+                                </NavigationMenuLink>
+                              </li>
+                            )
+                          })}
+                        </ul>
+                      )
+                    )}
+                  </div>
+                </div>
               </NavigationMenuContent>
             </NavigationMenuItem>
 
