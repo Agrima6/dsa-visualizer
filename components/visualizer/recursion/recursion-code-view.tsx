@@ -566,31 +566,46 @@ function StatCard({ label, value, accent }: { label: string; value: string; acce
 function CallStackViz({ stack }: { stack: StackFrame[] }) {
   return (
     <div
-      className="flex min-h-[140px] flex-col-reverse items-center justify-start gap-2 overflow-y-auto rounded-2xl border border-violet-500/8 bg-white/45 p-3 dark:bg-white/[0.02]"
-      style={{ maxHeight: 260 }}
+      className="flex min-h-[140px] flex-col-reverse items-center justify-start gap-1.5 overflow-y-auto rounded-2xl border border-violet-500/8 bg-white/45 p-3 dark:bg-white/[0.02]"
+      style={{ maxHeight: 320 }}
     >
       {stack.length === 0 && <div className="py-6 text-xs text-muted-foreground">Call stack is empty</div>}
-      {stack.map((f, i) => (
-        <div
-          key={f.id}
-          className="w-full max-w-sm rounded-xl border-2 px-3 py-2 text-sm"
-          style={{
-            borderColor: i === stack.length - 1 ? "#7c3aed" : "hsl(var(--border))",
-            backgroundColor: i === stack.length - 1 ? "rgba(124,58,237,0.08)" : "transparent",
-          }}
-        >
-          <p className="font-mono text-xs font-semibold">{f.label}</p>
-          {f.vars.length > 0 && (
-            <div className="mt-1 space-y-0.5">
-              {f.vars.map((v) => (
-                <p key={v.name} className="font-mono text-[11px] text-muted-foreground">
-                  {v.name} = {v.value}
-                </p>
-              ))}
+      {stack.map((f, i) => {
+        const isTop = i === stack.length - 1
+        return (
+          <div
+            key={f.id}
+            className="w-full max-w-sm rounded-xl border-2 px-3 text-sm transition-all"
+            style={{
+              borderColor: isTop ? "#7c3aed" : "hsl(var(--border))",
+              backgroundColor: isTop ? "rgba(124,58,237,0.08)" : "transparent",
+              paddingTop: isTop ? 8 : 6,
+              paddingBottom: isTop ? 8 : 6,
+              opacity: isTop ? 1 : 0.65,
+            }}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <p className="truncate font-mono text-xs font-semibold">{f.label}</p>
+              {!isTop && <span className="shrink-0 text-[9px] uppercase tracking-wide text-muted-foreground">waiting</span>}
             </div>
-          )}
-        </div>
-      ))}
+            {f.vars.length > 0 && (
+              isTop ? (
+                <div className="mt-1 space-y-0.5">
+                  {f.vars.map((v) => (
+                    <p key={v.name} className="font-mono text-[11px] text-muted-foreground">
+                      {v.name} = {v.value}
+                    </p>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-0.5 truncate font-mono text-[10px] text-muted-foreground">
+                  {f.vars.map((v) => `${v.name}=${v.value}`).join("  ")}
+                </p>
+              )
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }

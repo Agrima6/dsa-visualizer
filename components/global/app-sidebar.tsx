@@ -1,6 +1,6 @@
 "use client"
 
-import { Binary, Home, Database, BrainCircuit, TreePine, List, SquareStack, SquareChevronLeft, Equal, MessageSquare, X, Hash, ArrowRightLeft, Gauge, Parentheses, Repeat } from "lucide-react"
+import { Binary, Home, Database, BrainCircuit, TreePine, List, SquareStack, SquareChevronLeft, Equal, MessageSquare, X, Hash, ArrowRightLeft, Gauge, Parentheses, Repeat, Scale } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -51,8 +51,8 @@ const dataStructures = [
     name: "Queue",
     url: "/visualizer/queue",
     icon: SquareChevronLeft,
-    description: "FIFO data structure with enqueue and dequeue operations",
-  },  
+    description: "Simple, Circular, Priority, and Deque — all four types",
+  },
    {
     name: "Sorting",
     url: "/visualizer/sorting",
@@ -69,7 +69,7 @@ const dataStructures = [
     name: "Binary Tree",
     url: "/visualizer/binary-tree",
     icon: Binary,
-    description: "Basic binary tree with BST properties",
+    description: "Binary Search Tree and Heap, side by side",
   },
   
   {
@@ -83,6 +83,12 @@ const dataStructures = [
     url: "/visualizer/recursion",
     icon: Repeat,
     description: "20 interview questions from base cases to backtracking, with a real call-stack visualization",
+  },
+  {
+    name: "AVL Tree",
+    url: "/visualizer/avl-tree",
+    icon: Scale,
+    description: "Self-balancing BST — live balance factors and LL/RR/LR/RL rotations",
   },
 ]
 

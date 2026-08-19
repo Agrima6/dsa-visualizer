@@ -1,4 +1,4 @@
-import { BrainCircuit, Binary, Box, List, ArrowLeftRight, Calculator, MessageSquare, Hash, ArrowRightLeft, Gauge, Parentheses, Repeat, Sparkles, ArrowUpRight } from "lucide-react"
+import { BrainCircuit, Binary, Box, List, ArrowLeftRight, Calculator, MessageSquare, Hash, ArrowRightLeft, Gauge, Parentheses, Repeat, Sparkles, ArrowUpRight, Scale } from "lucide-react"
 import Link from "next/link"
 
 const sections = {
@@ -37,15 +37,21 @@ const sections = {
     },
     {
       name: "Queue",
-      description: "FIFO data structure for managing ordered elements. See enqueue and dequeue in action.",
+      description: "Simple, Circular, Priority, and Deque — all four types side by side.",
       href: "/visualizer/queue",
       icon: ArrowLeftRight,
     },
     {
       name: "Binary Tree",
-      description: "A binary tree that maintains sorted data with O(log n) operations. Learn about tree traversals.",
+      description: "Plain Binary Tree, BST, and Heap in one place — see exactly how each constrains node placement.",
       href: "/visualizer/binary-tree",
       icon: Binary,
+    },
+    {
+      name: "AVL Tree",
+      description: "A self-balancing BST — watch live balance factors and LL/RR/LR/RL rotations fire on every insert.",
+      href: "/visualizer/avl-tree",
+      icon: Scale,
     },
     {
       name: "Heap",

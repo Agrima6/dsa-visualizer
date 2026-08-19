@@ -7,9 +7,18 @@ import { useSearchParams } from "next/navigation"
 import { QueueControls } from "@/components/visualizer/queue/queue-controls"
 import { QueueDisplay } from "@/components/visualizer/queue/queue-display"
 import { QueueOperations } from "@/components/visualizer/queue/queue-operations"
+import { CircularQueueControls } from "@/components/visualizer/queue/circular-queue-controls"
+import { CircularQueueDisplay } from "@/components/visualizer/queue/circular-queue-display"
+import { PriorityQueueControls } from "@/components/visualizer/queue/priority-queue-controls"
+import { PriorityQueueDisplay } from "@/components/visualizer/queue/priority-queue-display"
+import { DequeControls } from "@/components/visualizer/queue/deque-controls"
+import { DequeDisplay } from "@/components/visualizer/queue/deque-display"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MarkdownContent } from "@/components/shared/markdown-content"
 import { useQueue } from "@/hooks/use-queue"
+import { useCircularQueue } from "@/hooks/use-circular-queue"
+import { usePriorityQueue } from "@/hooks/use-priority-queue"
+import { useDeque } from "@/hooks/use-deque"
 import { Sparkles } from "lucide-react"
 import { QueueAnalogy } from "./queue-analogy"
 import QueueCodeView from "./queue-code-view"
@@ -46,6 +55,10 @@ function QueueVisualizerOriginal({ content }: QueueVisualizerProps) {
     enqueue, dequeue, clear, isFull, isEmpty,
   } = useQueue()
 
+  const circular = useCircularQueue(6)
+  const priority = usePriorityQueue()
+  const deque = useDeque()
+
   return (
     <div className="container mx-auto space-y-8">
       {/* HERO HEADER */}
@@ -64,7 +77,8 @@ function QueueVisualizerOriginal({ content }: QueueVisualizerProps) {
             Queue (FIFO)
           </h1>
           <p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">
-            A First-In-First-Out (FIFO) data structure where elements are added at the rear and removed from the front.
+            Four variants, one underlying idea. Compare Simple, Circular, Priority,
+            and Double-Ended (Deque) queues side by side in the Visualization tab.
           </p>
         </div>
       </div>
@@ -99,24 +113,107 @@ function QueueVisualizerOriginal({ content }: QueueVisualizerProps) {
 
         {/* VISUALIZATION */}
         <TabsContent value="visualization" className="space-y-6">
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            <div className="xl:col-span-1 space-y-6">
-              <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
-                <QueueControls
-                  onEnqueue={enqueue} onDequeue={dequeue} onClear={clear}
-                  isAnimating={isAnimating} isFull={isFull} isEmpty={isEmpty}
-                />
+          <Tabs defaultValue="simple" className="w-full space-y-6">
+            <TabsList className="grid w-full grid-cols-4 rounded-xl bg-white/60 backdrop-blur-lg border border-violet-500/10 dark:bg-white/[0.05]">
+              <TabsTrigger value="simple" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white">
+                Simple Queue
+              </TabsTrigger>
+              <TabsTrigger value="circular" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white">
+                Circular Queue
+              </TabsTrigger>
+              <TabsTrigger value="priority" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white">
+                Priority Queue
+              </TabsTrigger>
+              <TabsTrigger value="deque" className="rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:to-blue-600 data-[state=active]:text-white">
+                Deque
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Simple Queue */}
+            <TabsContent value="simple" className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+                <div className="xl:col-span-1 space-y-6">
+                  <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
+                    <QueueControls
+                      onEnqueue={enqueue} onDequeue={dequeue} onClear={clear}
+                      isAnimating={isAnimating} isFull={isFull} isEmpty={isEmpty}
+                    />
+                  </div>
+                  <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
+                    <QueueOperations operations={operations} />
+                  </div>
+                </div>
+                <div className="xl:col-span-2">
+                  <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
+                    <QueueDisplay queue={queue} highlightedIndex={highlightedIndex} />
+                  </div>
+                </div>
               </div>
-              <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
-                <QueueOperations operations={operations} />
+            </TabsContent>
+
+            {/* Circular Queue */}
+            <TabsContent value="circular" className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+                <div className="xl:col-span-1 space-y-6">
+                  <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
+                    <CircularQueueControls
+                      onEnqueue={circular.enqueue} onDequeue={circular.dequeue} onClear={circular.clear}
+                      isAnimating={circular.isAnimating} isFull={circular.isFull} isEmpty={circular.isEmpty}
+                      size={circular.size} count={circular.count}
+                    />
+                  </div>
+                  <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
+                    <QueueOperations operations={circular.operations} />
+                  </div>
+                </div>
+                <div className="xl:col-span-2">
+                  <CircularQueueDisplay slots={circular.slots} front={circular.front} rear={circular.rear} activeIndex={circular.activeIndex} />
+                </div>
               </div>
-            </div>
-            <div className="xl:col-span-2">
-              <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
-                <QueueDisplay queue={queue} highlightedIndex={highlightedIndex} />
+            </TabsContent>
+
+            {/* Priority Queue */}
+            <TabsContent value="priority" className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+                <div className="xl:col-span-1 space-y-6">
+                  <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
+                    <PriorityQueueControls
+                      onInsert={priority.insert} onExtractMin={priority.extractMin} onClear={priority.clear}
+                      isAnimating={priority.isAnimating} isEmpty={priority.isEmpty}
+                    />
+                  </div>
+                  <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
+                    <QueueOperations operations={priority.operations} />
+                  </div>
+                </div>
+                <div className="xl:col-span-2">
+                  <PriorityQueueDisplay queue={priority.queue} highlightedIndex={priority.highlightedIndex} />
+                </div>
               </div>
-            </div>
-          </div>
+            </TabsContent>
+
+            {/* Deque */}
+            <TabsContent value="deque" className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+                <div className="xl:col-span-1 space-y-6">
+                  <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
+                    <DequeControls
+                      onAddFront={deque.addFront} onAddRear={deque.addRear}
+                      onRemoveFront={deque.removeFront} onRemoveRear={deque.removeRear}
+                      onClear={deque.clear}
+                      isAnimating={deque.isAnimating} isFull={deque.isFull} isEmpty={deque.isEmpty}
+                    />
+                  </div>
+                  <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
+                    <QueueOperations operations={deque.operations} />
+                  </div>
+                </div>
+                <div className="xl:col-span-2">
+                  <DequeDisplay queue={deque.queue} highlightedIndex={deque.highlightedIndex} />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </TabsContent>
 
         {/* EXPLANATION */}

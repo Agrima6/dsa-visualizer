@@ -1,16 +1,29 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { BinaryTreeNode } from "@/components/visualizer/binary-tree/types"
 import { useAlgorithmFeedback } from "@/hooks/use-algorithm-feedback"
 import { playNarration } from "@/lib/narration"
 
 let nodeIdCounter = 0
 
-export function useBinaryTree() {
-  const [tree, setTree] = useState<BinaryTreeNode | null>(null)
+export function useBinaryTree(mode: "bst" | "generic" = "bst") {
+  const [tree, setTreeState] = useState<BinaryTreeNode | null>(null)
   const [highlightedNodes, setHighlightedNodes] = useState<string[]>([])
   const [traversalHistory, setTraversalHistory] = useState<number[]>([])
   const [isAnimating, setIsAnimating] = useState(false)
   const [voiceEnabled, setVoiceEnabled] = useState(true)
+
+  // Bulk insert calls `insert` several times in a row (awaiting each), all
+  // from a single event handler closure that was created with whatever
+  // `insert` looked like at that render. Reading `tree` (the state
+  // variable) inside `insert` would keep seeing that render's stale
+  // snapshot across the whole loop, so every insert after the first would
+  // silently overwrite instead of add to the tree. This ref always holds
+  // the true latest tree, independent of which render's closure is running.
+  const treeRef = useRef<BinaryTreeNode | null>(null)
+  const setTree = (t: BinaryTreeNode | null) => {
+    treeRef.current = t
+    setTreeState(t)
+  }
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
 
@@ -30,7 +43,7 @@ export function useBinaryTree() {
       right: null,
     }
 
-    if (!tree) {
+    if (!treeRef.current) {
       setHighlightedNodes([newNode.id])
       stepSound()
       await new Promise((resolve) => setTimeout(resolve, 500))
@@ -44,7 +57,10 @@ export function useBinaryTree() {
       return
     }
 
-    const insertIntoTree = async (node: BinaryTreeNode): Promise<BinaryTreeNode> => {
+    const currentTree: BinaryTreeNode = treeRef.current
+
+    // BST insertion: ordered by value, like the original behavior.
+    const insertBST = async (node: BinaryTreeNode): Promise<BinaryTreeNode> => {
       setHighlightedNodes([node.id])
       stepSound()
       await new Promise((resolve) => setTimeout(resolve, 500))
@@ -63,7 +79,7 @@ export function useBinaryTree() {
 
         return {
           ...node,
-          left: await insertIntoTree(node.left),
+          left: await insertBST(node.left),
         }
       } else {
         if (!node.right) {
@@ -79,13 +95,49 @@ export function useBinaryTree() {
 
         return {
           ...node,
-          right: await insertIntoTree(node.right),
+          right: await insertBST(node.right),
         }
       }
     }
 
+    // Generic binary tree insertion: no ordering rule at all — the new
+    // node just goes in the next open slot in level order (top-to-bottom,
+    // left-to-right), same as building a complete tree. This is what
+    // actually distinguishes a plain binary tree from a BST.
+    const insertLevelOrder = async (root: BinaryTreeNode): Promise<BinaryTreeNode> => {
+      const cloneNode = (n: BinaryTreeNode): BinaryTreeNode => ({ ...n, left: n.left ? cloneNode(n.left) : null, right: n.right ? cloneNode(n.right) : null })
+      const clonedRoot = cloneNode(root)
+      const queue: BinaryTreeNode[] = [clonedRoot]
+
+      while (queue.length > 0) {
+        const node = queue.shift()!
+        setHighlightedNodes([node.id])
+        stepSound()
+        await new Promise((resolve) => setTimeout(resolve, 400))
+
+        if (!node.left) {
+          setHighlightedNodes([node.id, newNode.id])
+          stepSound()
+          await new Promise((resolve) => setTimeout(resolve, 500))
+          node.left = newNode
+          return clonedRoot
+        }
+        if (!node.right) {
+          setHighlightedNodes([node.id, newNode.id])
+          stepSound()
+          await new Promise((resolve) => setTimeout(resolve, 500))
+          node.right = newNode
+          return clonedRoot
+        }
+
+        queue.push(node.left, node.right)
+      }
+
+      return clonedRoot
+    }
+
     try {
-      const updatedTree = await insertIntoTree(tree)
+      const updatedTree = mode === "generic" ? await insertLevelOrder(currentTree) : await insertBST(currentTree)
       setTree(updatedTree)
     } finally {
       setHighlightedNodes([])

@@ -94,7 +94,7 @@ const featureList: FeatureProps[] = [
   },
   {
     title: "Queue",
-    description: "FIFO, animated enqueue and dequeue.",
+    description: "Simple, Circular, Priority, and Deque.",
     url: "/visualizer/queue",
   },
   {
@@ -104,8 +104,13 @@ const featureList: FeatureProps[] = [
   },
   {
     title: "Binary Tree",
-    description: "Insertions and traversals, clearly shown.",
+    description: "Plain tree, BST, and Heap — compared.",
     url: "/visualizer/binary-tree",
+  },
+  {
+    title: "AVL Tree",
+    description: "Self-balancing — rotations, live.",
+    url: "/visualizer/avl-tree",
   },
   {
     title: "Heaps",
