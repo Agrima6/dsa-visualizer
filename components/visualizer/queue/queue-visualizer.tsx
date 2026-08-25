@@ -52,7 +52,7 @@ export function QueueVisualizer(props: QueueVisualizerProps) {
 function QueueVisualizerOriginal({ content }: QueueVisualizerProps) {
   const {
     queue, operations, isAnimating, highlightedIndex,
-    enqueue, dequeue, clear, isFull, isEmpty,
+    enqueue, dequeue, clear, isFull, isEmpty, speed, setSpeed,
   } = useQueue()
 
   const circular = useCircularQueue(6)
@@ -137,6 +137,7 @@ function QueueVisualizerOriginal({ content }: QueueVisualizerProps) {
                     <QueueControls
                       onEnqueue={enqueue} onDequeue={dequeue} onClear={clear}
                       isAnimating={isAnimating} isFull={isFull} isEmpty={isEmpty}
+                      speed={speed} onSetSpeed={setSpeed}
                     />
                   </div>
                   <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
@@ -160,6 +161,7 @@ function QueueVisualizerOriginal({ content }: QueueVisualizerProps) {
                       onEnqueue={circular.enqueue} onDequeue={circular.dequeue} onClear={circular.clear}
                       isAnimating={circular.isAnimating} isFull={circular.isFull} isEmpty={circular.isEmpty}
                       size={circular.size} count={circular.count}
+                      speed={circular.speed} onSetSpeed={circular.setSpeed}
                     />
                   </div>
                   <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
@@ -180,6 +182,7 @@ function QueueVisualizerOriginal({ content }: QueueVisualizerProps) {
                     <PriorityQueueControls
                       onInsert={priority.insert} onExtractMin={priority.extractMin} onClear={priority.clear}
                       isAnimating={priority.isAnimating} isEmpty={priority.isEmpty}
+                      speed={priority.speed} onSetSpeed={priority.setSpeed}
                     />
                   </div>
                   <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
@@ -202,6 +205,7 @@ function QueueVisualizerOriginal({ content }: QueueVisualizerProps) {
                       onRemoveFront={deque.removeFront} onRemoveRear={deque.removeRear}
                       onClear={deque.clear}
                       isAnimating={deque.isAnimating} isFull={deque.isFull} isEmpty={deque.isEmpty}
+                      speed={deque.speed} onSetSpeed={deque.setSpeed}
                     />
                   </div>
                   <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-4 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">

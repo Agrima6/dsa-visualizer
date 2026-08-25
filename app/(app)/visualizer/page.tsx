@@ -1,107 +1,15 @@
-import { BrainCircuit, Binary, Box, List, ArrowLeftRight, Calculator, MessageSquare, Hash, ArrowRightLeft, Gauge, Parentheses, Repeat, Sparkles, ArrowUpRight, Scale } from "lucide-react"
+import { BrainCircuit, Sparkles, ArrowUpRight } from "lucide-react"
 import Link from "next/link"
+import { TOPICS, topicsByCategory } from "@/lib/visualizer-topics"
 
 const sections = {
-  concepts: [
-    {
-      name: "Time Complexity",
-      description: "Learn Big-O by experimenting — drag sliders, watch real code execute, and test yourself with instant-feedback quizzes.",
-      href: "/visualizer/time-complexity",
-      icon: Gauge,
-    },
-    {
-      name: "Functions",
-      description: "Learn functions by watching real call stacks push and pop — recursion, closures, and higher-order functions in action.",
-      href: "/visualizer/functions",
-      icon: Parentheses,
-    },
-  ],
-  dataStructures: [
-    {
-      name: "Linked List",
-      description: "Dynamic data structure with nodes connected through references. Explore different types of linked lists.",
-      href: "/visualizer/linked-list",
-      icon: List,
-    },
-    {
-      name: "Sorting",
-      description: "Watch sorting algorithms run step by step — bubble, merge, quick, insertion, and more.",
-      href: "/visualizer/sorting",
-      icon: List,
-    },
-    {
-      name: "Stack",
-      description: "LIFO data structure supporting push and pop operations. Visualize stack operations and state.",
-      href: "/visualizer/stack",
-      icon: ArrowLeftRight,
-    },
-    {
-      name: "Queue",
-      description: "Simple, Circular, Priority, and Deque — all four types side by side.",
-      href: "/visualizer/queue",
-      icon: ArrowLeftRight,
-    },
-    {
-      name: "Binary Tree",
-      description: "Plain Binary Tree, BST, and Heap in one place — see exactly how each constrains node placement.",
-      href: "/visualizer/binary-tree",
-      icon: Binary,
-    },
-    {
-      name: "AVL Tree",
-      description: "A self-balancing BST — watch live balance factors and LL/RR/LR/RL rotations fire on every insert.",
-      href: "/visualizer/avl-tree",
-      icon: Scale,
-    },
-    {
-      name: "Heap",
-      description: "Complete binary tree with heap property. Switch between min and max heaps.",
-      href: "/visualizer/heap",
-      icon: Box,
-    },
-    {
-      name: "Recursion",
-      description: "20 interview questions from base cases to backtracking, with a real call-stack visualization.",
-      href: "/visualizer/recursion",
-      icon: Repeat,
-    },
-  ],
-  applications: [
-    {
-      name: "Infix to Postfix",
-      description: "Convert infix expressions to postfix notation using stacks. Step through the conversion process.",
-      href: "/visualizer/stack-applications",
-      icon: Calculator,
-    },
-    {
-      name: "Message Queue",
-      description: "Simulate message queuing systems with producers and consumers. Visualize message flow.",
-      href: "/visualizer/queue-applications",
-      icon: MessageSquare,
-    },
-    {
-      name: "Polynomial Multiplication",
-      description: "Visualize polynomial multiplication using linked lists. See term-by-term multiplication steps.",
-      href: "/visualizer/polynomial",
-      icon: Calculator,
-    },
-    {
-      name: "Huffman Coding",
-      description: "A popular data compression technique that creates variable-length prefix codes based on character frequency.",
-      href: "/visualizer/huffman",
-      icon: Hash,
-    },
-    {
-      name: "Dijkstra's Algorithm",
-      description: "Visualize Dijkstra's algorithm to find the shortest path in a graph.",
-      href: "/visualizer/dijkstra",
-      icon: ArrowRightLeft,
-    },
-  ],
+  concepts: topicsByCategory("concepts").map((t) => ({ name: t.name, description: t.description, href: t.href, icon: t.icon })),
+  dataStructures: topicsByCategory("dataStructures").map((t) => ({ name: t.name, description: t.description, href: t.href, icon: t.icon })),
+  applications: topicsByCategory("applications").map((t) => ({ name: t.name, description: t.description, href: t.href, icon: t.icon })),
 }
 
 const stats = [
-  { label: "Topics", value: `${sections.concepts.length + sections.dataStructures.length + sections.applications.length}` },
+  { label: "Topics", value: `${TOPICS.length}` },
   { label: "Practice questions", value: "100+" },
   { label: "Companies covered", value: "10+" },
 ]

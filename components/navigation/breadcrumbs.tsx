@@ -12,62 +12,15 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { usePathname } from "next/navigation"
+import { TOPICS } from "@/lib/visualizer-topics"
+import { CommandPalette } from "@/components/global/command-palette"
 
-const routes = {
-  "/": {
-    name: "Home",
-    path: "/home",
-  },
-  
-  "/visualizer": {
-    name: "Visualizer",
-    path: "/visualizer",
-  },
-   "/visualizer/sorting": {
-    name: "Sorting",
-    path: "/visualizer/sorting",
-  },
-  "/visualizer/stack": {
-    name: "Stack",
-    path: "/visualizer/stack",
-  },
-  "/visualizer/queue": {
-    name: "Queue",
-    path: "/visualizer/queue",
-  },
-  "/visualizer/stack-applications": {
-    name: "Infix to Postfix",
-    path: "/visualizer/stack-applications",
-  },
-  "/visualizer/queue-applications": {
-    name: "Message Queue",
-    path: "/visualizer/queue-applications",
-  },
-  "/visualizer/linked-list": {
-    name: "Linked List",
-    path: "/visualizer/linked-list",
-  },
-  "/visualizer/polynomial": {
-    name: "Polynomial Multiplication",
-    path: "/visualizer/polynomial",
-  },
-  "/visualizer/binary-tree": {
-    name: "Binary Tree",
-    path: "/visualizer/binary-tree",
-  },
-  
-  "/visualizer/heap": {
-    name: "Heap",
-    path: "/visualizer/heap",
-  },
-  "/visualizer/huffman": {
-    name: "Huffman Coding",
-    path: "/visualizer/huffman",
-  },
-  "/visualizer/dijkstra": {
-    name: "Dijkstra's Algorithm",
-    path: "/visualizer/dijkstra",
-  },
+const routes: Record<string, { name: string; path: string }> = {
+  "/": { name: "Home", path: "/home" },
+  "/visualizer": { name: "Visualizer", path: "/visualizer" },
+  ...Object.fromEntries(
+    TOPICS.map((t) => [t.href, { name: t.name, path: t.href }])
+  ),
 }
 
 export function Breadcrumbs({ 
@@ -129,6 +82,7 @@ export function Breadcrumbs({
           </BreadcrumbList>
         </Breadcrumb>
         <div className="ml-auto flex items-center gap-4">
+          <CommandPalette />
           {action}
           <ModeToggle />
         </div>

@@ -13,7 +13,10 @@ export function useHeap(initialType: HeapType = "max") {
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
 
-  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+  const [speed, setSpeedState] = useState(1)
+  const speedRef = useRef(1)
+  const setSpeed = (v: number) => { speedRef.current = v; setSpeedState(v) }
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms / speedRef.current))
 
   const shouldSwap = (parent: number, child: number): boolean => {
     if (heapType === "max") {
@@ -171,5 +174,7 @@ export function useHeap(initialType: HeapType = "max") {
     clear,
     voiceEnabled,
     setVoiceEnabled,
+    speed,
+    setSpeed,
   }
 }

@@ -4,6 +4,7 @@
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useUser, SignInButton } from "@clerk/nextjs"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 import {
   GRAPH_PROBLEMS,
   type GraphProblem,
@@ -341,7 +342,8 @@ function ProblemDetail({ problem,onBack,onPay,unlocked,paying }:{
   const [steps]        = useState<GraphVisStep[]>(()=>problem.generateSteps())
   const [cur, setCur]  = useState(0)
   const [playing, setPlaying] = useState(false)
-  const [speed, setSpeed]     = useState(700)
+  const [speedMultiplier, setSpeedMultiplier] = useState(1)
+  const speed = 700 / speedMultiplier
   const [tab, setTab]         = useState<"description"|"approaches"|"pitfalls">("description")
   const ivRef  = useRef<ReturnType<typeof setInterval>|null>(null)
   const codeRef= useRef<HTMLDivElement>(null)
@@ -438,8 +440,7 @@ function ProblemDetail({ problem,onBack,onPay,unlocked,paying }:{
                 <button onClick={()=>{setPlaying(false);setCur(s=>Math.min(steps.length-1,s+1))}} disabled={cur>=steps.length-1} className="h-11 rounded-xl border border-violet-500/12 bg-white/70 text-sm text-muted-foreground hover:bg-violet-500/5 disabled:opacity-35 dark:bg-white/[0.03]">Next ›</button>
               </div>
               <div className="mt-5 border-t border-violet-500/10 pt-4">
-                <div className="mb-2 flex items-center justify-between"><span className="text-xs text-muted-foreground">Speed</span><span className="text-xs font-mono text-violet-500">{speed}ms</span></div>
-                <input type="range" min={150} max={1500} step={50} value={speed} onChange={e=>setSpeed(Number(e.target.value))} className="w-full accent-violet-600"/>
+                <SpeedControl speed={speedMultiplier} onSetSpeed={setSpeedMultiplier} />
               </div>
             </div>
 

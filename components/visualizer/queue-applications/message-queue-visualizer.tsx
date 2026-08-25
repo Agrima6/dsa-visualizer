@@ -17,6 +17,8 @@ export function MessageQueueVisualizer({ content }: { content: React.ReactNode }
     produceMessage,
     processNextMessage,
     clear,
+    speed,
+    setSpeed,
   } = useMessageQueue()
 
   return (
@@ -76,6 +78,8 @@ export function MessageQueueVisualizer({ content }: { content: React.ReactNode }
                   consumers={consumers}
                   onProcess={processNextMessage}
                   queueSize={queue.length}
+                  speed={speed}
+                  onSetSpeed={setSpeed}
                 />
               </div>
             </div>

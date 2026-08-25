@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState } from "react"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 
 const MAX_QUEUE_SIZE = 6
 
@@ -14,6 +15,8 @@ interface QueueControlsProps {
   isAnimating: boolean
   isFull: boolean
   isEmpty: boolean
+  speed?: number
+  onSetSpeed?: (speed: number) => void
 }
 
 export function QueueControls({
@@ -23,6 +26,8 @@ export function QueueControls({
   isAnimating,
   isFull,
   isEmpty,
+  speed,
+  onSetSpeed,
 }: QueueControlsProps) {
   const [value, setValue] = useState("")
   const [bulkValue, setBulkValue] = useState("")
@@ -112,8 +117,12 @@ export function QueueControls({
           </Button>
         </div>
 
+        {typeof speed === "number" && onSetSpeed && (
+          <SpeedControl speed={speed} onSetSpeed={onSetSpeed} disabled={isAnimating} />
+        )}
+
         <div className="grid grid-cols-2 gap-2">
-          <Button 
+          <Button
             onClick={handleDequeue}
             disabled={isAnimating || isEmpty}
             variant="secondary"

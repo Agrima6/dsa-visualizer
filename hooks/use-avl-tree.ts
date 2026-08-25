@@ -41,7 +41,11 @@ export function useAVLTree() {
   const treeRef = useRef<AVLTreeNode | null>(null)
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
 
-  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+  const [speed, setSpeedState] = useState(1)
+  const speedRef = useRef(1)
+  const setSpeed = (v: number) => { speedRef.current = v; setSpeedState(v) }
+
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms / speedRef.current))
 
   const commit = (t: AVLTreeNode | null) => {
     treeRef.current = t
@@ -247,5 +251,7 @@ export function useAVLTree() {
     postorderTraversal: () => runTraversal("postorder"),
     voiceEnabled,
     setVoiceEnabled,
+    speed,
+    setSpeed,
   }
 }

@@ -27,6 +27,11 @@ export function useBinaryTree(mode: "bst" | "generic" = "bst") {
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
 
+  const [speed, setSpeedState] = useState(1)
+  const speedRef = useRef(1)
+  const setSpeed = (v: number) => { speedRef.current = v; setSpeedState(v) }
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms / speedRef.current))
+
   const insert = async (value: number) => {
     if (isNaN(value) || isAnimating) return
 
@@ -46,7 +51,7 @@ export function useBinaryTree(mode: "bst" | "generic" = "bst") {
     if (!treeRef.current) {
       setHighlightedNodes([newNode.id])
       stepSound()
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await sleep(500)
 
       setTree(newNode)
       setHighlightedNodes([])
@@ -63,13 +68,13 @@ export function useBinaryTree(mode: "bst" | "generic" = "bst") {
     const insertBST = async (node: BinaryTreeNode): Promise<BinaryTreeNode> => {
       setHighlightedNodes([node.id])
       stepSound()
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await sleep(500)
 
       if (value <= node.value) {
         if (!node.left) {
           setHighlightedNodes([node.id, newNode.id])
           stepSound()
-          await new Promise((resolve) => setTimeout(resolve, 500))
+          await sleep(500)
 
           return {
             ...node,
@@ -85,7 +90,7 @@ export function useBinaryTree(mode: "bst" | "generic" = "bst") {
         if (!node.right) {
           setHighlightedNodes([node.id, newNode.id])
           stepSound()
-          await new Promise((resolve) => setTimeout(resolve, 500))
+          await sleep(500)
 
           return {
             ...node,
@@ -113,19 +118,19 @@ export function useBinaryTree(mode: "bst" | "generic" = "bst") {
         const node = queue.shift()!
         setHighlightedNodes([node.id])
         stepSound()
-        await new Promise((resolve) => setTimeout(resolve, 400))
+        await sleep(400)
 
         if (!node.left) {
           setHighlightedNodes([node.id, newNode.id])
           stepSound()
-          await new Promise((resolve) => setTimeout(resolve, 500))
+          await sleep(500)
           node.left = newNode
           return clonedRoot
         }
         if (!node.right) {
           setHighlightedNodes([node.id, newNode.id])
           stepSound()
-          await new Promise((resolve) => setTimeout(resolve, 500))
+          await sleep(500)
           node.right = newNode
           return clonedRoot
         }
@@ -159,7 +164,7 @@ export function useBinaryTree(mode: "bst" | "generic" = "bst") {
       setTraversalHistory((prev) => [...prev, value])
       stepSound()
 
-      await new Promise((resolve) => setTimeout(resolve, 800))
+      await sleep(800)
 
       setHighlightedNodes((prev) => prev.filter((id) => id !== nodeId))
     }
@@ -285,5 +290,7 @@ export function useBinaryTree(mode: "bst" | "generic" = "bst") {
     postorderTraversal,
     voiceEnabled,
     setVoiceEnabled,
+    speed,
+    setSpeed,
   }
 }

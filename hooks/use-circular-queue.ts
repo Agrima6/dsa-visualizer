@@ -28,6 +28,10 @@ export function useCircularQueue(size: number = 6) {
   stateRef.current = { slots, front, rear, count }
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
+  const [speed, setSpeedState] = useState(1)
+  const speedRef = useRef(1)
+  const setSpeed = (v: number) => { speedRef.current = v; setSpeedState(v) }
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms / speedRef.current))
 
   const isFull = count >= size
   const isEmpty = count === 0
@@ -42,7 +46,7 @@ export function useCircularQueue(size: number = 6) {
     const nextRear = s.count === 0 ? 0 : (s.rear + 1) % size
     setActiveIndex(nextRear)
     stepSound()
-    await new Promise((r) => setTimeout(r, 500))
+    await sleep(500)
 
     const newNode: QueueNode = { id: `node-${nodeIdCounter++}`, value, index: nextRear }
     const nextSlots = [...s.slots]
@@ -57,7 +61,7 @@ export function useCircularQueue(size: number = 6) {
 
     setOperations((prev) => [...prev, { type: "enqueue", value, timestamp: Date.now() }])
     stepSound()
-    await new Promise((r) => setTimeout(r, 400))
+    await sleep(400)
 
     setActiveIndex(null)
     setIsAnimating(false)
@@ -75,7 +79,7 @@ export function useCircularQueue(size: number = 6) {
 
     setActiveIndex(s.front)
     stepSound()
-    await new Promise((r) => setTimeout(r, 500))
+    await sleep(500)
 
     const nextSlots = [...s.slots]
     nextSlots[s.front] = null
@@ -91,7 +95,7 @@ export function useCircularQueue(size: number = 6) {
 
     setOperations((prev) => [...prev, { type: "dequeue", value: removed.value, timestamp: Date.now() }])
     stepSound()
-    await new Promise((r) => setTimeout(r, 400))
+    await sleep(400)
 
     setActiveIndex(null)
     setIsAnimating(false)
@@ -118,5 +122,6 @@ export function useCircularQueue(size: number = 6) {
     enqueue, dequeue, clear,
     isFull, isEmpty,
     voiceEnabled, setVoiceEnabled,
+    speed, setSpeed,
   }
 }

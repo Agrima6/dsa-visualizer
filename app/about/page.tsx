@@ -59,7 +59,7 @@ const missionPoints = [
   {
     emoji: "🎯",
     title: "Stop guessing. Start seeing.",
-    body: "Most students fail DSA not because they're not smart  but because nobody showed them how it actually works. We fix that with step-by-step visuals.",
+    body: "Most students fail DSA not because they're not smart, but because nobody showed them how it actually works. We fix that with step-by-step visuals.",
   },
   {
     emoji: "💡",
@@ -69,7 +69,7 @@ const missionPoints = [
   {
     emoji: "🚀",
     title: "From confused to confident.",
-    body: "Whether you're a beginner or prepping for FAANG, AlgoMaitri meets you where you are and helps you level up  one algorithm at a time.",
+    body: "Whether you're a beginner or prepping for FAANG, AlgoMaitri meets you where you are and helps you level up, one algorithm at a time.",
   },
 ];
 
@@ -171,7 +171,7 @@ export default function AboutPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "3rem", alignItems: "start" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               <p style={{ fontSize: "1.15rem", lineHeight: 1.75, color: t.textMuted, margin: 0, maxWidth: 480 }}>
-                AlgoMaitri is built on a simple belief  that everyone can understand data structures and algorithms when they can actually <em>see</em> them working. We design for the moment things finally click.
+                AlgoMaitri is built on a simple belief: that everyone can understand data structures and algorithms when they can actually <em>see</em> them working. We design for the moment things finally click.
               </p>
               <p style={{ fontSize: "1rem", lineHeight: 1.75, color: t.textFaint, margin: 0, maxWidth: 480 }}>
                 Our platform bridges the gap between theory and intuition, replacing rote memorization with visual, step-by-step exploration that sticks.

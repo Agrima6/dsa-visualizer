@@ -29,6 +29,8 @@ export function AVLTreeVisualizer({ content }: AVLTreeVisualizerProps) {
     inorderTraversal,
     preorderTraversal,
     postorderTraversal,
+    speed,
+    setSpeed,
   } = useAVLTree()
 
   const handleTraversal = async (type: "inorder" | "preorder" | "postorder") => {
@@ -101,6 +103,8 @@ export function AVLTreeVisualizer({ content }: AVLTreeVisualizerProps) {
                   onTraversal={handleTraversal}
                   isAnimating={isAnimating}
                   traversalHistory={traversalHistory}
+                  speed={speed}
+                  onSetSpeed={setSpeed}
                 />
               </div>
               <div className="rounded-2xl border border-violet-500/15 bg-white/60 p-4 text-xs text-muted-foreground dark:bg-white/[0.03]">

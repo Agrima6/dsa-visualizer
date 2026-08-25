@@ -5,6 +5,7 @@ const VISUALIZER_SLUGS = [
   "avl-tree",
   "binary-tree",
   "dijkstra",
+  "dp",
   "functions",
   "graph",
   "heap",
@@ -18,6 +19,7 @@ const VISUALIZER_SLUGS = [
   "stack",
   "stack-applications",
   "time-complexity",
+  "trie",
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

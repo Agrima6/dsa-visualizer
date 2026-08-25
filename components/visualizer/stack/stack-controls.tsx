@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState } from "react"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 
 const MAX_STACK_SIZE = 10
 
@@ -14,6 +15,8 @@ interface StackControlsProps {
   isAnimating: boolean
   isFull: boolean
   isEmpty: boolean
+  speed?: number
+  onSetSpeed?: (speed: number) => void
 }
 
 export function StackControls({
@@ -23,6 +26,8 @@ export function StackControls({
   isAnimating,
   isFull,
   isEmpty,
+  speed,
+  onSetSpeed,
 }: StackControlsProps) {
   const [value, setValue] = useState("")
   const [bulkValue, setBulkValue] = useState("")
@@ -118,8 +123,12 @@ export function StackControls({
           </Button>
         </div>
 
+        {typeof speed === "number" && onSetSpeed && (
+          <SpeedControl speed={speed} onSetSpeed={onSetSpeed} disabled={isAnimating} />
+        )}
+
         <div className="grid grid-cols-2 gap-2">
-          <Button 
+          <Button
             onClick={handlePop}
             disabled={isAnimating || isEmpty}
             variant="secondary"

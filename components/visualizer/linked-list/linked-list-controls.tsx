@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState } from "react"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 
 interface LinkedListControlsProps {
   onInsertFront: (value: number) => Promise<void>
@@ -16,6 +17,8 @@ interface LinkedListControlsProps {
   isAnimating: boolean
   isEmpty: boolean
   isFull: boolean
+  speed?: number
+  onSetSpeed?: (speed: number) => void
 }
 
 export function LinkedListControls({
@@ -27,6 +30,8 @@ export function LinkedListControls({
   isAnimating,
   isEmpty,
   isFull,
+  speed,
+  onSetSpeed,
 }: LinkedListControlsProps) {
   const [value, setValue] = useState("")
   const [insertAtFront, setInsertAtFront] = useState(true)
@@ -102,6 +107,10 @@ export function LinkedListControls({
             Delete Back
           </Button>
         </div>
+
+        {typeof speed === "number" && onSetSpeed && (
+          <SpeedControl speed={speed} onSetSpeed={onSetSpeed} disabled={isAnimating} />
+        )}
 
         {/* Reverse Control */}
         <Button

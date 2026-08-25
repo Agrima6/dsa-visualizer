@@ -21,6 +21,10 @@ export function useDeque(maxSize: number = 8) {
   queueRef.current = queue
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
+  const [speed, setSpeedState] = useState(1)
+  const speedRef = useRef(1)
+  const setSpeed = (v: number) => { speedRef.current = v; setSpeedState(v) }
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms / speedRef.current))
 
   const reindex = (arr: QueueNode[]) => arr.map((n, i) => ({ ...n, index: i }))
 
@@ -32,14 +36,14 @@ export function useDeque(maxSize: number = 8) {
 
     setHighlightedIndex(0)
     stepSound()
-    await new Promise((r) => setTimeout(r, 500))
+    await sleep(500)
 
     const next = reindex([{ id: `node-${nodeIdCounter++}`, value, index: 0 }, ...current])
     setQueue(next)
     queueRef.current = next
     setOperations((prev) => [...prev, { type: "enqueue", value, timestamp: Date.now() }])
     stepSound()
-    await new Promise((r) => setTimeout(r, 350))
+    await sleep(350)
 
     setHighlightedIndex(null)
     setIsAnimating(false)
@@ -55,14 +59,14 @@ export function useDeque(maxSize: number = 8) {
 
     setHighlightedIndex(current.length)
     stepSound()
-    await new Promise((r) => setTimeout(r, 500))
+    await sleep(500)
 
     const next = reindex([...current, { id: `node-${nodeIdCounter++}`, value, index: current.length }])
     setQueue(next)
     queueRef.current = next
     setOperations((prev) => [...prev, { type: "enqueue", value, timestamp: Date.now() }])
     stepSound()
-    await new Promise((r) => setTimeout(r, 350))
+    await sleep(350)
 
     setHighlightedIndex(null)
     setIsAnimating(false)
@@ -80,14 +84,14 @@ export function useDeque(maxSize: number = 8) {
 
     setHighlightedIndex(0)
     stepSound()
-    await new Promise((r) => setTimeout(r, 500))
+    await sleep(500)
 
     const next = reindex(current.slice(1))
     setQueue(next)
     queueRef.current = next
     setOperations((prev) => [...prev, { type: "dequeue", value: removed.value, timestamp: Date.now() }])
     stepSound()
-    await new Promise((r) => setTimeout(r, 350))
+    await sleep(350)
 
     setHighlightedIndex(null)
     setIsAnimating(false)
@@ -105,14 +109,14 @@ export function useDeque(maxSize: number = 8) {
 
     setHighlightedIndex(current.length - 1)
     stepSound()
-    await new Promise((r) => setTimeout(r, 500))
+    await sleep(500)
 
     const next = reindex(current.slice(0, -1))
     setQueue(next)
     queueRef.current = next
     setOperations((prev) => [...prev, { type: "dequeue", value: removed.value, timestamp: Date.now() }])
     stepSound()
-    await new Promise((r) => setTimeout(r, 350))
+    await sleep(350)
 
     setHighlightedIndex(null)
     setIsAnimating(false)
@@ -135,5 +139,6 @@ export function useDeque(maxSize: number = 8) {
     isFull: queue.length >= maxSize,
     isEmpty: queue.length === 0,
     voiceEnabled, setVoiceEnabled,
+    speed, setSpeed,
   }
 }

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState } from "react"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 
 interface PriorityQueueControlsProps {
   onInsert: (value: number) => Promise<void>
@@ -11,6 +12,8 @@ interface PriorityQueueControlsProps {
   onClear: () => void
   isAnimating: boolean
   isEmpty: boolean
+  speed?: number
+  onSetSpeed?: (speed: number) => void
 }
 
 export function PriorityQueueControls({
@@ -19,6 +22,8 @@ export function PriorityQueueControls({
   onClear,
   isAnimating,
   isEmpty,
+  speed,
+  onSetSpeed,
 }: PriorityQueueControlsProps) {
   const [value, setValue] = useState("")
 
@@ -55,6 +60,10 @@ export function PriorityQueueControls({
             Insert
           </Button>
         </div>
+
+        {typeof speed === "number" && onSetSpeed && (
+          <SpeedControl speed={speed} onSetSpeed={onSetSpeed} disabled={isAnimating} />
+        )}
 
         <div className="grid grid-cols-2 gap-2">
           <Button onClick={onExtractMin} disabled={isAnimating || isEmpty} variant="secondary">

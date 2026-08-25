@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import {
   ListType,
   ListNode,
@@ -36,7 +36,10 @@ export function useLinkedList(type: ListType) {
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
 
-  const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
+  const [speed, setSpeedState] = useState(1)
+  const speedRef = useRef(1)
+  const setSpeed = (v: number) => { speedRef.current = v; setSpeedState(v) }
+  const delay = (ms: number) => new Promise((r) => setTimeout(r, ms / speedRef.current))
 
   const addOperation = (operation: Omit<ListOperation, 'timestamp'>) => {
     setOperations((prev) => [...prev, { ...operation, timestamp: Date.now() }])
@@ -310,5 +313,7 @@ export function useLinkedList(type: ListType) {
     reverse,
     voiceEnabled,
     setVoiceEnabled,
+    speed,
+    setSpeed,
   }
 }

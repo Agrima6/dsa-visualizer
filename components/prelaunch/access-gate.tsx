@@ -16,11 +16,9 @@ import {
 } from "@/components/ui/dialog"
 import { GatePanel } from "@/components/prelaunch/gate-panel"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
+import { TOPICS } from "@/lib/visualizer-topics"
 
-const topics = [
-  "Arrays", "Linked Lists", "Stacks", "Queues", "Trees", "Heaps",
-  "Sorting", "Graphs", "Dijkstra", "Huffman Coding", "Polynomial",
-]
+const topics = TOPICS.map((t) => t.name)
 const marqueeTopics = [...topics, ...topics]
 
 const features = [

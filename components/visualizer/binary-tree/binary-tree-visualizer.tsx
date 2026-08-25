@@ -160,6 +160,8 @@ function BinaryTreeVisualizerOriginal({ content, heapContent }: BinaryTreeVisual
                       onTraversal={handleGenericTraversal}
                       isAnimating={genericTree.isAnimating}
                       traversalHistory={genericTree.traversalHistory}
+                      speed={genericTree.speed}
+                      onSetSpeed={genericTree.setSpeed}
                     />
                   </div>
                 </div>
@@ -207,6 +209,8 @@ function BinaryTreeVisualizerOriginal({ content, heapContent }: BinaryTreeVisual
                       onTraversal={handleBstTraversal}
                       isAnimating={bst.isAnimating}
                       traversalHistory={bst.traversalHistory}
+                      speed={bst.speed}
+                      onSetSpeed={bst.setSpeed}
                     />
                   </div>
                 </div>
@@ -273,7 +277,7 @@ function BinaryTreeVisualizerOriginal({ content, heapContent }: BinaryTreeVisual
                       </div>
 
                       <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">
-                        <HeapControls title="Max Heap" onInsert={maxHeap.insert} onInsertMany={maxHeap.insertMany} onClear={maxHeap.clear} heapType={maxHeap.heapType} />
+                        <HeapControls title="Max Heap" onInsert={maxHeap.insert} onInsertMany={maxHeap.insertMany} onClear={maxHeap.clear} heapType={maxHeap.heapType} speed={maxHeap.speed} onSetSpeed={maxHeap.setSpeed} />
                       </div>
 
                       <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">
@@ -303,7 +307,7 @@ function BinaryTreeVisualizerOriginal({ content, heapContent }: BinaryTreeVisual
                       </div>
 
                       <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">
-                        <HeapControls title="Min Heap" onInsert={minHeap.insert} onInsertMany={minHeap.insertMany} onClear={minHeap.clear} heapType={minHeap.heapType} />
+                        <HeapControls title="Min Heap" onInsert={minHeap.insert} onInsertMany={minHeap.insertMany} onClear={minHeap.clear} heapType={minHeap.heapType} speed={minHeap.speed} onSetSpeed={minHeap.setSpeed} />
                       </div>
 
                       <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">

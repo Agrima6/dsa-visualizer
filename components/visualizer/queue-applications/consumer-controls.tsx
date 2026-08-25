@@ -4,14 +4,17 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Consumer } from "./types"
 import { Loader2 } from "lucide-react"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 
 interface ConsumerControlsProps {
   consumers: Consumer[]
   onProcess: (consumerId: string) => void
   queueSize: number
+  speed: number
+  onSetSpeed: (speed: number) => void
 }
 
-export function ConsumerControls({ consumers, onProcess, queueSize }: ConsumerControlsProps) {
+export function ConsumerControls({ consumers, onProcess, queueSize, speed, onSetSpeed }: ConsumerControlsProps) {
   return (
     <Card className="bg-card/50 backdrop-blur-sm">
       <CardHeader>
@@ -40,6 +43,7 @@ export function ConsumerControls({ consumers, onProcess, queueSize }: ConsumerCo
             </Button>
           ))}
         </div>
+        <SpeedControl speed={speed} onSetSpeed={onSetSpeed} />
       </CardContent>
     </Card>
   )

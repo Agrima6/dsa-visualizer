@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useUser, SignInButton } from "@clerk/nextjs"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 import {
   HEAP_PROBLEMS,
   type HeapProblem,
@@ -627,7 +628,8 @@ function ProblemDetail({
   const [steps]       = useState<HeapVisStep[]>(() => problem.generateSteps())
   const [currentStep, setCurrentStep] = useState(0)
   const [isPlaying, setIsPlaying]     = useState(false)
-  const [speed, setSpeed]             = useState(700)
+  const [speedMultiplier, setSpeedMultiplier] = useState(1)
+  const speed = 700 / speedMultiplier
   const [activeTab, setActiveTab]     = useState<"description" | "approaches" | "pitfalls">("description")
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -788,12 +790,7 @@ function ProblemDetail({
                 </button>
               </div>
               <div className="mt-5 border-t border-violet-500/10 pt-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Animation Speed</span>
-                  <span className="text-xs font-mono text-violet-500 dark:text-violet-300">{speed}ms</span>
-                </div>
-                <input type="range" min={150} max={1500} step={50} value={speed}
-                  onChange={(e) => setSpeed(Number(e.target.value))} className="w-full accent-violet-600" />
+                <SpeedControl speed={speedMultiplier} onSetSpeed={setSpeedMultiplier} />
               </div>
             </div>
 

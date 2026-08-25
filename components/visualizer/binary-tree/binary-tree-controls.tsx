@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState } from "react"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 
 interface BinaryTreeControlsProps {
   onInsert: (value: number) => Promise<void>
@@ -11,6 +12,8 @@ interface BinaryTreeControlsProps {
   onTraversal: (type: "inorder" | "preorder" | "postorder") => void
   traversalHistory: number[]
   isAnimating: boolean
+  speed?: number
+  onSetSpeed?: (speed: number) => void
 }
 
 export function BinaryTreeControls({
@@ -19,6 +22,8 @@ export function BinaryTreeControls({
   onTraversal,
   traversalHistory,
   isAnimating,
+  speed,
+  onSetSpeed,
 }: BinaryTreeControlsProps) {
   const [value, setValue] = useState("")
   const [bulkValue, setBulkValue] = useState("")
@@ -143,6 +148,13 @@ export function BinaryTreeControls({
 
           {/* Divider */}
           <div className="h-px bg-border/50" />
+
+          {typeof speed === "number" && onSetSpeed && (
+            <>
+              <SpeedControl speed={speed} onSetSpeed={onSetSpeed} disabled={isAnimating} />
+              <div className="h-px bg-border/50" />
+            </>
+          )}
 
           {/* Clear — full width, separated so it's clearly destructive */}
           <Button

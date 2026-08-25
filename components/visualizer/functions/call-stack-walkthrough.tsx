@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Play, Pause, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 import { cn } from "@/lib/utils"
 import { FUNCTION_DEMOS, getRecursionDemo } from "./call-demos-data"
 import { getConcept } from "./concepts-data"
@@ -14,6 +15,7 @@ export function CallStackWalkthrough() {
   const [n, setN] = useState(4)
   const [stepIdx, setStepIdx] = useState(0)
   const [playing, setPlaying] = useState(false)
+  const [speedMultiplier, setSpeedMultiplier] = useState(1)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const isRecursion = demoId === "recursion"
@@ -46,13 +48,13 @@ export function CallStackWalkthrough() {
           }
           return i + 1
         })
-      }, 700)
+      }, 700 / speedMultiplier)
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playing, steps.length])
+  }, [playing, steps.length, speedMultiplier])
 
   return (
     <div className="space-y-5">
@@ -197,6 +199,10 @@ export function CallStackWalkthrough() {
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
+            </div>
+
+            <div className="w-40">
+              <SpeedControl speed={speedMultiplier} onSetSpeed={setSpeedMultiplier} />
             </div>
           </div>
 

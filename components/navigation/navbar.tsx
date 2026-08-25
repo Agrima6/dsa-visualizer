@@ -24,16 +24,12 @@ import Link from "next/link";
 import { ModeToggle } from "@/components/global/mode-toggle";
 import { useUser, UserButton } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
+import { roadmapTopics } from "@/lib/visualizer-topics";
+import { CommandPalette } from "@/components/global/command-palette";
 
 interface RouteProps {
   href: string;
   label: string;
-}
-
-interface FeatureProps {
-  title: string;
-  description: string;
-  url: string;
 }
 
 const routeList: RouteProps[] = [
@@ -51,98 +47,16 @@ const routeList: RouteProps[] = [
   },
 ];
 
-// Ordered as a learning roadmap — position in this array IS the step
-// number shown in the nav (01, 02, 03...), so don't reorder casually.
-// Descriptions here are deliberately short (~35 chars) — this list renders
-// in a narrow two-column nav dropdown with a 1-line clamp, so anything
-// longer just truncates mid-word.
-const featureList: FeatureProps[] = [
-  {
-    title: "Time Complexity",
-    description: "Big-O through live graphs and quizzes.",
-    url: "/visualizer/time-complexity",
-  },
-  {
-    title: "Functions",
-    description: "Real call stacks, closures, recursion.",
-    url: "/visualizer/functions",
-  },
-  {
-    title: "Arrays",
-    description: "Interactive array visualizations.",
-    url: "/visualizer/array",
-  },
-  {
-    title: "Searching",
-    description: "Linear and binary search, step by step.",
-    url: "/visualizer/array",
-  },
-  {
-    title: "Sorting",
-    description: "Watch sorting algorithms run live.",
-    url: "/visualizer/sorting",
-  },
-  {
-    title: "Recursion",
-    description: "Real call-stack visualizations.",
-    url: "/visualizer/recursion",
-  },
-  {
-    title: "Stack",
-    description: "LIFO, animated push and pop.",
-    url: "/visualizer/stack",
-  },
-  {
-    title: "Queue",
-    description: "Simple, Circular, Priority, and Deque.",
-    url: "/visualizer/queue",
-  },
-  {
-    title: "Linked Lists",
-    description: "Node-based structures, step by step.",
-    url: "/visualizer/linked-list",
-  },
-  {
-    title: "Binary Tree",
-    description: "Plain tree, BST, and Heap — compared.",
-    url: "/visualizer/binary-tree",
-  },
-  {
-    title: "AVL Tree",
-    description: "Self-balancing — rotations, live.",
-    url: "/visualizer/avl-tree",
-  },
-  {
-    title: "Heaps",
-    description: "Heap operations and ordering.",
-    url: "/visualizer/heap",
-  },
-  {
-    title: "Infix to Postfix",
-    description: "Expression conversion with a stack.",
-    url: "/visualizer/stack-applications",
-  },
-  {
-    title: "Message Queue",
-    description: "Producer-consumer queue systems.",
-    url: "/visualizer/queue-applications",
-  },
-  {
-    title: "Polynomial Multiplication",
-    description: "Polynomial operations, visualized.",
-    url: "/visualizer/polynomial",
-  },
-  {
-    title: "Huffman Coding",
-    description: "Tree-based compression, encode/decode.",
-    url: "/visualizer/huffman",
-  },
-  {
-    title: "Dijkstra's Algorithm",
-    description: "Shortest paths through a graph.",
-    url: "/visualizer/dijkstra",
-  },
-];
+// Ordered as a learning roadmap — the `order` field on each topic in
+// lib/topics.ts IS the step number shown in the nav (01, 02, 03...).
+// Descriptions rendered here use each topic's shortDescription (~35 chars)
+// since this list renders in a narrow two-column nav dropdown with a
+// 1-line clamp, so anything longer just truncates mid-word.
+const featureList = roadmapTopics().map((t) => ({
+  title: t.name,
+  description: t.shortDescription,
+  url: t.href,
+}));
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -328,6 +242,7 @@ export const Navbar = () => {
         </NavigationMenu>
 
         <div className="hidden lg:flex items-center gap-3">
+          <CommandPalette />
           <ModeToggle />
 
           {isSignedIn ? (

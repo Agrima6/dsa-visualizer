@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Play, Pause, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 import { cn } from "@/lib/utils"
 import { ALGORITHM_DEMOS } from "./algorithms-data"
 import { getComplexity } from "./complexity-data"
@@ -14,6 +15,7 @@ export function CodeWalkthrough() {
   const [n, setN] = useState(6)
   const [stepIdx, setStepIdx] = useState(0)
   const [playing, setPlaying] = useState(false)
+  const [speedMultiplier, setSpeedMultiplier] = useState(1)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const demo = ALGORITHM_DEMOS.find((d) => d.id === algoId)!
@@ -37,13 +39,13 @@ export function CodeWalkthrough() {
           }
           return i + 1
         })
-      }, 500)
+      }, 500 / speedMultiplier)
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playing, steps.length])
+  }, [playing, steps.length, speedMultiplier])
 
   const maxN = demo.id === "bubble-sort" || demo.id === "merge-sort" ? 14 : 24
 
@@ -174,6 +176,10 @@ export function CodeWalkthrough() {
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
+            </div>
+
+            <div className="w-40">
+              <SpeedControl speed={speedMultiplier} onSetSpeed={setSpeedMultiplier} />
             </div>
           </div>
 

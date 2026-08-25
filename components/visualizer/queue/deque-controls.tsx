@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState } from "react"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 
 interface DequeControlsProps {
   onAddFront: (value: number) => Promise<void>
@@ -14,6 +15,8 @@ interface DequeControlsProps {
   isAnimating: boolean
   isFull: boolean
   isEmpty: boolean
+  speed?: number
+  onSetSpeed?: (speed: number) => void
 }
 
 export function DequeControls({
@@ -25,6 +28,8 @@ export function DequeControls({
   isAnimating,
   isFull,
   isEmpty,
+  speed,
+  onSetSpeed,
 }: DequeControlsProps) {
   const [value, setValue] = useState("")
 
@@ -71,6 +76,10 @@ export function DequeControls({
             − Rear
           </Button>
         </div>
+
+        {typeof speed === "number" && onSetSpeed && (
+          <SpeedControl speed={speed} onSetSpeed={onSetSpeed} disabled={isAnimating} />
+        )}
 
         <Button onClick={onClear} disabled={isAnimating || isEmpty} variant="destructive" className="w-full">
           Clear

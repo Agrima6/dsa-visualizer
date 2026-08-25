@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { HeapType } from "./types"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 
 interface HeapControlsProps {
   title: string
@@ -13,6 +14,8 @@ interface HeapControlsProps {
   onInsertMany: (values: string) => void
   onClear: () => void
   heapType: HeapType
+  speed?: number
+  onSetSpeed?: (speed: number) => void
 }
 
 export function HeapControls({
@@ -21,6 +24,8 @@ export function HeapControls({
   onInsertMany,
   onClear,
   heapType,
+  speed,
+  onSetSpeed,
 }: HeapControlsProps) {
   const [value, setValue] = useState("")
   const [bulkInput, setBulkInput] = useState("")
@@ -81,8 +86,12 @@ export function HeapControls({
             </div>
           </div>
 
-          <Button 
-            variant="destructive" 
+          {typeof speed === "number" && onSetSpeed && (
+            <SpeedControl speed={speed} onSetSpeed={onSetSpeed} />
+          )}
+
+          <Button
+            variant="destructive"
             onClick={onClear}
             className="w-full"
           >

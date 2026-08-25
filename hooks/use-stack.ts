@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { StackNode, StackOperation } from "@/components/visualizer/stack/types"
 import { useAlgorithmFeedback } from "@/hooks/use-algorithm-feedback"
 import { playNarration } from "@/lib/narration"
@@ -11,6 +11,10 @@ export function useStack(maxSize: number = 8) {
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null)
   const [voiceEnabled, setVoiceEnabled] = useState(true)
 const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
+  const [speed, setSpeedState] = useState(1)
+  const speedRef = useRef(1)
+  const setSpeed = (v: number) => { speedRef.current = v; setSpeedState(v) }
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms / speedRef.current))
   const push = async (value: number) => {
    
     if (stack.length >= maxSize || isAnimating) return
@@ -26,7 +30,7 @@ const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
     setHighlightedIndex(stack.length)
     
     // Add new node with animation delay
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await sleep(500)
     
     setStack(prev => [
       ...prev,
@@ -37,7 +41,7 @@ const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
       }
     ])
 
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await sleep(500)
     setHighlightedIndex(null)
     setIsAnimating(false)
     endSound()
@@ -57,11 +61,11 @@ showEndMessage("Algorithm ended", `Push operation completed for ${value}.`)
     // Highlight the top element
     setHighlightedIndex(stack.length - 1)
     
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await sleep(500)
     
     setStack(prev => prev.slice(0, -1))
     
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await sleep(500)
     setHighlightedIndex(null)
     setIsAnimating(false)
     endSound()
@@ -88,5 +92,7 @@ showEndMessage("Algorithm ended", "Pop operation completed.")
     isEmpty: stack.length === 0,
     voiceEnabled,
     setVoiceEnabled,
+    speed,
+    setSpeed,
   }
 } 

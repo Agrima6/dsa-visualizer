@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import { Message, Producer, Consumer } from "@/components/visualizer/queue-applications/types"
 
 let messageIdCounter = 0
@@ -16,6 +16,10 @@ export function useMessageQueue() {
     { id: 'c1', name: 'Consumer 1', processedCount: 0, isProcessing: false },
     { id: 'c2', name: 'Consumer 2', processedCount: 0, isProcessing: false },
   ])
+
+  const [speed, setSpeedState] = useState(1)
+  const speedRef = useRef(1)
+  const setSpeed = (v: number) => { speedRef.current = v; setSpeedState(v) }
 
   const produceMessage = useCallback(async (producerId: string, content: string) => {
     const message: Message = {
@@ -49,7 +53,7 @@ export function useMessageQueue() {
     ))
 
     // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, DEFAULT_PROCESS_TIME))
+    await new Promise(resolve => setTimeout(resolve, DEFAULT_PROCESS_TIME / speedRef.current))
 
     // Mark as completed and update consumer
     message.status = 'completed'
@@ -77,5 +81,7 @@ export function useMessageQueue() {
     produceMessage,
     processNextMessage,
     clear,
+    speed,
+    setSpeed,
   }
 }

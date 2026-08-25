@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { QueueNode, QueueOperation } from "@/components/visualizer/queue/types"
 import { useAlgorithmFeedback } from "@/hooks/use-algorithm-feedback"
 import { playNarration } from "@/lib/narration"
@@ -13,6 +13,10 @@ export function useQueue(maxSize: number = 8) {
   const [voiceEnabled, setVoiceEnabled] = useState(true)
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
+  const [speed, setSpeedState] = useState(1)
+  const speedRef = useRef(1)
+  const setSpeed = (v: number) => { speedRef.current = v; setSpeedState(v) }
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms / speedRef.current))
 
   const enqueue = async (value: number) => {
     if (queue.length >= maxSize || isAnimating) return
@@ -33,7 +37,7 @@ export function useQueue(maxSize: number = 8) {
     stepSound()
 
     // wait before inserting
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    await sleep(500)
 
     setQueue((prev) => [
       ...prev,
@@ -47,7 +51,7 @@ export function useQueue(maxSize: number = 8) {
     // optional second step sound after actual insertion
     stepSound()
 
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    await sleep(500)
 
     setHighlightedIndex(null)
     setIsAnimating(false)
@@ -80,7 +84,7 @@ export function useQueue(maxSize: number = 8) {
     setHighlightedIndex(0)
     stepSound()
 
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    await sleep(500)
 
     setQueue((prev) => {
       const newQueue = prev.slice(1)
@@ -93,7 +97,7 @@ export function useQueue(maxSize: number = 8) {
     // sound after removal
     stepSound()
 
-    await new Promise((resolve) => setTimeout(resolve, 500))
+    await sleep(500)
 
     setHighlightedIndex(null)
     setIsAnimating(false)
@@ -122,5 +126,7 @@ export function useQueue(maxSize: number = 8) {
     isEmpty: queue.length === 0,
     voiceEnabled,
     setVoiceEnabled,
+    speed,
+    setSpeed,
   }
 }

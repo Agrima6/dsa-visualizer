@@ -42,7 +42,7 @@ export function StackVisualizer(props: StackVisualizerProps) {
 function StackVisualizerOriginal({ content }: StackVisualizerProps) {
   const {
     stack, operations, isAnimating, highlightedIndex,
-    push, pop, clear, isFull, isEmpty,
+    push, pop, clear, isFull, isEmpty, speed, setSpeed,
   } = useStack()
 
   return (
@@ -97,6 +97,7 @@ function StackVisualizerOriginal({ content }: StackVisualizerProps) {
                 <StackControls
                   onPush={push} onPop={pop} onClear={clear}
                   isAnimating={isAnimating} isFull={isFull} isEmpty={isEmpty}
+                  speed={speed} onSetSpeed={setSpeed}
                 />
               </div>
               <div className="rounded-2xl border border-violet-500/15 bg-white/70 backdrop-blur-xl p-4 dark:bg-white/[0.04]">

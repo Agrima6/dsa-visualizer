@@ -131,6 +131,8 @@ function LinkedListContent({ type }: { type: ListType }) {
     deleteFront,
     deleteBack,
     reverse,
+    speed,
+    setSpeed,
   } = useLinkedList(type)
 
   // ✅ Derive real node count from the map
@@ -161,7 +163,9 @@ function LinkedListContent({ type }: { type: ListType }) {
           onReverse={reverse}
           isAnimating={isAnimating}
           isEmpty={!list.head}
-          isFull={isFull}           
+          isFull={isFull}
+          speed={speed}
+          onSetSpeed={setSpeed}
         />
         <LinkedListOperations operations={operations} />
       </div>

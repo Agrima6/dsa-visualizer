@@ -24,6 +24,10 @@ export function usePriorityQueue() {
   queueRef.current = queue
 
   const { stepSound, endSound, showEndMessage } = useAlgorithmFeedback()
+  const [speed, setSpeedState] = useState(1)
+  const speedRef = useRef(1)
+  const setSpeed = (v: number) => { speedRef.current = v; setSpeedState(v) }
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms / speedRef.current))
 
   const insert = async (value: number) => {
     if (isAnimating) return
@@ -36,7 +40,7 @@ export function usePriorityQueue() {
     for (let i = 0; i < current.length; i++) {
       setHighlightedIndex(i)
       stepSound()
-      await new Promise((r) => setTimeout(r, 350))
+      await sleep(350)
       if (value < current[i].value) {
         insertAt = i
         break
@@ -55,7 +59,7 @@ export function usePriorityQueue() {
     setOperations((prev) => [...prev, { type: "enqueue", value, timestamp: Date.now() }])
     setHighlightedIndex(insertAt)
     stepSound()
-    await new Promise((r) => setTimeout(r, 450))
+    await sleep(450)
 
     setHighlightedIndex(null)
     setIsAnimating(false)
@@ -73,14 +77,14 @@ export function usePriorityQueue() {
 
     setHighlightedIndex(0)
     stepSound()
-    await new Promise((r) => setTimeout(r, 500))
+    await sleep(500)
 
     const next = current.slice(1).map((n, i) => ({ ...n, index: i }))
     setQueue(next)
     queueRef.current = next
     setOperations((prev) => [...prev, { type: "dequeue", value: removed.value, timestamp: Date.now() }])
     stepSound()
-    await new Promise((r) => setTimeout(r, 400))
+    await sleep(400)
 
     setHighlightedIndex(null)
     setIsAnimating(false)
@@ -102,5 +106,6 @@ export function usePriorityQueue() {
     insert, extractMin, clear,
     isEmpty: queue.length === 0,
     voiceEnabled, setVoiceEnabled,
+    speed, setSpeed,
   }
 }

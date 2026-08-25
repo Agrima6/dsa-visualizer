@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useState } from "react"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 
 interface CircularQueueControlsProps {
   onEnqueue: (value: number) => Promise<void>
@@ -14,6 +15,8 @@ interface CircularQueueControlsProps {
   isEmpty: boolean
   size: number
   count: number
+  speed?: number
+  onSetSpeed?: (speed: number) => void
 }
 
 export function CircularQueueControls({
@@ -25,6 +28,8 @@ export function CircularQueueControls({
   isEmpty,
   size,
   count,
+  speed,
+  onSetSpeed,
 }: CircularQueueControlsProps) {
   const [value, setValue] = useState("")
 
@@ -64,6 +69,10 @@ export function CircularQueueControls({
 
         {isFull && (
           <p className="text-xs font-medium text-amber-500">Queue is full — dequeue to free a slot.</p>
+        )}
+
+        {typeof speed === "number" && onSetSpeed && (
+          <SpeedControl speed={speed} onSetSpeed={onSetSpeed} disabled={isAnimating} />
         )}
 
         <div className="grid grid-cols-2 gap-2">
