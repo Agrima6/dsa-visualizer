@@ -1,12 +1,23 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import dynamic from "next/dynamic"
 import { motion } from "framer-motion"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { COMPLEXITIES, ComplexityId, formatOps } from "./complexity-data"
-import { ComplexityChart } from "./complexity-chart"
+
+// Recharts' ResponsiveContainer measures its parent via a real DOM layout
+// pass, which doesn't exist during `next build`'s server-side prerender —
+// that mismatch is what produces the harmless but noisy "width(-1) and
+// height(-1)" warning in build logs. Loading it client-only sidesteps the
+// SSR pass for this component entirely instead of just resizing after the
+// fact.
+const ComplexityChart = dynamic(
+  () => import("./complexity-chart").then((m) => m.ComplexityChart),
+  { ssr: false, loading: () => <div className="h-[280px] w-full sm:h-[340px]" /> }
+)
 
 const MAX_N = 40
 

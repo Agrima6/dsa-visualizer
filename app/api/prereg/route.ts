@@ -10,7 +10,7 @@ import { isCurrentUserAdmin } from "@/lib/admin"
  */
 export async function POST(req: Request) {
   const ip = getClientIp(req)
-  const { allowed: withinLimit } = rateLimit(`prereg:${ip}`, 5, 60_000)
+  const { allowed: withinLimit } = await rateLimit(`prereg:${ip}`, 5, 60_000)
   if (!withinLimit) {
     return NextResponse.json({ error: "Too many attempts. Try again shortly." }, { status: 429 })
   }

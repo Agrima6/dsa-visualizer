@@ -36,8 +36,13 @@ export function ComplexityChart({ maxN, currentN, logScale, activeIds, highlight
   }, [maxN, visible.map((c) => c.id).join(",")])
 
   return (
-    <div className="h-[280px] w-full sm:h-[340px]">
-      <ResponsiveContainer width="100%" height="100%">
+    <div className="h-[280px] w-full min-w-[240px] sm:h-[340px]">
+      {/* minWidth/minHeight matter here: this chart can mount inside a
+          hidden tab panel (display:none) or before layout settles, where
+          the container briefly measures 0×0 — Recharts then logs a
+          "width(-1) and height(-1)" warning on every such render. Explicit
+          minimums give it a sane fallback size instead of a negative one. */}
+      <ResponsiveContainer width="100%" height="100%" minWidth={240} minHeight={280}>
         <LineChart data={data} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />
           <XAxis

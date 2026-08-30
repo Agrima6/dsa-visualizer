@@ -22,9 +22,15 @@ export async function POST(req: Request) {
 
     const { topicSlug } = await req.json();
 
-    if (!topicSlug) {
+    // Basic shape validation — a real catalog check happens implicitly at
+    // verify time, since verify only ever unlocks whatever topic the paid
+    // order's own notes record (see payment/verify/route.ts), so a bogus
+    // slug here can't unlock anything real. This just keeps the field sane
+    // (no oversized payloads, no characters that would break the receipt).
+    const SLUG_RE = /^[a-zA-Z0-9_-]{1,64}$/;
+    if (typeof topicSlug !== "string" || !SLUG_RE.test(topicSlug)) {
       return NextResponse.json(
-        { error: "topicSlug is required." },
+        { error: "A valid topicSlug is required." },
         { status: 400 }
       );
     }
@@ -56,16 +62,13 @@ export async function POST(req: Request) {
       currency: order.currency,
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
     });
-  } catch (error: any) {
+  } catch (error) {
+    // Log the real Razorpay error server-side, but never forward it to the
+    // client — it can include account-identifying details.
     console.error("Create order error:", error);
 
-    const razorpayMessage =
-      error?.error?.description ||
-      error?.message ||
-      "Failed to create order.";
-
     return NextResponse.json(
-      { error: razorpayMessage },
+      { error: "Failed to create order. Try again in a moment." },
       { status: 500 }
     );
   }

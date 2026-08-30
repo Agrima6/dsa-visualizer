@@ -10,7 +10,7 @@ import { signGateToken, GATE_COOKIE, GATE_MAX_AGE } from "@/lib/gate-cookie"
  */
 export async function POST(req: Request) {
   const ip = getClientIp(req)
-  const { allowed: withinLimit } = rateLimit(`gate-check:${ip}`, 8, 60_000)
+  const { allowed: withinLimit } = await rateLimit(`gate-check:${ip}`, 8, 60_000)
   if (!withinLimit) {
     return NextResponse.json({ allowed: false, error: "Too many attempts. Try again shortly." }, { status: 429 })
   }

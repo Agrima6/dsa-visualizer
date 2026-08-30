@@ -199,7 +199,7 @@ export function AccessGate() {
                 Ready when you are.
               </h2>
               <p className="max-w-lg text-muted-foreground">
-                Access is limited to approved emails only. If you&apos;re on the list, it takes ten seconds.
+                Access is invite-only for now. Have a password? Enter it below — otherwise join the waitlist and we&apos;ll email you when you're in.
               </p>
               <RainbowButton
                 onClick={() => setOpen(true)}
@@ -207,7 +207,7 @@ export function AccessGate() {
               >
                 Get Early Access <MoveRight className="h-4 w-4" />
               </RainbowButton>
-              <p className="text-xs text-muted-foreground">No spam. No password. Just a one-time code.</p>
+              <p className="text-xs text-muted-foreground">No spam. Just a heads-up the moment early access opens.</p>
             </div>
           </motion.div>
         </section>
