@@ -8,6 +8,7 @@ import { ArrayDisplay } from "./Array-display"
 import { ArrayControls } from "./Array-controls"
 import { useArray } from "@/hooks/Use array"
 import ArrayCodeView from "./Array code view"
+import { ShareButton } from "@/components/visualizer/shared/share-button"
 
 interface ArrayVisualizerProps {
   content?: React.ReactNode
@@ -50,6 +51,7 @@ function ArrayVisualizerOriginal({ content }: ArrayVisualizerProps) {
     reverse, rotateLeft, rotateRight, updateAt, clear,
     setAnimationSpeed,
     voiceEnabled, setVoiceEnabled,
+    shareState,
   } = useArray()
 
   const handleRandom = () => {
@@ -124,6 +126,11 @@ function ArrayVisualizerOriginal({ content }: ArrayVisualizerProps) {
         </div>
 
         <div className="space-y-6">
+          {array.length > 0 && (
+            <div className="flex justify-end">
+              <ShareButton state={shareState} />
+            </div>
+          )}
           <ArrayDisplay
             array={array}
             highlightedIndices={highlightedIndices}

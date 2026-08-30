@@ -760,3 +760,47 @@ body {
   background: rgba(167, 139, 250, 0.14);
   color: #c084fc;
 }
+
+/* ── Accessibility mode ──────────────────────────────────────────
+   Toggled by hooks/use-accessibility.tsx, which sets these attributes on
+   <html> and persists the choice to localStorage. */
+
+[data-reduced-motion="true"] *,
+[data-reduced-motion="true"] *::before,
+[data-reduced-motion="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+[data-high-contrast="true"] {
+  --border: 0 0% 20%;
+  --muted-foreground: 0 0% 20%;
+}
+
+.dark[data-high-contrast="true"] {
+  --border: 0 0% 85%;
+  --muted-foreground: 0 0% 90%;
+}
+
+[data-high-contrast="true"] * {
+  text-shadow: none !important;
+}
+
+[data-high-contrast="true"] button,
+[data-high-contrast="true"] a,
+[data-high-contrast="true"] input,
+[data-high-contrast="true"] [role="button"],
+[data-high-contrast="true"] [role="tab"] {
+  outline-offset: 2px;
+}
+
+/* Keyboard-first mode: force a visible focus ring everywhere, even for
+   elements that only show one on :focus-visible by default — some custom
+   buttons in this codebase suppress the ring entirely for mouse users,
+   which also hides it for keyboard users unless we override it here. */
+[data-keyboard-mode="true"] *:focus {
+  outline: 3px solid hsl(var(--ring)) !important;
+  outline-offset: 2px !important;
+}

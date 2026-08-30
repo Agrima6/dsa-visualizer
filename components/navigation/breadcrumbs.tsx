@@ -14,6 +14,7 @@ import {
 import { usePathname } from "next/navigation"
 import { TOPICS } from "@/lib/visualizer-topics"
 import { CommandPalette } from "@/components/global/command-palette"
+import { AccessibilityMenu } from "@/components/global/accessibility-menu"
 
 const routes: Record<string, { name: string; path: string }> = {
   "/": { name: "Home", path: "/home" },
@@ -83,6 +84,7 @@ export function Breadcrumbs({
         </Breadcrumb>
         <div className="ml-auto flex items-center gap-4">
           <CommandPalette />
+          <AccessibilityMenu />
           {action}
           <ModeToggle />
         </div>

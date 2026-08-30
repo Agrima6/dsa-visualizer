@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { AlertTriangle, Sparkles, Bug } from "lucide-react"
+import { AlertTriangle, Sparkles, Bug, Target } from "lucide-react"
 import { useProgress } from "@/hooks/use-progress"
-import { getDailyProgress, getTopicStats, getBugSpotStats } from "@/lib/user-progress"
+import { getDailyProgress, getTopicStats, getBugSpotStats, getWeakTopics } from "@/lib/user-progress"
 import { useUser } from "@clerk/nextjs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Navbar } from "@/components/navigation/navbar"
@@ -56,6 +56,7 @@ export default function DashboardClient() {
   const calendarDays = getCalendarDays()
   const topics = getTopicStats(progress)
   const bugStats = getBugSpotStats(progress)
+  const weakTopics = getWeakTopics(progress)
   const solved = progress.solvedProblems.length
   const firstName = user?.firstName || user?.username || "there"
   const isFirstVisit = solved === 0
@@ -187,6 +188,34 @@ export default function DashboardClient() {
             ))}
           </div>
         </section>
+
+        {weakTopics.length > 0 && (
+          <section className="rounded-3xl border border-amber-500/20 bg-amber-500/5 p-6">
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4 text-amber-500" />
+              <h2 className="font-semibold">Recommended focus</h2>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Based on what you haven't opened yet and where your Spot-the-Bug accuracy is lowest.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              {weakTopics.map((t) => (
+                <Link
+                  key={t.topic}
+                  href="/company-questions"
+                  className="group rounded-2xl border border-amber-500/20 bg-card p-4 transition hover:border-amber-500/40"
+                >
+                  <p className="font-medium">{t.label}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {t.reason === "unstarted" && "Not started yet"}
+                    {t.reason === "low-progress" && `${t.solved}/${t.total} solved`}
+                    {t.reason === "low-quiz-accuracy" && `${t.bugAccuracy}% quiz accuracy`}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="rounded-3xl border bg-card p-6">
           <h2 className="font-semibold">Recent practice</h2>

@@ -7,6 +7,12 @@ import {
   playNarration,
   generateNarration,
 } from "@/lib/narration"
+import { decodeState } from "@/lib/share-state"
+
+interface SharedSortState {
+  values: number[]
+  algorithm: SortAlgorithm
+}
 
 const DEFAULT_SPEED = 700
 
@@ -22,6 +28,21 @@ export function useSorting() {
 
   const {  endSound, showEndMessage } = useAlgorithmFeedback()
   const hasEndedRef = useRef(false)
+
+  // Shareable state: on first mount, if the URL has a `?s=` param (set by
+  // ShareButton), hydrate the array + algorithm from it instead of the
+  // usual empty-input state, so opening a shared link reproduces exactly
+  // what the sharer built.
+  useEffect(() => {
+    const param = new URLSearchParams(window.location.search).get("s")
+    if (!param) return
+    const shared = decodeState<SharedSortState>(param)
+    if (!shared || !Array.isArray(shared.values) || shared.values.length === 0) return
+    setInput(shared.values.join(", "))
+    setArray(shared.values)
+    if (shared.algorithm) setAlgorithm(shared.algorithm)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const current = steps[currentStep] || {
     array,
@@ -548,14 +569,62 @@ export function useSorting() {
   setSteps(generatedSteps)
   setCurrentStep(0)
 
-  for (const step of generatedSteps) {
-    if (step.narration) {
-      await generateNarration(step.narration)
+  if (voiceEnabled) {
+    for (const step of generatedSteps) {
+      if (step.narration) {
+        await generateNarration(step.narration)
+      }
     }
   }
 
   setIsPlaying(true)
 }
+
+  /**
+   * Generates steps for an explicit array + algorithm without starting
+   * auto-play — for challenge mode, which steps through predictions
+   * manually via nextStep() and would otherwise race against the
+   * auto-advance effect below if isPlaying were also true.
+   */
+  const loadSteps = (values: number[], algo: SortAlgorithm) => {
+    if (values.length === 0) return
+    setInput(values.join(", "))
+    setArray(values)
+    setAlgorithm(algo)
+    setIsPlaying(false)
+    hasEndedRef.current = false
+    setSteps(generateSteps(algo, values))
+    setCurrentStep(0)
+  }
+
+  /**
+   * Like loadInputArray + startSorting combined, but takes the array and
+   * algorithm as explicit arguments instead of reading them off state —
+   * calling setInput/setAlgorithm then immediately startSorting() in the
+   * same tick would read their *previous* values due to React state
+   * batching. Used by comparison mode, where an external array/algorithm
+   * choice needs to drive this hook programmatically.
+   */
+  const loadAndRun = async (values: number[], algo: SortAlgorithm, narrate: boolean = voiceEnabled) => {
+    if (values.length === 0) return
+    setInput(values.join(", "))
+    setArray(values)
+    setAlgorithm(algo)
+    setIsPlaying(false)
+    hasEndedRef.current = false
+
+    const generatedSteps = generateSteps(algo, values)
+    setSteps(generatedSteps)
+    setCurrentStep(0)
+
+    if (narrate) {
+      for (const step of generatedSteps) {
+        if (step.narration) await generateNarration(step.narration)
+      }
+    }
+
+    setIsPlaying(true)
+  }
 
   const nextStep = () => {
     if (steps.length === 0) return
@@ -652,5 +721,8 @@ export function useSorting() {
     togglePlay,
     voiceEnabled,
 setVoiceEnabled,
+    loadAndRun,
+    loadSteps,
+    shareState: { values: array, algorithm } satisfies SharedSortState,
   }
 }

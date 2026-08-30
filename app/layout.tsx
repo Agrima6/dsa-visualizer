@@ -5,6 +5,9 @@ import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/global/theme-provider"
 import { ClerkProvider } from "@clerk/nextjs"
 import { ProgressProvider } from "@/hooks/use-progress"
+import { AccessibilityProvider } from "@/hooks/use-accessibility"
+import { TranscriptPanel } from "@/components/global/transcript-panel"
+import { MotionConfigBridge } from "@/components/global/motion-config-bridge"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://algomaitri.com"),
@@ -40,6 +43,8 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body>
+          <AccessibilityProvider>
+          <MotionConfigBridge>
           <ProgressProvider>
           <ThemeProvider
             attribute="class"
@@ -58,8 +63,11 @@ export default function RootLayout({
             </div>
 
             <Toaster />
+            <TranscriptPanel />
           </ThemeProvider>
           </ProgressProvider>
+          </MotionConfigBridge>
+          </AccessibilityProvider>
         </body>
       </html>
     </ClerkProvider>

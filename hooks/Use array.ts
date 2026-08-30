@@ -4,6 +4,7 @@
 import { useState, useRef, useCallback, useEffect } from "react"
 import { playNarration, stopNarration } from '@/lib/narration'
 import type { ArrayOperation, ArrayStep } from "@/components/visualizer/array/types"
+import { decodeState } from "@/lib/share-state"
 
 function sleep(ms: number) {
   return new Promise<void>((res) => setTimeout(res, ms))
@@ -87,6 +88,19 @@ export function useArray() {
   }, [isAnimating])
 
   useEffect(() => { if (!voiceEnabled) stopNarration() }, [voiceEnabled])
+
+  // Shareable state: hydrate from a `?s=` link (set by ShareButton) on
+  // first mount, so opening a shared link shows the exact array it was
+  // built with instead of the default sample array.
+  useEffect(() => {
+    const param = new URLSearchParams(window.location.search).get("s")
+    if (!param) return
+    const shared = decodeState<{ values: number[] }>(param)
+    if (!shared || !Array.isArray(shared.values) || shared.values.length === 0) return
+    setInputArray(shared.values)
+    setArray(shared.values)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const insertAt = useCallback(async (index: number, value: number) => {
     if (isAnimating) return
@@ -378,5 +392,6 @@ export function useArray() {
     clear,
     voiceEnabled,
     setVoiceEnabled,
+    shareState: { values: inputArray },
   }
 }

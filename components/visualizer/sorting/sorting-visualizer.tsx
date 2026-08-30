@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useSorting } from "@/hooks/use-sorting"
 import SortingCodeView from "./sorting-code-view"
+import { ShareButton } from "@/components/visualizer/shared/share-button"
 
 const MAX_ELEMENTS = 10
 
@@ -73,6 +74,8 @@ function SortingVisualizerOriginal() {
   voiceEnabled,
   setVoiceEnabled,
 
+  shareState,
+
 } = useSorting()
 
   const [error, setError] = useState("")
@@ -110,7 +113,20 @@ function SortingVisualizerOriginal() {
           <p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">
             Understand how sorting algorithms compare, swap, and arrange values step by step through animated visual execution.
           </p>
-          
+          <div className="mt-4 flex flex-wrap gap-2">
+            <a
+              href="/visualizer/compare/sorting"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-violet-500/20 bg-white/60 px-3 py-1.5 text-xs font-semibold text-violet-600 transition hover:border-violet-500/40 dark:bg-white/[0.04] dark:text-violet-300"
+            >
+              Try Comparison Mode — race two algorithms side by side →
+            </a>
+            <a
+              href="/visualizer/challenge/sorting"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/20 bg-white/60 px-3 py-1.5 text-xs font-semibold text-amber-600 transition hover:border-amber-500/40 dark:bg-white/[0.04] dark:text-amber-300"
+            >
+              Try Challenge Mode — predict the next swap →
+            </a>
+          </div>
         </div>
       </div>
 
@@ -196,6 +212,13 @@ function SortingVisualizerOriginal() {
                   Random
                 </Button>
               </div>
+
+              {shareState.values.length > 0 && (
+                <ShareButton
+                  state={shareState}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-violet-500/20 py-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+                />
+              )}
 
               <Button
                 className="w-full rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white shadow-[0_10px_30px_rgba(139,92,246,0.2)]"

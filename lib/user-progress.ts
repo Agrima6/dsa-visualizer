@@ -89,6 +89,56 @@ export function getTopicStats(p: UserProgress): TopicStat[] {
   }))
 }
 
+export interface WeakTopic extends TopicStat {
+  ratio: number       // solved/total, 0-1
+  bugAccuracy: number | null // 0-100, or null if never attempted a bug-spot quiz for this topic
+  reason: "unstarted" | "low-progress" | "low-quiz-accuracy"
+}
+
+/**
+ * Recommends topics worth focusing on next, ranked worst-first. A topic is
+ * "weak" for one of three reasons: never opened at all, opened but barely
+ * progressed, or progressed but doing poorly on its Spot-the-Bug quizzes
+ * (wrong more often than right). Topics already fully solved are excluded
+ * outright — there's nothing to recommend there.
+ */
+export function getWeakTopics(p: UserProgress, limit = 3): WeakTopic[] {
+  const topicStats = getTopicStats(p)
+
+  const bugCountsByTopic: Record<string, { attempts: number; correct: number }> = {}
+  for (const b of p.bugsSpotted) {
+    const bucket = (bugCountsByTopic[b.topic] ??= { attempts: 0, correct: 0 })
+    bucket.attempts += 1
+    if (b.correct) bucket.correct += 1
+  }
+
+  const candidates: WeakTopic[] = topicStats
+    .filter((t) => t.total > 0 && t.solved < t.total)
+    .map((t) => {
+      const bugStats = bugCountsByTopic[t.topic]
+      const bugAccuracy = bugStats && bugStats.attempts > 0
+        ? Math.round((bugStats.correct / bugStats.attempts) * 100)
+        : null
+      const ratio = t.solved / t.total
+
+      let reason: WeakTopic["reason"] = "low-progress"
+      if (t.solved === 0) reason = "unstarted"
+      else if (bugAccuracy !== null && bugAccuracy < 60) reason = "low-quiz-accuracy"
+
+      return { ...t, ratio, bugAccuracy, reason }
+    })
+    // Worst quiz accuracy first, then lowest progress ratio — a topic
+    // you're actively getting wrong beats one you simply haven't opened.
+    .sort((a, b) => {
+      const aScore = a.bugAccuracy ?? 100
+      const bScore = b.bugAccuracy ?? 100
+      if (aScore !== bScore) return aScore - bScore
+      return a.ratio - b.ratio
+    })
+
+  return candidates.slice(0, limit)
+}
+
 export function getRecentActivity(p: UserProgress, days = 7): { date: string; count: number }[] {
   const result: { date: string; count: number }[] = []
   for (let i = days - 1; i >= 0; i--) {

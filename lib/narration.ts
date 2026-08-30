@@ -3,6 +3,33 @@ let activeAudio: HTMLAudioElement | null = null
 let resolveActivePlayback: (() => void) | null = null
 let narrationRequestId = 0
 
+// ── Transcript pub-sub ───────────────────────────────────────────
+// Every narration line played anywhere in the app gets pushed here too, so
+// a <TranscriptPanel /> (or anything else) can subscribe and show a running
+// text log — for accessibility-mode users who have narration muted or
+// can't rely on audio, and for anyone who wants a scrollback of what a
+// visualizer just said.
+export interface TranscriptEntry {
+  id: number
+  text: string
+  at: number
+}
+
+let transcriptIdCounter = 0
+const transcriptSubscribers = new Set<(entry: TranscriptEntry) => void>()
+
+export function subscribeTranscript(fn: (entry: TranscriptEntry) => void) {
+  transcriptSubscribers.add(fn)
+  return () => {
+    transcriptSubscribers.delete(fn)
+  }
+}
+
+function pushTranscript(text: string) {
+  const entry: TranscriptEntry = { id: ++transcriptIdCounter, text, at: Date.now() }
+  transcriptSubscribers.forEach((fn) => fn(entry))
+}
+
 export function stopNarration() {
   narrationRequestId += 1
   activeAudio?.pause()
@@ -60,6 +87,7 @@ export async function generateNarration(
 export async function playNarration(
   text: string
 ) {
+  pushTranscript(text)
   try {
     const requestId = ++narrationRequestId
     const audioUrl =

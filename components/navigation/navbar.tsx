@@ -26,6 +26,7 @@ import { useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import { roadmapTopics } from "@/lib/visualizer-topics";
 import { CommandPalette } from "@/components/global/command-palette";
+import { AccessibilityMenu } from "@/components/global/accessibility-menu";
 import { UserButtonWithAdminLink as UserButton } from "@/components/global/user-button-with-admin-link";
 
 interface RouteProps {
@@ -34,6 +35,10 @@ interface RouteProps {
 }
 
 const routeList: RouteProps[] = [
+  {
+    href: "/learning-paths",
+    label: "Learning Paths",
+  },
   {
     href: "/company-questions",
     label: "Company Questions",
@@ -244,6 +249,7 @@ export const Navbar = () => {
 
         <div className="hidden lg:flex items-center gap-3">
           <CommandPalette />
+          <AccessibilityMenu />
           <ModeToggle />
 
           {isSignedIn ? (
