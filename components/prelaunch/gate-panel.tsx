@@ -1,11 +1,12 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { motion } from "framer-motion"
 import { Loader2, Lock, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { usePasswordGate } from "@/hooks/use-password-gate"
+import { PreregisterPanel } from "@/components/prelaunch/preregister-panel"
 
 const fadeStep = {
   initial: { opacity: 0, y: 12 },
@@ -16,6 +17,11 @@ const fadeStep = {
 export function GatePanel({ onClose }: { onClose?: () => void }) {
   const gate = usePasswordGate()
   const inputRef = useRef<HTMLInputElement>(null)
+  const [mode, setMode] = useState<"password" | "preregister">("password")
+
+  if (mode === "preregister") {
+    return <PreregisterPanel onBack={() => setMode("password")} />
+  }
 
   if (gate.success) {
     return (
@@ -68,6 +74,13 @@ export function GatePanel({ onClose }: { onClose?: () => void }) {
           {gate.submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Unlock access
         </Button>
+        <button
+          type="button"
+          onClick={() => setMode("preregister")}
+          className="text-center text-sm text-muted-foreground transition hover:text-foreground"
+        >
+          Don't have a password? <span className="text-primary underline underline-offset-2">Join the waitlist</span>
+        </button>
         {onClose && (
           <button
             type="button"
