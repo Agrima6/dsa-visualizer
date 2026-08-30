@@ -50,11 +50,17 @@ export default async function SuperadminPage() {
 
   const admin = await isCurrentUserAdmin()
   if (!admin) {
+    const seenEmails = user.emailAddresses.map((e) => e.emailAddress).join(", ") || "(none on file)"
     return (
       <DeniedScreen
         icon={ShieldAlert}
         title="Access denied"
         description="Your account isn't marked as an admin. Ask an existing admin to add your email to ADMIN_EMAILS, or set publicMetadata.role to 'admin' on your Clerk account."
+        action={
+          <p className="rounded-xl border border-border/60 bg-muted/40 px-4 py-2 font-mono text-xs text-muted-foreground">
+            Signed in as: {seenEmails}
+          </p>
+        }
       />
     )
   }

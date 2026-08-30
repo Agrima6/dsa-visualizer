@@ -1,7 +1,8 @@
 "use client"
 
-import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react"
+import { BadgeCheck, ChevronsUpDown, LogOut, ShieldCheck } from "lucide-react"
 import { useClerk, useUser } from "@clerk/nextjs"
+import Link from "next/link"
 
 import {
   Avatar,
@@ -78,6 +79,12 @@ export function NavUser() {
               <DropdownMenuItem onClick={() => openUserProfile()}>
                 <BadgeCheck />
                 Account
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/superadmin">
+                  <ShieldCheck />
+                  Superadmin
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

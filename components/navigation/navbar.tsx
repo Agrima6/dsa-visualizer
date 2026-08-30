@@ -22,10 +22,11 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ModeToggle } from "@/components/global/mode-toggle";
-import { useUser, UserButton } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 import { roadmapTopics } from "@/lib/visualizer-topics";
 import { CommandPalette } from "@/components/global/command-palette";
+import { UserButtonWithAdminLink as UserButton } from "@/components/global/user-button-with-admin-link";
 
 interface RouteProps {
   href: string;
