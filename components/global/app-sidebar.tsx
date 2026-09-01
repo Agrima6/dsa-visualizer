@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, Database, MapPin } from "lucide-react"
+import { Home, Database, MapPin, Code2 } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -28,6 +28,11 @@ const navItems = [
     title: "Learning Paths",
     url: "/learning-paths",
     icon: MapPin,
+  },
+  {
+    title: "Code Playground",
+    url: "/visualizer/code-playground",
+    icon: Code2,
   },
 ]
 

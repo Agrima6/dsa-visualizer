@@ -36,6 +36,10 @@ interface RouteProps {
 
 const routeList: RouteProps[] = [
   {
+    href: "/visualizer/code-playground",
+    label: "Code Playground",
+  },
+  {
     href: "/learning-paths",
     label: "Learning Paths",
   },
