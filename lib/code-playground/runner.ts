@@ -7,6 +7,9 @@ export interface RunResult {
   comparisons: number
   swaps: number
   writes: number
+  /** The raw return value when it wasn't an array — e.g. a search
+   * function returning a found index or a boolean. */
+  returnValue: string | null
 }
 
 const MAX_SOURCE_LENGTH = 8000
@@ -75,7 +78,12 @@ export async function runUserSortCode(source: string, initialArray: number[]): P
         try {
           var input = e.data.slice();
           var result = ${instrumented.functionName}(input);
-          self.postMessage({ ok: true, trace: __trace, result: Array.isArray(result) ? result : input });
+          self.postMessage({
+            ok: true,
+            trace: __trace,
+            result: Array.isArray(result) ? result : input,
+            returnValue: Array.isArray(result) ? null : JSON.stringify(result),
+          });
         } catch (err) {
           self.postMessage({ ok: false, error: (err && err.message) ? err.message : String(err) });
         }
@@ -112,12 +120,15 @@ export async function runUserSortCode(source: string, initialArray: number[]): P
       }
 
       const trace: TraceEvent[] = data.trace
-      const steps = traceToSteps(initialArray, trace, data.result)
+      const swaps = trace.filter((t) => t.type === "swap").length
+      const writes = trace.filter((t) => t.type === "write").length
+      const steps = traceToSteps(initialArray, trace, data.result, swaps + writes > 0)
       resolve({
         steps,
         comparisons: trace.filter((t) => t.type === "compare").length,
-        swaps: trace.filter((t) => t.type === "swap").length,
-        writes: trace.filter((t) => t.type === "write").length,
+        swaps,
+        writes,
+        returnValue: data.returnValue ?? null,
       })
     }
 

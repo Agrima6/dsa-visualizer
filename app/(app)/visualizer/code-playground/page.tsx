@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { AlertTriangle, Loader2, Pause, Play, RotateCcw, Shuffle, Sparkles, SkipBack, SkipForward } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
+import { AlertTriangle, Bug, Loader2, Pause, Play, RotateCcw, Shuffle, Sparkles, SkipBack, SkipForward } from "lucide-react"
 import { runUserSortCode, type RunResult } from "@/lib/code-playground/runner"
 import { useTracePlayer } from "@/hooks/use-trace-player"
 import { SortingBars } from "@/components/visualizer/sorting/sorting-bars"
@@ -13,7 +13,14 @@ interface SharedPlaygroundState {
   values: number[]
 }
 
-const STARTER_CODE = `function solve(arr) {
+const EMPTY_SORT_STEP = { array: [], compared: [], swapped: [], sorted: [], message: "" }
+
+const TEMPLATES: { id: string; label: string; code: string; input: string }[] = [
+  {
+    id: "bubble-sort",
+    label: "Bubble Sort",
+    input: "38, 27, 43, 3, 9, 82, 10",
+    code: `function solve(arr) {
   for (let i = 0; i < arr.length - 1; i++) {
     for (let j = 0; j < arr.length - 1 - i; j++) {
       if (arr[j] > arr[j + 1]) {
@@ -22,16 +29,83 @@ const STARTER_CODE = `function solve(arr) {
     }
   }
   return arr;
-}`
+}`,
+  },
+  {
+    id: "linear-search",
+    label: "Linear Search",
+    input: "12, 5, 8, 19, 3, 27, 14",
+    code: `function solve(arr) {
+  var target = 19;
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] === target) {
+      return i;
+    }
+  }
+  return -1;
+}`,
+  },
+  {
+    id: "reverse-array",
+    label: "Reverse Array",
+    input: "5, 12, 8, 1, 27, 9",
+    code: `function solve(arr) {
+  let left = 0;
+  let right = arr.length - 1;
+  while (left < right) {
+    [arr[left], arr[right]] = [arr[right], arr[left]];
+    left = left + 1;
+    right = right - 1;
+  }
+  return arr;
+}`,
+  },
+  {
+    id: "remove-duplicates",
+    label: "Remove Duplicates (sorted input)",
+    input: "1, 1, 2, 3, 3, 3, 4, 5, 5",
+    code: `function solve(arr) {
+  let writeIndex = 0;
+  for (let i = 0; i < arr.length; i++) {
+    if (i === 0 || arr[i] !== arr[i - 1]) {
+      arr[writeIndex] = arr[i];
+      writeIndex = writeIndex + 1;
+    }
+  }
+  return arr.slice(0, writeIndex);
+}`,
+  },
+]
 
 export default function CodePlaygroundPage() {
-  const [code, setCode] = useState(STARTER_CODE)
-  const [input, setInput] = useState("38, 27, 43, 3, 9, 82, 10")
+  const [code, setCode] = useState(TEMPLATES[0].code)
+  const [input, setInput] = useState(TEMPLATES[0].input)
   const [running, setRunning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<RunResult | null>(null)
+  const [runArray, setRunArray] = useState<number[]>([])
+  const [debugMode, setDebugMode] = useState(true)
 
-  const player = useTracePlayer(result?.steps ?? [])
+  const player = useTracePlayer(result?.steps ?? [], EMPTY_SORT_STEP)
+
+  // Ground truth for debug mode: what the array *should* look like once
+  // sorted, computed from whatever array this run was actually given
+  // (captured at run time, not re-read from the input field — the user
+  // may have edited it since). Only meaningful for algorithms that intend
+  // to sort — a pure search/reverse function isn't "wrong" just because
+  // its output isn't ascending, so this is gated on mutated below.
+  const expectedSorted = useMemo(() => [...runArray].sort((a, b) => a - b), [runArray])
+  const mutated = (result?.swaps ?? 0) + (result?.writes ?? 0) > 0
+  const incorrectIndices = useMemo(() => {
+    if (!debugMode || !mutated || !result) return []
+    const current = player.current.array
+    if (current.length !== expectedSorted.length) return []
+    const wrong: number[] = []
+    current.forEach((v, i) => { if (v !== expectedSorted[i]) wrong.push(i) })
+    return wrong
+  }, [debugMode, mutated, result, player.current.array, expectedSorted])
+  const isLastStep = player.currentStep === player.totalSteps - 1
+  const hasBug = mutated && isLastStep && incorrectIndices.length > 0
 
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("p")
@@ -51,6 +125,7 @@ export default function CodePlaygroundPage() {
     setRunning(true)
     setError(null)
     setResult(null)
+    setRunArray(array)
     try {
       const res = await runUserSortCode(code, array)
       setResult(res)
@@ -80,24 +155,44 @@ export default function CodePlaygroundPage() {
           </h1>
           <p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">
             Every other visualizer here animates a reference implementation. This one animates{" "}
-            <em>yours</em> — write a function that takes an array and sorts it, and watch your own
-            comparisons and swaps play out on the same grid.
+            <em>yours</em> — write a function that takes an array, and watch your own comparisons,
+            swaps, and writes play out on the same grid. Works for sorting, searching, reversing,
+            or any array algorithm you write by hand.
           </p>
           <p className="mt-2 max-w-2xl text-xs text-muted-foreground">
             Runs entirely in your browser in a sandboxed worker — nothing is sent to a server.
             Works best with direct index writes (<code className="rounded bg-muted px-1">arr[i] = ...</code>) and
             comparisons (<code className="rounded bg-muted px-1">arr[i] &gt; arr[j]</code>) — the common shape of
-            hand-written bubble/selection/insertion/quicksort code.
+            hand-written array algorithms.
           </p>
+          <a
+            href="/visualizer/code-playground/tree"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-violet-500/20 bg-white/60 px-3 py-1.5 text-xs font-semibold text-violet-600 transition hover:border-violet-500/40 dark:bg-white/[0.04] dark:text-violet-300"
+          >
+            Binary Tree Playground →
+          </a>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Editor */}
         <div className="rounded-[24px] border border-violet-500/15 bg-white/70 p-5 shadow-[0_10px_35px_rgba(139,92,246,0.06)] backdrop-blur-xl dark:bg-white/[0.04]">
-          <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            Your function
-          </label>
+          <div className="mb-2 flex items-center justify-between">
+            <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Your function
+            </label>
+            <select
+              onChange={(e) => {
+                const t = TEMPLATES.find((tpl) => tpl.id === e.target.value)
+                if (t) { setCode(t.code); setInput(t.input); setResult(null); setError(null) }
+              }}
+              defaultValue=""
+              className="rounded-lg border border-violet-500/15 bg-white/70 px-2 py-1 text-xs dark:bg-white/[0.04]"
+            >
+              <option value="" disabled>Load a starter...</option>
+              {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+            </select>
+          </div>
           <textarea
             value={code}
             onChange={(e) => setCode(e.target.value)}
@@ -153,8 +248,37 @@ export default function CodePlaygroundPage() {
                 </span>
               </div>
 
-              <SortingBars step={player.current} height={220} />
+              {mutated && (
+                <label className="mb-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <input type="checkbox" checked={debugMode} onChange={(e) => setDebugMode(e.target.checked)} className="accent-red-500" />
+                  Debug mode — ring wrong positions against the correctly sorted array
+                </label>
+              )}
+
+              <SortingBars step={player.current} height={220} incorrect={incorrectIndices} />
               <p className="mt-3 min-h-[1.25rem] text-sm text-muted-foreground">{player.current.message}</p>
+              {result.returnValue !== null && player.currentStep === player.totalSteps - 1 && (
+                <p className="mt-1 text-sm font-semibold text-violet-600 dark:text-violet-300">
+                  Returned: {result.returnValue}
+                </p>
+              )}
+
+              {hasBug && (
+                <div className="mt-3 rounded-xl border border-red-500/20 bg-red-500/5 p-3 text-sm text-red-700 dark:text-red-300">
+                  <p className="flex items-center gap-1.5 font-semibold">
+                    <Bug className="h-4 w-4" /> Bug found — {incorrectIndices.length} position{incorrectIndices.length === 1 ? "" : "s"} wrong
+                  </p>
+                  <p className="mt-1 text-xs">
+                    Your result: <code className="rounded bg-muted px-1">[{player.current.array.join(", ")}]</code>
+                  </p>
+                  <p className="text-xs">
+                    Expected: <code className="rounded bg-muted px-1">[{expectedSorted.join(", ")}]</code>
+                  </p>
+                  <p className="mt-1 text-xs">
+                    Wrong at index {incorrectIndices.join(", ")} — scrub backward to see the last time your code touched {incorrectIndices.length === 1 ? "that index" : "those indices"}.
+                  </p>
+                </div>
+              )}
 
               <div className="mt-4 flex items-center gap-2">
                 <button onClick={player.reset} className="rounded-xl border border-violet-500/20 p-2 text-muted-foreground hover:text-foreground" aria-label="Restart">

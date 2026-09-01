@@ -1,14 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import type { SortStep } from "@/components/visualizer/sorting/types"
 
-const EMPTY_STEP: SortStep = { array: [], compared: [], swapped: [], sorted: [], message: "" }
-
-/** Generic play/pause/scrub controls over an externally-provided SortStep[] —
- * used by the code playground, which generates its steps from a user's own
- * traced execution rather than from a built-in algorithm generator. */
-export function useTracePlayer(steps: SortStep[], speedMs = 500) {
+/** Generic play/pause/scrub controls over an externally-provided step
+ * array — used by the code playground, which generates its steps from a
+ * user's own traced execution rather than from a built-in algorithm
+ * generator. Generic over the step shape so it works for both the array
+ * (SortStep) and binary tree (TreeStep) playgrounds. */
+export function useTracePlayer<T>(steps: T[], emptyStep: T, speedMs = 500) {
   const [currentStep, setCurrentStep] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
 
@@ -28,7 +27,7 @@ export function useTracePlayer(steps: SortStep[], speedMs = 500) {
   }, [isPlaying, currentStep, steps, speedMs])
 
   return {
-    current: steps[currentStep] ?? EMPTY_STEP,
+    current: steps[currentStep] ?? emptyStep,
     currentStep,
     totalSteps: steps.length,
     isPlaying,
