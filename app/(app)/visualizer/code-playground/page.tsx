@@ -15,10 +15,11 @@ interface SharedPlaygroundState {
 
 const EMPTY_SORT_STEP = { array: [], compared: [], swapped: [], sorted: [], message: "" }
 
-const TEMPLATES: { id: string; label: string; code: string; input: string }[] = [
+const TEMPLATES: { id: string; label: string; code: string; input: string; sortsArray: boolean }[] = [
   {
     id: "bubble-sort",
     label: "Bubble Sort",
+    sortsArray: true,
     input: "38, 27, 43, 3, 9, 82, 10",
     code: `function solve(arr) {
   for (let i = 0; i < arr.length - 1; i++) {
@@ -34,6 +35,7 @@ const TEMPLATES: { id: string; label: string; code: string; input: string }[] = 
   {
     id: "linear-search",
     label: "Linear Search",
+    sortsArray: false,
     input: "12, 5, 8, 19, 3, 27, 14",
     code: `function solve(arr) {
   var target = 19;
@@ -48,6 +50,7 @@ const TEMPLATES: { id: string; label: string; code: string; input: string }[] = 
   {
     id: "reverse-array",
     label: "Reverse Array",
+    sortsArray: false,
     input: "5, 12, 8, 1, 27, 9",
     code: `function solve(arr) {
   let left = 0;
@@ -63,6 +66,7 @@ const TEMPLATES: { id: string; label: string; code: string; input: string }[] = 
   {
     id: "remove-duplicates",
     label: "Remove Duplicates (sorted input)",
+    sortsArray: false,
     input: "1, 1, 2, 3, 3, 3, 4, 5, 5",
     code: `function solve(arr) {
   let writeIndex = 0;
@@ -85,6 +89,12 @@ export default function CodePlaygroundPage() {
   const [result, setResult] = useState<RunResult | null>(null)
   const [runArray, setRunArray] = useState<number[]>([])
   const [debugMode, setDebugMode] = useState(true)
+  // Whether the loaded algorithm is even trying to produce an ascending
+  // array — a reverse/dedupe/rotate function correctly leaves the array
+  // unsorted, so debug mode (and the "isn't fully sorted" message) must
+  // only apply to code that's actually meant to sort. Defaults to true
+  // since the default starter (and hand-typed custom code) is a sort.
+  const [sortsArray, setSortsArray] = useState(TEMPLATES[0].sortsArray)
 
   const player = useTracePlayer(result?.steps ?? [], EMPTY_SORT_STEP)
 
@@ -97,15 +107,15 @@ export default function CodePlaygroundPage() {
   const expectedSorted = useMemo(() => [...runArray].sort((a, b) => a - b), [runArray])
   const mutated = (result?.swaps ?? 0) + (result?.writes ?? 0) > 0
   const incorrectIndices = useMemo(() => {
-    if (!debugMode || !mutated || !result) return []
+    if (!debugMode || !mutated || !sortsArray || !result) return []
     const current = player.current.array
     if (current.length !== expectedSorted.length) return []
     const wrong: number[] = []
     current.forEach((v, i) => { if (v !== expectedSorted[i]) wrong.push(i) })
     return wrong
-  }, [debugMode, mutated, result, player.current.array, expectedSorted])
+  }, [debugMode, mutated, sortsArray, result, player.current.array, expectedSorted])
   const isLastStep = player.currentStep === player.totalSteps - 1
-  const hasBug = mutated && isLastStep && incorrectIndices.length > 0
+  const hasBug = mutated && sortsArray && isLastStep && incorrectIndices.length > 0
 
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("p")
@@ -127,7 +137,7 @@ export default function CodePlaygroundPage() {
     setResult(null)
     setRunArray(array)
     try {
-      const res = await runUserSortCode(code, array)
+      const res = await runUserSortCode(code, array, sortsArray)
       setResult(res)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong running your code.")
@@ -184,7 +194,7 @@ export default function CodePlaygroundPage() {
             <select
               onChange={(e) => {
                 const t = TEMPLATES.find((tpl) => tpl.id === e.target.value)
-                if (t) { setCode(t.code); setInput(t.input); setResult(null); setError(null) }
+                if (t) { setCode(t.code); setInput(t.input); setSortsArray(t.sortsArray); setResult(null); setError(null) }
               }}
               defaultValue=""
               className="rounded-lg border border-violet-500/15 bg-white/70 px-2 py-1 text-xs dark:bg-white/[0.04]"
@@ -248,7 +258,7 @@ export default function CodePlaygroundPage() {
                 </span>
               </div>
 
-              {mutated && (
+              {mutated && sortsArray && (
                 <label className="mb-2 flex items-center gap-1.5 text-xs text-muted-foreground">
                   <input type="checkbox" checked={debugMode} onChange={(e) => setDebugMode(e.target.checked)} className="accent-red-500" />
                   Debug mode — ring wrong positions against the correctly sorted array

@@ -37,12 +37,17 @@ export async function instrumentTreeCode(source: string): Promise<TreeInstrument
     return {
       visitor: {
         Program(path: any) {
-          for (const stmt of path.node.body) {
+          // Same helper-vs-entry ambiguity as the array instrumenter: a
+          // hand-written BST insert is sometimes split into a helper (e.g.
+          // a validity check) defined before the real insert function, and
+          // both can have >=2 params — so pick whichever candidate is
+          // never called by another, not just the first one found.
+          const candidates: { name: string; path: any }[] = []
+          for (const stmtPath of path.get("body")) {
+            const stmt = stmtPath.node
             if (t.isFunctionDeclaration(stmt) && stmt.id && stmt.params.length >= 2) {
-              functionName = stmt.id.name
-              break
-            }
-            if (t.isVariableDeclaration(stmt)) {
+              candidates.push({ name: stmt.id.name, path: stmtPath })
+            } else if (t.isVariableDeclaration(stmt)) {
               for (const decl of stmt.declarations) {
                 if (
                   t.isIdentifier(decl.id) &&
@@ -50,13 +55,32 @@ export async function instrumentTreeCode(source: string): Promise<TreeInstrument
                   (t.isArrowFunctionExpression(decl.init) || t.isFunctionExpression(decl.init)) &&
                   decl.init.params.length >= 2
                 ) {
-                  functionName = decl.id.name
-                  break
+                  candidates.push({ name: decl.id.name, path: stmtPath })
                 }
               }
-              if (functionName) break
             }
           }
+
+          if (candidates.length === 0) return
+          if (candidates.length === 1) {
+            functionName = candidates[0].name
+            return
+          }
+
+          const names = new Set(candidates.map((c) => c.name))
+          const calledByOthers = new Set<string>()
+          for (const c of candidates) {
+            c.path.traverse({
+              CallExpression(callPath: any) {
+                const callee = callPath.node.callee
+                if (t.isIdentifier(callee) && names.has(callee.name) && callee.name !== c.name) {
+                  calledByOthers.add(callee.name)
+                }
+              },
+            })
+          }
+          const entryCandidates = candidates.filter((c) => !calledByOthers.has(c.name))
+          functionName = (entryCandidates.length === 1 ? entryCandidates[0] : candidates[candidates.length - 1]).name
         },
 
         BinaryExpression(path: any) {

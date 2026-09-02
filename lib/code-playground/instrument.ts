@@ -52,21 +52,25 @@ export async function instrumentUserCode(source: string): Promise<InstrumentResu
     return {
       visitor: {
         Program(path: any) {
-          // Find the first top-level function whose first parameter is a
+          // Collect every top-level function whose first parameter is a
           // plain identifier — that identifier is treated as "the array".
-          for (const stmt of path.node.body) {
+          // Real hand-written sorts are often split into an entry function
+          // plus helpers (e.g. `partition` + `quickSort`, or `merge` +
+          // `mergeSort`) that also happen to take an array first — so we
+          // can't just take the first match found in source order, or a
+          // helper defined above the real entry point gets run instead
+          // (called with no low/high bounds at all).
+          const candidates: { name: string; paramName: string; path: any }[] = []
+          for (const stmtPath of path.get("body")) {
+            const stmt = stmtPath.node
             if (
               t.isFunctionDeclaration(stmt) &&
               stmt.id &&
               stmt.params[0] &&
               t.isIdentifier(stmt.params[0])
             ) {
-              functionName = stmt.id.name
-              paramName = stmt.params[0].name
-              break
-            }
-            if (t.isVariableDeclaration(stmt)) {
-              let found = false
+              candidates.push({ name: stmt.id.name, paramName: stmt.params[0].name, path: stmtPath })
+            } else if (t.isVariableDeclaration(stmt)) {
               for (const decl of stmt.declarations) {
                 if (
                   t.isIdentifier(decl.id) &&
@@ -75,15 +79,40 @@ export async function instrumentUserCode(source: string): Promise<InstrumentResu
                   decl.init.params[0] &&
                   t.isIdentifier(decl.init.params[0])
                 ) {
-                  functionName = decl.id.name
-                  paramName = decl.init.params[0].name
-                  found = true
-                  break
+                  candidates.push({ name: decl.id.name, paramName: decl.init.params[0].name, path: stmtPath })
                 }
               }
-              if (found) break
             }
           }
+
+          if (candidates.length === 0) return
+          if (candidates.length === 1) {
+            functionName = candidates[0].name
+            paramName = candidates[0].paramName
+            return
+          }
+
+          // Prefer whichever candidate is never called by one of the
+          // others — that's the outer entry point; whatever it calls is a
+          // helper. If that signal is ambiguous, fall back to the last
+          // candidate defined, since helpers are conventionally written
+          // before the function that uses them.
+          const names = new Set(candidates.map((c) => c.name))
+          const calledByOthers = new Set<string>()
+          for (const c of candidates) {
+            c.path.traverse({
+              CallExpression(callPath: any) {
+                const callee = callPath.node.callee
+                if (t.isIdentifier(callee) && names.has(callee.name) && callee.name !== c.name) {
+                  calledByOthers.add(callee.name)
+                }
+              },
+            })
+          }
+          const entryCandidates = candidates.filter((c) => !calledByOthers.has(c.name))
+          const chosen = entryCandidates.length === 1 ? entryCandidates[0] : candidates[candidates.length - 1]
+          functionName = chosen.name
+          paramName = chosen.paramName
         },
 
         BinaryExpression(path: any) {

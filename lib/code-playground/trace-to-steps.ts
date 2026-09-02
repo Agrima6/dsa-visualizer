@@ -15,7 +15,8 @@ export function traceToSteps(
   initialArray: number[],
   trace: TraceEvent[],
   finalArray: number[],
-  mutated: boolean
+  mutated: boolean,
+  expectSorted: boolean
 ): SortStep[] {
   const steps: SortStep[] = [
     { array: initialArray, compared: [], swapped: [], sorted: [], message: "Starting your code..." },
@@ -54,10 +55,13 @@ export function traceToSteps(
 
   const isSorted = finalArray.length > 0 && finalArray.every((v, idx) => idx === 0 || finalArray[idx - 1] <= v)
   // Only claim "should be sorted" for algorithms that actually rearranged
-  // the array — a pure search/read-only function (no swaps or writes)
-  // isn't trying to sort anything, so warning it "isn't fully sorted"
-  // would be a false, irrelevant complaint.
-  const message = !mutated
+  // the array (no swaps or writes means a pure search/read-only function,
+  // which isn't trying to sort anything) AND are expected to sort in the
+  // first place — a reverse, dedupe, or rotate function correctly leaves
+  // the array unsorted, so asserting it "isn't fully sorted" there would
+  // be a false, misleading complaint about correct code.
+  const checkSorted = mutated && expectSorted
+  const message = !checkSorted
     ? "Your function finished."
     : isSorted
       ? "Done — the array is sorted!"
@@ -67,7 +71,7 @@ export function traceToSteps(
     array: finalArray,
     compared: [],
     swapped: [],
-    sorted: mutated && isSorted ? finalArray.map((_, i) => i) : [],
+    sorted: checkSorted && isSorted ? finalArray.map((_, i) => i) : [],
     message,
   })
 

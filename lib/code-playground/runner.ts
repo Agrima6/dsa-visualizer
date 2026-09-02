@@ -60,7 +60,11 @@ self.XMLHttpRequest = undefined;
 self.importScripts = undefined;
 `
 
-export async function runUserSortCode(source: string, initialArray: number[]): Promise<RunResult> {
+export async function runUserSortCode(
+  source: string,
+  initialArray: number[],
+  expectSorted: boolean = true
+): Promise<RunResult> {
   if (source.length > MAX_SOURCE_LENGTH) {
     throw new Error(`Keep it under ${MAX_SOURCE_LENGTH} characters.`)
   }
@@ -122,7 +126,7 @@ export async function runUserSortCode(source: string, initialArray: number[]): P
       const trace: TraceEvent[] = data.trace
       const swaps = trace.filter((t) => t.type === "swap").length
       const writes = trace.filter((t) => t.type === "write").length
-      const steps = traceToSteps(initialArray, trace, data.result, swaps + writes > 0)
+      const steps = traceToSteps(initialArray, trace, data.result, swaps + writes > 0, expectSorted)
       resolve({
         steps,
         comparisons: trace.filter((t) => t.type === "compare").length,
