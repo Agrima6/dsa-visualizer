@@ -6,18 +6,24 @@ import { useSorting } from "@/hooks/use-sorting"
 import { SortingBars } from "@/components/visualizer/sorting/sorting-bars"
 import type { SortAlgorithm } from "@/components/visualizer/sorting/types"
 
-const ALGORITHMS: { id: SortAlgorithm; label: string }[] = [
-  { id: "bubble", label: "Bubble Sort" },
-  { id: "selection", label: "Selection Sort" },
-  { id: "insertion", label: "Insertion Sort" },
-]
+// Bubble Sort is the only algorithm this game can offer: it's the only one
+// whose step trace matches what the game actually tests — "compare this
+// exact pair → the very next step resolves whether that exact pair got
+// swapped." Selection Sort's real swap happens once per outer loop, several
+// steps after the compare that triggered it (never on the very next step),
+// and Insertion Sort's shown comparisons happen only when a shift is about
+// to occur — so "always guess no" scores ~90%+ on Selection Sort, and
+// "always guess yes" scores a perfect 100% on Insertion Sort, regardless of
+// whether the player understands anything. Don't add another algorithm here
+// without checking its step generator in hooks/use-sorting.ts matches that
+// same immediate compare-then-resolve shape.
+const ALGORITHM: SortAlgorithm = "bubble"
 
 type Verdict = { correct: boolean; predictedSwap: boolean; actualSwap: boolean } | null
 
 export default function SortingChallengePage() {
   const sorting = useSorting()
   const [input, setInput] = useState("29, 10, 14, 37, 3")
-  const [algorithm, setAlgorithm] = useState<SortAlgorithm>("bubble")
   const [started, setStarted] = useState(false)
   const [score, setScore] = useState({ correct: 0, total: 0 })
   const [verdict, setVerdict] = useState<Verdict>(null)
@@ -35,7 +41,7 @@ export default function SortingChallengePage() {
     setScore({ correct: 0, total: 0 })
     setVerdict(null)
     setStarted(true)
-    sorting.loadSteps(values, algorithm)
+    sorting.loadSteps(values, ALGORITHM)
   }
 
   const randomize = () => {
@@ -86,20 +92,13 @@ export default function SortingChallengePage() {
 
       {!started ? (
         <div className="rounded-[24px] border border-violet-500/15 bg-white/70 p-6 shadow-[0_10px_35px_rgba(139,92,246,0.06)] backdrop-blur-xl dark:bg-white/[0.04]">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_auto_auto]">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_auto]">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Comma-separated numbers"
               className="rounded-xl border border-violet-500/15 bg-white/70 px-3 py-2 text-sm font-mono outline-none focus:border-violet-500/40 dark:bg-white/[0.04]"
             />
-            <select
-              value={algorithm}
-              onChange={(e) => setAlgorithm(e.target.value as SortAlgorithm)}
-              className="rounded-xl border border-violet-500/15 bg-white/70 px-3 py-2 text-sm dark:bg-white/[0.04]"
-            >
-              {ALGORITHMS.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
-            </select>
             <button onClick={randomize} className="flex items-center gap-1.5 rounded-xl border border-violet-500/20 px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground">
               <Shuffle className="h-3.5 w-3.5" /> Random
             </button>
