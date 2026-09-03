@@ -283,7 +283,7 @@ function BinaryTreeVisualizerOriginal({ content, heapContent }: BinaryTreeVisual
                       </div>
 
                       <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">
-                        <HeapControls title="Max Heap" onInsert={maxHeap.insert} onInsertMany={maxHeap.insertMany} onClear={maxHeap.clear} heapType={maxHeap.heapType} speed={maxHeap.speed} onSetSpeed={maxHeap.setSpeed} />
+                        <HeapControls title="Max Heap" onInsert={maxHeap.insert} onInsertMany={maxHeap.insertMany} onExtract={maxHeap.extractRoot} onClear={maxHeap.clear} heapType={maxHeap.heapType} speed={maxHeap.speed} onSetSpeed={maxHeap.setSpeed} />
                       </div>
 
                       <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">
@@ -313,7 +313,7 @@ function BinaryTreeVisualizerOriginal({ content, heapContent }: BinaryTreeVisual
                       </div>
 
                       <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">
-                        <HeapControls title="Min Heap" onInsert={minHeap.insert} onInsertMany={minHeap.insertMany} onClear={minHeap.clear} heapType={minHeap.heapType} speed={minHeap.speed} onSetSpeed={minHeap.setSpeed} />
+                        <HeapControls title="Min Heap" onInsert={minHeap.insert} onInsertMany={minHeap.insertMany} onExtract={minHeap.extractRoot} onClear={minHeap.clear} heapType={minHeap.heapType} speed={minHeap.speed} onSetSpeed={minHeap.setSpeed} />
                       </div>
 
                       <div className="rounded-2xl border border-violet-500/15 bg-white/70 p-4 dark:bg-white/[0.04] backdrop-blur-xl">

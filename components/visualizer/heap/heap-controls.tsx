@@ -12,6 +12,7 @@ interface HeapControlsProps {
   title: string
   onInsert: (value: number) => void
   onInsertMany: (values: string) => void
+  onExtract: () => void
   onClear: () => void
   heapType: HeapType
   speed?: number
@@ -22,6 +23,7 @@ export function HeapControls({
   title,
   onInsert,
   onInsertMany,
+  onExtract,
   onClear,
   heapType,
   speed,
@@ -89,6 +91,14 @@ export function HeapControls({
           {typeof speed === "number" && onSetSpeed && (
             <SpeedControl speed={speed} onSetSpeed={onSetSpeed} />
           )}
+
+          <Button
+            onClick={onExtract}
+            variant="secondary"
+            className="w-full"
+          >
+            Extract {heapType === "max" ? "Max" : "Min"}
+          </Button>
 
           <Button
             variant="destructive"

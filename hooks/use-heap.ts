@@ -157,6 +157,48 @@ export function useHeap(initialType: HeapType = "max") {
   }
 
 
+  // Extract-root: the other half of a heap's core contract (insert +
+  // extract), previously entirely missing from this visualizer even though
+  // heapifyDown above was already fully written for it — nothing ever
+  // called it. Standard algorithm: swap the root with the last element,
+  // shrink the array, then sift the new root down.
+  const extractRoot = async () => {
+    if (heapArray.length === 0) {
+      showEndMessage("Heap is empty", "Nothing to extract.")
+      return null
+    }
+
+    const label = heapType === "max" ? "maximum" : "minimum"
+    if (voiceEnabled) {
+      await playNarration(`Extracting the ${label} value from the ${heapType} heap.`)
+    }
+
+    const newArray = [...heapArray]
+    const root = newArray[0]
+
+    setHighlightedNodes(["array-0"])
+    stepSound()
+    await sleep(500)
+
+    const last = newArray.pop() as number
+    if (newArray.length > 0) {
+      newArray[0] = last
+      setHeapArray([...newArray])
+      rebuildHeapTree(newArray)
+      setHighlightedNodes(["array-0"])
+      stepSound()
+      await sleep(400)
+      await heapifyDown(newArray, 0)
+    }
+
+    setHeapArray([...newArray])
+    rebuildHeapTree(newArray)
+    setHighlightedNodes([])
+    endSound()
+    showEndMessage("Algorithm ended", `Extracted ${root} (the ${label}) from the ${heapType} heap.`)
+    return root
+  }
+
   const clear = () => {
     setHeap(null)
     setHeapArray([])
@@ -171,6 +213,7 @@ export function useHeap(initialType: HeapType = "max") {
     highlightedNodes,
     insert,
     insertMany,
+    extractRoot,
     clear,
     voiceEnabled,
     setVoiceEnabled,
