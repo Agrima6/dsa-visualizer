@@ -226,7 +226,40 @@ export function toRoomView(room: BattleRoom, viewerUserId: string): BattleRoomVi
           lastTestsTotal: lastOpponentSubmission?.testsTotal ?? null,
         }
       : null,
+    replay: room.status === "finished" ? buildReplayData(room) : null,
   }
+}
+
+/**
+ * Post-match-only payload for the "Compare Approaches" replay: each
+ * player's final attempt on every question they touched (code included),
+ * plus one safe sample input per question to actually run that code
+ * against client-side. Gated entirely on the caller checking
+ * room.status === "finished" first — this function itself doesn't
+ * re-check, so don't call it from anywhere that hasn't.
+ */
+function buildReplayData(room: BattleRoom): NonNullable<BattleRoomView["replay"]> {
+  const submissions: NonNullable<BattleRoomView["replay"]>["submissions"] = []
+  for (const player of Object.values(room.players)) {
+    // Last submission per question index — usually the passing one, but a
+    // player who ran out of time mid-question still gets their best/last
+    // attempt shown rather than nothing.
+    const byQuestion = new Map<number, PlayerSubmission>()
+    for (const sub of player.submissions) byQuestion.set(sub.questionIndex, sub)
+    for (const sub of byQuestion.values()) {
+      submissions.push({ userId: player.userId, name: player.name, questionIndex: sub.questionIndex, passed: sub.passed, code: sub.code })
+    }
+  }
+
+  const sampleInputs = room.questionSlugs
+    .map((slug, questionIndex) => {
+      const problem = getBattleProblem(slug)
+      if (!problem || problem.testCases.length === 0) return null
+      return { questionIndex, slug, title: problem.title, input: problem.testCases[0].input }
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null)
+
+  return { submissions, sampleInputs }
 }
 
 /** The current question's public-safe problem info (no test cases) for a room, from either player's side. */

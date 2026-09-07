@@ -44,6 +44,11 @@ export interface PlayerSubmission {
   testsTotal: number
   submittedAt: number
   error: string | null
+  // The actual source submitted. Kept for the post-match replay/compare
+  // feature — never sent to the opponent while the room is still active
+  // (see toRoomView in store.ts); only surfaced once status is "finished",
+  // the same moment a real contest would reveal everyone's solutions.
+  code: string
 }
 
 export interface BattlePlayer {
@@ -104,5 +109,13 @@ export interface BattleRoomView {
     totalTimeMs: number
     lastTestsPassed: number | null
     lastTestsTotal: number | null
+  } | null
+  // Populated only once status === "finished" — each player's final
+  // attempt on each question they touched, code included, plus a safe
+  // sample input to actually run that code against for the Compare
+  // Approaches replay. Never present in "waiting"/"active" views.
+  replay: {
+    submissions: { userId: string; name: string; questionIndex: number; passed: boolean; code: string }[]
+    sampleInputs: { questionIndex: number; slug: string; title: string; input: unknown[] }[]
   } | null
 }

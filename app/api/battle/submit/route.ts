@@ -35,7 +35,7 @@ export async function POST(req: Request) {
   // touch room state at all, so a slow/failed judge call can't leave the
   // room half-updated.
   const judged = await judgeSubmission(problem, code)
-  const submission = toSubmission(player.currentQuestion, judged)
+  const submission = toSubmission(player.currentQuestion, judged, code)
 
   const result = await recordSubmission(roomId, userId, player.currentQuestion, submission)
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 })

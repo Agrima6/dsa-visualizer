@@ -135,13 +135,14 @@ export async function judgeSubmission(problem: BattleProblem, code: string): Pro
   }
 }
 
-export function toSubmission(questionIndex: number, result: JudgeResult): PlayerSubmission {
+export function toSubmission(questionIndex: number, result: JudgeResult, code: string): PlayerSubmission {
   return {
     questionIndex,
     passed: result.passed,
     testsPassed: result.testsPassed,
     testsTotal: result.testsTotal,
     submittedAt: Date.now(),
+    code,
     error: result.error,
   }
 }

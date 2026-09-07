@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { AlertTriangle, Check, Clock, Copy, Loader2, Swords, Trophy } from "lucide-react"
+import { AlertTriangle, Check, ChevronDown, Clock, Copy, Loader2, Swords, Trophy } from "lucide-react"
+import { runReplay, type OpCounts } from "@/lib/battle/replay-runner"
 
 interface PublicQuestion {
   slug: string
@@ -22,6 +23,12 @@ interface Submission {
   testsTotal: number
   submittedAt: number
   error: string | null
+  code: string
+}
+
+interface ReplayData {
+  submissions: { userId: string; name: string; questionIndex: number; passed: boolean; code: string }[]
+  sampleInputs: { questionIndex: number; slug: string; title: string; input: unknown[] }[]
 }
 
 interface RoomView {
@@ -35,6 +42,7 @@ interface RoomView {
   totalQuestions: number
   me: { userId: string; name: string; currentQuestion: number; solvedCount: number; totalTimeMs: number; lastSubmission: Submission | null } | null
   opponent: { userId: string; name: string; currentQuestion: number; solvedCount: number; totalTimeMs: number; lastTestsPassed: number | null; lastTestsTotal: number | null } | null
+  replay: ReplayData | null
 }
 
 function formatClock(seconds: number): string {
@@ -270,6 +278,8 @@ export default function BattleRoomPage() {
             <Swords className="h-4 w-4" /> Battle Again
           </button>
         </div>
+
+        {room.replay && room.me && <CompareApproaches replay={room.replay} myUserId={room.me.userId} />}
       </div>
     )
   }
@@ -384,6 +394,150 @@ export default function BattleRoomPage() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+// ── Compare Approaches ──────────────────────────────────────────────
+// Post-match only (room.replay is null until status === "finished").
+// Reruns both players' final code against the same sample input, client-
+// side, and shows how much actual work each one did — the differentiator
+// this feature was built around: not just who passed, but *how*.
+
+function CompareApproaches({ replay, myUserId }: { replay: ReplayData; myUserId: string }) {
+  const byQuestion = new Map<number, { title: string; input: unknown[]; mine?: ReplayData["submissions"][number]; theirs?: ReplayData["submissions"][number] }>()
+  for (const sample of replay.sampleInputs) {
+    byQuestion.set(sample.questionIndex, { title: sample.title, input: sample.input })
+  }
+  for (const sub of replay.submissions) {
+    const entry = byQuestion.get(sub.questionIndex)
+    if (!entry) continue
+    if (sub.userId === myUserId) entry.mine = sub
+    else entry.theirs = sub
+  }
+
+  const comparable = Array.from(byQuestion.entries()).filter(([, v]) => v.mine && v.theirs)
+  if (comparable.length === 0) return null
+
+  return (
+    <div className="mt-6 rounded-[24px] border border-violet-500/15 bg-white/70 p-6 shadow-[0_10px_35px_rgba(139,92,246,0.06)] backdrop-blur-xl dark:bg-white/[0.04]">
+      <h2 className="font-semibold">Compare Approaches</h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Both of you attempted these — see how much work each solution actually does on the same input, not just whether it passed.
+      </p>
+      <div className="mt-4 space-y-3">
+        {comparable.map(([questionIndex, entry]) => (
+          <QuestionCompareCard key={questionIndex} title={entry.title} input={entry.input} mine={entry.mine!} theirs={entry.theirs!} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function QuestionCompareCard({
+  title,
+  input,
+  mine,
+  theirs,
+}: {
+  title: string
+  input: unknown[]
+  mine: ReplayData["submissions"][number]
+  theirs: ReplayData["submissions"][number]
+}) {
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [mineResult, setMineResult] = useState<{ ops: OpCounts; output: string | null; error: string | null } | null>(null)
+  const [theirsResult, setTheirsResult] = useState<{ ops: OpCounts; output: string | null; error: string | null } | null>(null)
+  const [showCode, setShowCode] = useState<"mine" | "theirs" | null>(null)
+
+  const runComparison = async () => {
+    if (mineResult && theirsResult) return // already ran once — don't re-run on every expand
+    setLoading(true)
+    try {
+      const [a, b] = await Promise.all([runReplay(mine.code, input), runReplay(theirs.code, input)])
+      setMineResult(a)
+      setTheirsResult(b)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const toggle = () => {
+    const next = !open
+    setOpen(next)
+    if (next) void runComparison()
+  }
+
+  const totalOps = (o: OpCounts) => o.comparisons + o.loopIterations
+  const moreEfficient =
+    mineResult && theirsResult && !mineResult.error && !theirsResult.error
+      ? totalOps(mineResult.ops) === totalOps(theirsResult.ops)
+        ? "tie"
+        : totalOps(mineResult.ops) < totalOps(theirsResult.ops)
+          ? "mine"
+          : "theirs"
+      : null
+
+  return (
+    <div className="rounded-xl border border-violet-500/15">
+      <button onClick={toggle} className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold">
+        {title}
+        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="border-t border-violet-500/10 p-4">
+          {loading ? (
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="h-5 w-5 animate-spin text-violet-500" />
+            </div>
+          ) : mineResult && theirsResult ? (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: "You", result: mineResult, key: "mine" as const },
+                  { label: "Opponent", result: theirsResult, key: "theirs" as const },
+                ].map(({ label, result, key }) => (
+                  <div
+                    key={key}
+                    className={`rounded-lg border p-3 text-xs ${
+                      moreEfficient === key ? "border-emerald-500/30 bg-emerald-500/5" : "border-violet-500/10"
+                    }`}
+                  >
+                    <p className="font-semibold">{label}</p>
+                    {result.error ? (
+                      <p className="mt-1 text-rose-600 dark:text-rose-300">{result.error}</p>
+                    ) : (
+                      <ul className="mt-1 space-y-0.5 text-muted-foreground">
+                        <li>Comparisons: <strong className="text-foreground">{result.ops.comparisons}</strong></li>
+                        <li>Loop iterations: <strong className="text-foreground">{result.ops.loopIterations}</strong></li>
+                        {result.ops.calls > 0 && <li>Recursive calls: <strong className="text-foreground">{result.ops.calls}</strong></li>}
+                      </ul>
+                    )}
+                    <button
+                      onClick={() => setShowCode(showCode === key ? null : key)}
+                      className="mt-2 text-[11px] font-semibold text-violet-600 hover:underline dark:text-violet-300"
+                    >
+                      {showCode === key ? "Hide code" : "View code"}
+                    </button>
+                    {showCode === key && (
+                      <pre className="mt-2 max-h-40 overflow-auto rounded bg-neutral-950 p-2 text-[11px] text-emerald-300">{key === "mine" ? mine.code : theirs.code}</pre>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {moreEfficient && moreEfficient !== "tie" && (
+                <p className="mt-3 text-xs text-muted-foreground">
+                  {moreEfficient === "mine" ? "Your" : "Their"} approach did less work on this input — that's a hint about algorithmic
+                  efficiency, not a formal proof (one input can't confirm Big-O), but a wide gap like this usually means a real
+                  difference in approach (e.g. a hashmap vs. nested loops).
+                </p>
+              )}
+            </>
+          ) : null}
+        </div>
+      )}
     </div>
   )
 }
