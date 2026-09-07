@@ -175,12 +175,20 @@ export default function CodePlaygroundPage() {
             comparisons (<code className="rounded bg-muted px-1">arr[i] &gt; arr[j]</code>) — the common shape of
             hand-written array algorithms.
           </p>
-          <a
-            href="/visualizer/code-playground/tree"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-violet-500/20 bg-white/60 px-3 py-1.5 text-xs font-semibold text-violet-600 transition hover:border-violet-500/40 dark:bg-white/[0.04] dark:text-violet-300"
-          >
-            Binary Tree Playground →
-          </a>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <a
+              href="/visualizer/code-playground/tree"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-violet-500/20 bg-white/60 px-3 py-1.5 text-xs font-semibold text-violet-600 transition hover:border-violet-500/40 dark:bg-white/[0.04] dark:text-violet-300"
+            >
+              Binary Tree Playground →
+            </a>
+            <a
+              href="/visualizer/battle"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-violet-500/20 bg-white/60 px-3 py-1.5 text-xs font-semibold text-violet-600 transition hover:border-violet-500/40 dark:bg-white/[0.04] dark:text-violet-300"
+            >
+              ⚔️ Code Battle — race a friend 1v1 →
+            </a>
+          </div>
         </div>
       </div>
 
