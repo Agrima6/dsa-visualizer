@@ -13,7 +13,7 @@ import {
   type GraphVisEdge,
   type Difficulty,
   type Company,
-} from "./Graph problems data"
+} from "./graph-problems-data"
 
 declare global { interface Window { Razorpay: any } }
 

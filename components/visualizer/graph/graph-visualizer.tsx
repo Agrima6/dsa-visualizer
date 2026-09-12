@@ -1,11 +1,11 @@
 "use client"
-// components/visualizer/graph/Graph visualizer.tsx
+// components/visualizer/graph/graph-visualizer.tsx
 
 import { useState } from "react"
-import { GraphDisplay } from "./Graph display"
-import { GraphControls } from "./Graph controls"
-import { useGraph } from "@/hooks/Use graph"
-import GraphCodeView from "./Graph code view"
+import { GraphDisplay } from "./graph-display"
+import { GraphControls } from "./graph-controls"
+import { useGraph } from "@/hooks/use-graph"
+import GraphCodeView from "./graph-code-view"
 
 export function GraphVisualizer() {
   const [mode, setMode] = useState<"visualizer" | "code">("visualizer")

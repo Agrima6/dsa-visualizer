@@ -11,7 +11,7 @@ import {
   type ArrayVisStep,
   type Difficulty,
   type Company,
-} from "./Array problems data"
+} from "./array-problems-data"
 
 declare global { interface Window { Razorpay: any } }
 

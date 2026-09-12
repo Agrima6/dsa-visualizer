@@ -12,7 +12,7 @@ import { MarkdownContent } from "@/components/shared/markdown-content"
 import { useHeap } from "@/hooks/use-heap"
 
 import { Sparkles } from "lucide-react"
-import HeapCodeView from "./Heap code view"
+import HeapCodeView from "./heap-code-view"
 
 interface HeapVisualizerProps {
   content: React.ReactNode

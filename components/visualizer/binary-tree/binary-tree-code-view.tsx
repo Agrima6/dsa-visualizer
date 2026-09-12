@@ -13,7 +13,7 @@ import {
   type BinaryTreeNodeVis,
   type Difficulty,
   type Company,
-} from "./Binary tree problems data"
+} from "./binary-tree-problems-data"
 
 declare global { interface Window { Razorpay: any } }
 

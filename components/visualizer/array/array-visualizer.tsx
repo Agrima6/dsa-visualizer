@@ -4,10 +4,10 @@
 import { Suspense, useRef } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { MarkdownContent } from "@/components/shared/markdown-content"
-import { ArrayDisplay } from "./Array-display"
-import { ArrayControls } from "./Array-controls"
-import { useArray } from "@/hooks/Use array"
-import ArrayCodeView from "./Array code view"
+import { ArrayDisplay } from "./array-display"
+import { ArrayControls } from "./array-controls"
+import { useArray } from "@/hooks/use-array"
+import ArrayCodeView from "./array-code-view"
 import { ShareButton } from "@/components/visualizer/shared/share-button"
 
 interface ArrayVisualizerProps {

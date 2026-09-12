@@ -11,14 +11,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = join(__dirname, "..")
 
 const FILES = [
-  { slug: "arrays", files: ["components/visualizer/array/Array problems data.ts"] },
+  { slug: "arrays", files: ["components/visualizer/array/array-problems-data.ts"] },
   { slug: "sorting", files: ["components/visualizer/sorting/sorting-problems-data.ts"] },
   { slug: "linked-lists", files: ["components/visualizer/linked-list/linked-list-problems-data.ts"] },
   { slug: "stacks", files: ["components/visualizer/stack/stack-problems-data.ts"] },
   { slug: "queues", files: ["components/visualizer/queue/queue-problems-data.ts"] },
-  { slug: "binary-tree", files: ["components/visualizer/binary-tree/Binary tree problems data.tsx"] },
-  { slug: "heaps", files: ["components/visualizer/heap/Heap problems data.tsx"] },
-  { slug: "graphs", files: ["components/visualizer/graph/Graph problems data.ts"] },
+  { slug: "binary-tree", files: ["components/visualizer/binary-tree/binary-tree-problems-data.tsx"] },
+  { slug: "heaps", files: ["components/visualizer/heap/heap-problems-data.tsx"] },
+  { slug: "graphs", files: ["components/visualizer/graph/graph-problems-data.ts"] },
   {
     slug: "recursion",
     files: [

@@ -14,7 +14,7 @@ import { HeapControls } from "@/components/visualizer/heap/heap-controls"
 import { HeapDisplay } from "@/components/visualizer/heap/heap-display"
 import { HeapArray } from "@/components/visualizer/heap/heap-array"
 import { Sparkles } from "lucide-react"
-import BinaryTreeCodeView from "./Binary tree code view"
+import BinaryTreeCodeView from "./binary-tree-code-view"
 
 interface BinaryTreeVisualizerProps {
   content: React.ReactNode

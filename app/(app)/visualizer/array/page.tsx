@@ -1,5 +1,5 @@
 // app/visualizer/array/page.tsx
-import { ArrayVisualizer } from "@/components/visualizer/array/Array visualizer"
+import { ArrayVisualizer } from "@/components/visualizer/array/array-visualizer"
 
 export const metadata = {
   title: "Array Visualizer | AlgoMaitri",

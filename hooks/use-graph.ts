@@ -1,5 +1,5 @@
 "use client"
-// hooks/Use graph.ts
+// hooks/use-graph.ts
 
 import { useState, useCallback, useEffect } from "react"
 import { playNarration, stopNarration } from "@/lib/narration"

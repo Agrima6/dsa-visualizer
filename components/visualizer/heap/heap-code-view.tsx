@@ -13,7 +13,7 @@ import {
   type Company,
   type HeapVisStep,
   type HeapNode,
-} from "./Heap problems data"
+} from "./heap-problems-data"
 
 declare global {
   interface Window { Razorpay: any }

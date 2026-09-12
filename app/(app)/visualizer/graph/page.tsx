@@ -1,5 +1,5 @@
 
-import { GraphVisualizer } from "@/components/visualizer/graph/Graph visualizer"
+import { GraphVisualizer } from "@/components/visualizer/graph/graph-visualizer"
 
 export const metadata = {
   title: "Graph Visualizer | AlgoMaitri",
