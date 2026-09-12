@@ -138,6 +138,7 @@ export function DPControls({
         <button
           onClick={onReset}
           disabled={isAnimating}
+          aria-label="Reset"
           className="flex items-center justify-center gap-2 rounded-xl border border-violet-500/20 px-3 py-2.5 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50"
         >
           <RotateCcw className="h-4 w-4" />

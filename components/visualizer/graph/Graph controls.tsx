@@ -121,7 +121,7 @@ export function GraphControls({
               <option value="">To</option>
               {nodes.map(n => <option key={n.id} value={n.id}>{n.label}</option>)}
             </select>
-            <button onClick={handleAddEdge} disabled={isAnimating || !edgeFrom || !edgeTo || edgeFrom === edgeTo}
+            <button onClick={handleAddEdge} disabled={isAnimating || !edgeFrom || !edgeTo || edgeFrom === edgeTo} aria-label="Add edge"
               className={cn("h-10 w-10 rounded-xl border border-violet-500/15 bg-violet-500/10 text-violet-600 dark:text-violet-300 flex items-center justify-center hover:bg-violet-500/15 disabled:opacity-40 transition-all")}>
               <GitBranch className="h-4 w-4" />
             </button>

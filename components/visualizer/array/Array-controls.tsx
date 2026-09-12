@@ -365,6 +365,7 @@ export function ArrayControls({
           <button
             onClick={handleDelete}
             disabled={isAnimating || arrayLength === 0}
+            aria-label="Delete at index"
             className={cn(btn, "border border-rose-500/20 bg-rose-500/10 text-rose-700 dark:text-rose-300 hover:bg-rose-500/15 px-3")}
           >
             <Trash2 className="h-4 w-4" />
@@ -390,6 +391,7 @@ export function ArrayControls({
           <button
             onClick={handleSearch}
             disabled={isAnimating}
+            aria-label="Search"
             className={cn(btn, "border border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-300 hover:bg-amber-500/15 px-3")}
           >
             <Search className="h-4 w-4" />
@@ -426,6 +428,7 @@ export function ArrayControls({
           <button
             onClick={handleUpdate}
             disabled={isAnimating}
+            aria-label="Update value at index"
             className={cn(btn, "border border-violet-500/20 bg-violet-500/10 text-violet-700 dark:text-violet-300 hover:bg-violet-500/15 px-3")}
           >
             <ArrowLeftRight className="h-4 w-4" />
