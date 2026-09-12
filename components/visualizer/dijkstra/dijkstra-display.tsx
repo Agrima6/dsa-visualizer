@@ -51,7 +51,10 @@ export function DijkstraDisplay({
       position: { x: node.x, y: node.y },
       data: {
         id: node.id,
-        distance: distances.get(node.id) || Infinity,
+        // `??`, not `||` — the start node's real distance is 0, and 0 is
+        // falsy, so `distances.get(node.id) || Infinity` was replacing a
+        // perfectly correct "0" with "∞" on every single run.
+        distance: distances.get(node.id) ?? Infinity,
         isVisited: visitedNodes.has(node.id),
         isCurrent: node.id === currentNode,
         isPath: path.includes(node.id),

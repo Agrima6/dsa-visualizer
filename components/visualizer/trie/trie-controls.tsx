@@ -43,6 +43,9 @@ export function TrieControls({
           placeholder="e.g. cat"
           className="w-full rounded-xl border border-violet-500/15 bg-white/70 px-3 py-2 text-sm font-mono outline-none focus:border-violet-500/40 dark:bg-white/[0.04]"
         />
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          Only lowercase a–z letters are stored — numbers, spaces, and punctuation are stripped silently.
+        </p>
       </div>
 
       <div className="grid grid-cols-3 gap-2">

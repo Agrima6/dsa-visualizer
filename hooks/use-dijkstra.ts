@@ -53,14 +53,16 @@ export function useDijkstra() {
   }
 
   const addEdge = (source: string, target: string, weight: number) => {
+    // Only store one entry per edge — findShortestPath already treats every
+    // edge as traversable in both directions (it matches on `e.source ===
+    // current || e.target === current`), the same assumption example-graphs.ts
+    // relies on for its own edges. Adding a second, reversed entry here used
+    // to double up every edge rendered by DijkstraDisplay (two overlapping
+    // ReactFlow edges + two overlapping weight labels per manually-added edge)
+    // without changing the algorithm's behavior at all.
     setGraph(prev => ({
       ...prev,
-      edges: [
-        ...prev.edges,
-        { source, target, weight },
-        // Add reverse edge automatically
-        { source: target, target: source, weight }
-      ]
+      edges: [...prev.edges, { source, target, weight }]
     }))
   }
 
