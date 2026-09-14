@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from "@sentry/nextjs/config";
 const withMDX = require("@next/mdx")();
 
 const nextConfig: NextConfig = {
@@ -12,5 +12,7 @@ export default withSentryConfig(withMDX(nextConfig), {
   // (+ SENTRY_ORG/SENTRY_PROJECT) as a deliberate opt-in, not a build
   // requirement.
   silent: true,
-  disableLogger: true,
+  webpack: {
+    treeshake: { removeDebugLogging: true },
+  },
 });

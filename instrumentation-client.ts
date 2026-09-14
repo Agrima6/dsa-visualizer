@@ -15,3 +15,7 @@ Sentry.init({
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 0,
 })
+
+// Lets Sentry instrument App Router client-side navigations (required export,
+// not optional — Sentry's Next.js SDK looks for this by name).
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart
