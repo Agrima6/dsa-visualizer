@@ -9,6 +9,7 @@ import { AccessibilityProvider } from "@/hooks/use-accessibility"
 import { TranscriptPanel } from "@/components/global/transcript-panel"
 import { MotionConfigBridge } from "@/components/global/motion-config-bridge"
 import { PostHogProvider } from "@/components/global/posthog-provider"
+import { FeedbackWidget } from "@/components/global/feedback-widget"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://algomaitri.com"),
@@ -66,6 +67,7 @@ export default function RootLayout({
 
             <Toaster />
             <TranscriptPanel />
+            <FeedbackWidget />
           </ThemeProvider>
           </ProgressProvider>
           </MotionConfigBridge>

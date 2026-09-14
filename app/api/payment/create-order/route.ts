@@ -1,6 +1,7 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import Razorpay from "razorpay";
 import { NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
   try {
@@ -8,6 +9,14 @@ export async function POST(req: Request) {
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Per-user, not per-IP — this is authenticated, and the thing worth
+    // bounding is "how many real Razorpay orders can one account create,"
+    // regardless of which network they're on.
+    const { allowed } = await rateLimit(`payment-create-order:${userId}`, 10, 60_000);
+    if (!allowed) {
+      return NextResponse.json({ error: "Too many order attempts. Try again in a minute." }, { status: 429 });
     }
 
     const razorpayKeyId = process.env.RAZORPAY_KEY_ID;
@@ -33,6 +42,18 @@ export async function POST(req: Request) {
         { error: "A valid topicSlug is required." },
         { status: 400 }
       );
+    }
+
+    // Nothing downstream ever checked this — a user could pay twice for a
+    // topic they already have access to (forgot they'd bought it, double-
+    // clicked, whatever) with zero warning, since verify/webhook both just
+    // idempotently no-op the *unlock*, not the *charge*. Real money was
+    // still taken for a second, functionally useless order.
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    const unlockedTopics = (user.privateMetadata?.unlockedTopics as string[] | undefined) || [];
+    if (unlockedTopics.includes(topicSlug)) {
+      return NextResponse.json({ error: "You already have access to this topic." }, { status: 409 });
     }
 
     const razorpay = new Razorpay({
