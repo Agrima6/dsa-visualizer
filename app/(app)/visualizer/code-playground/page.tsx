@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { AlertTriangle, Bug, Loader2, Pause, Play, RotateCcw, Shuffle, Sparkles, SkipBack, SkipForward } from "lucide-react"
+import { AlertTriangle, Bug, LineChart, Loader2, Pause, Play, RotateCcw, Shuffle, Sparkles, SkipBack, SkipForward } from "lucide-react"
 import { runUserSortCode, type RunResult } from "@/lib/code-playground/runner"
+import { estimateComplexity, type ComplexityResult } from "@/lib/code-playground/complexity-estimator"
 import { useTracePlayer } from "@/hooks/use-trace-player"
 import { SortingBars } from "@/components/visualizer/sorting/sorting-bars"
 import { ShareButton } from "@/components/visualizer/shared/share-button"
@@ -95,6 +96,9 @@ export default function CodePlaygroundPage() {
   // only apply to code that's actually meant to sort. Defaults to true
   // since the default starter (and hand-typed custom code) is a sort.
   const [sortsArray, setSortsArray] = useState(TEMPLATES[0].sortsArray)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [analyzeProgress, setAnalyzeProgress] = useState(0)
+  const [complexity, setComplexity] = useState<ComplexityResult | null>(null)
 
   const player = useTracePlayer(result?.steps ?? [], EMPTY_SORT_STEP)
 
@@ -151,6 +155,24 @@ export default function CodePlaygroundPage() {
     setInput(arr.join(", "))
   }
 
+  const analyzeComplexity = async () => {
+    setAnalyzing(true)
+    setAnalyzeProgress(0)
+    setComplexity(null)
+    setError(null)
+    try {
+      const res = await estimateComplexity(code, sortsArray, (completed, total) => setAnalyzeProgress(completed / total))
+      setComplexity(res)
+      if (res.dataPoints.length === 0) {
+        setError(res.error ?? "Couldn't measure complexity — check your code runs correctly first.")
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong analyzing complexity.")
+    } finally {
+      setAnalyzing(false)
+    }
+  }
+
   return (
     <div className="container mx-auto space-y-8">
       <div className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
@@ -202,7 +224,7 @@ export default function CodePlaygroundPage() {
             <select
               onChange={(e) => {
                 const t = TEMPLATES.find((tpl) => tpl.id === e.target.value)
-                if (t) { setCode(t.code); setInput(t.input); setSortsArray(t.sortsArray); setResult(null); setError(null) }
+                if (t) { setCode(t.code); setInput(t.input); setSortsArray(t.sortsArray); setResult(null); setError(null); setComplexity(null) }
               }}
               defaultValue=""
               className="rounded-lg border border-violet-500/15 bg-white/70 px-2 py-1 text-xs dark:bg-white/[0.04]"
@@ -230,19 +252,55 @@ export default function CodePlaygroundPage() {
             </button>
           </div>
 
-          <button
-            onClick={run}
-            disabled={running}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 py-2.5 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(139,92,246,0.2)] disabled:opacity-60"
-          >
-            {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-            {running ? "Running..." : "Run & Visualize"}
-          </button>
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[2fr_1fr]">
+            <button
+              onClick={run}
+              disabled={running}
+              className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 py-2.5 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(139,92,246,0.2)] disabled:opacity-60"
+            >
+              {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+              {running ? "Running..." : "Run & Visualize"}
+            </button>
+            <button
+              onClick={analyzeComplexity}
+              disabled={analyzing}
+              title="Runs your code at several input sizes to estimate its real growth rate — average-case, from an empirical measurement, not a formal proof."
+              className="flex items-center justify-center gap-2 rounded-xl border border-violet-500/20 py-2.5 text-sm font-semibold text-violet-600 transition hover:border-violet-500/40 disabled:opacity-60 dark:text-violet-300"
+            >
+              {analyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <LineChart className="h-4 w-4" />}
+              {analyzing ? `Analyzing... ${Math.round(analyzeProgress * 100)}%` : "Analyze Complexity"}
+            </button>
+          </div>
 
           {error && (
             <div className="mt-3 flex items-start gap-2 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3 text-sm text-rose-700 dark:text-rose-300">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{error}</span>
+            </div>
+          )}
+
+          {complexity && complexity.dataPoints.length > 0 && (
+            <div className="mt-3 rounded-xl border border-violet-500/15 bg-violet-500/5 p-3">
+              <div className="flex items-center justify-between">
+                <p className="flex items-center gap-1.5 text-sm font-semibold">
+                  <LineChart className="h-4 w-4 text-violet-500" />
+                  Estimated: <span className="text-violet-600 dark:text-violet-300">{complexity.bestFit}</span>
+                </p>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] text-muted-foreground">
+                {complexity.dataPoints.map((p) => (
+                  <span key={p.n}>n={p.n} → {p.ops.toLocaleString()} ops</span>
+                ))}
+              </div>
+              {complexity.error && (
+                <p className="mt-1.5 text-[11px] text-muted-foreground">
+                  Stopped early at a larger size: {complexity.error}
+                </p>
+              )}
+              <p className="mt-1.5 text-[11px] text-muted-foreground">
+                Measured on random input, not a worst-case guarantee — an algorithm whose behavior depends on
+                already-sorted or adversarial input may show a different growth rate here than its textbook worst case.
+              </p>
             </div>
           )}
         </div>
