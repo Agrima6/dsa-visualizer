@@ -8,6 +8,7 @@ import { ProgressProvider } from "@/hooks/use-progress"
 import { AccessibilityProvider } from "@/hooks/use-accessibility"
 import { TranscriptPanel } from "@/components/global/transcript-panel"
 import { MotionConfigBridge } from "@/components/global/motion-config-bridge"
+import { PostHogProvider } from "@/components/global/posthog-provider"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://algomaitri.com"),
@@ -43,6 +44,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body>
+          <PostHogProvider>
           <AccessibilityProvider>
           <MotionConfigBridge>
           <ProgressProvider>
@@ -68,6 +70,7 @@ export default function RootLayout({
           </ProgressProvider>
           </MotionConfigBridge>
           </AccessibilityProvider>
+          </PostHogProvider>
         </body>
       </html>
     </ClerkProvider>

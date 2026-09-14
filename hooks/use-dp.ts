@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { playNarration, stopNarration } from "@/lib/narration"
 
 export type DPProblem = "knapsack" | "lcs"
@@ -247,6 +247,15 @@ export function useDP() {
     setResult(null)
     setResultLabel("")
   }, [isAnimating, commitTable, commitStatus])
+
+  // Switching between Knapsack and LCS left the *other* problem's table on
+  // screen — fully filled, correctly labeled for the problem you just left,
+  // and completely wrong for the one you switched to — until Run was
+  // clicked again. Clear the visualization the moment the problem changes.
+  useEffect(() => {
+    reset()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [problem])
 
   return {
     problem, setProblem,

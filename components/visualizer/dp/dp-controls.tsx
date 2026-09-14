@@ -47,7 +47,14 @@ export function DPControls({
         return { weight: w || 0, value: v || 0 }
       })
       .filter((it) => it.weight > 0)
-    if (parsed.length) onSetItems(parsed)
+    // Always propagate, even when parsed is empty (e.g. the field was just
+    // cleared) — runKnapsack handles 0 items fine (base case: value 0, "No
+    // items fit"). The previous `if (parsed.length)` guard silently kept
+    // the *old* items active whenever the field parsed to nothing, so
+    // clearing the input did nothing but blank the box: Run kept computing
+    // against whatever was typed before, with no indication to the user
+    // that their edit was ignored.
+    onSetItems(parsed)
   }
 
   return (

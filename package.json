@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
     "@babel/standalone": "^8.0.4",
@@ -28,6 +29,7 @@
     "@radix-ui/react-tabs": "^1.1.2",
     "@radix-ui/react-toast": "^1.2.4",
     "@radix-ui/react-tooltip": "^1.1.6",
+    "@sentry/nextjs": "^10.74.0",
     "@types/mdx": "^2.0.13",
     "@upstash/redis": "^1.38.3",
     "class-variance-authority": "^0.7.1",
@@ -39,6 +41,7 @@
     "next": "^15.5.24",
     "next-swagger-doc": "0.4.0",
     "next-themes": "^0.4.4",
+    "posthog-js": "^1.430.3",
     "razorpay": "^2.9.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
@@ -58,6 +61,7 @@
     "eslint-config-next": "15.5.9",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^2.1.9"
   }
 }

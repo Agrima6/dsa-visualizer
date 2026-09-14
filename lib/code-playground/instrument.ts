@@ -49,6 +49,39 @@ export async function instrumentUserCode(source: string): Promise<InstrumentResu
       )
     }
 
+    // A bare Identifier or NumericLiteral index is safe to evaluate twice —
+    // reading `i` or `2` has no side effect. Anything else (arr[i++],
+    // arr[nextIndex()], ...) does, so it must be hoisted into a temp
+    // *before* the statement and evaluated exactly once — otherwise
+    // cloning it into both the value-reading position and the reported
+    // "which index" position (as the old code did) silently runs that
+    // side effect twice, e.g. turning `arr[k++] = x` into two increments
+    // of k per write. This is exactly the class of bug a real merge-sort
+    // or two-pointer implementation hits immediately.
+    function isSideEffectFree(node: any): boolean {
+      if (t.isIdentifier(node) || t.isNumericLiteral(node)) return true
+      if (t.isBinaryExpression(node)) return isSideEffectFree(node.left) && isSideEffectFree(node.right)
+      return false
+    }
+
+    // Ensures `member.property` can be safely read twice (once as the
+    // value used in place, once as the reported index) by hoisting it into
+    // a fresh temp variable declared right before `stmtPath` when it isn't
+    // already side-effect-free — then rewriting `member.property` in place
+    // to reference that temp. Returns the expression to report as "the
+    // index" (either the original property, or the new temp).
+    function stabilizeIndex(member: any, stmtPath: any): any {
+      if (isSideEffectFree(member.property)) {
+        return t.cloneNode(member.property)
+      }
+      const temp = stmtPath.scope.generateUidIdentifier("idx")
+      stmtPath.insertBefore(
+        t.variableDeclaration("var", [t.variableDeclarator(t.cloneNode(temp), member.property)])
+      )
+      member.property = t.cloneNode(temp)
+      return t.cloneNode(temp)
+    }
+
     return {
       visitor: {
         Program(path: any) {
@@ -122,8 +155,16 @@ export async function instrumentUserCode(source: string): Promise<InstrumentResu
           const rightIsMember = isTrackedMember(node.right)
           if (!leftIsMember && !rightIsMember) return
 
-          const leftIndex = leftIsMember ? t.cloneNode(node.left.property) : t.nullLiteral()
-          const rightIndex = rightIsMember ? t.cloneNode(node.right.property) : t.nullLiteral()
+          const stmtPath = path.getStatementParent()
+          if (!stmtPath) return
+
+          // stabilizeIndex mutates node.left/right.property in place when it
+          // needs to hoist a side-effecting index (e.g. arr[i++]) into a
+          // temp — must happen before the clones below, so both the
+          // reported index and the value read below reference that same
+          // stable temp instead of two independent evaluations of `i++`.
+          const leftIndex = leftIsMember ? stabilizeIndex(node.left, stmtPath) : t.nullLiteral()
+          const rightIndex = rightIsMember ? stabilizeIndex(node.right, stmtPath) : t.nullLiteral()
 
           path.replaceWith(
             t.callExpression(t.identifier("__cmp"), [
@@ -153,8 +194,11 @@ export async function instrumentUserCode(source: string): Promise<InstrumentResu
             node.left.elements.every((el: any) => isTrackedMember(el)) &&
             node.right.elements.every((el: any) => isTrackedMember(el))
           ) {
-            const i = t.cloneNode(node.left.elements[0].property)
-            const j = t.cloneNode(node.left.elements[1].property)
+            // Only the two assignment *targets* need stabilizing — the
+            // right-hand side's own arr[...] reads evaluate naturally, in
+            // place, exactly once, as part of the statement itself.
+            const i = stabilizeIndex(node.left.elements[0], stmtPath)
+            const j = stabilizeIndex(node.left.elements[1], stmtPath)
             stmtPath.insertAfter(
               t.expressionStatement(
                 t.callExpression(t.identifier("__afterSwap"), [t.identifier(paramName), i, j])
@@ -165,12 +209,29 @@ export async function instrumentUserCode(source: string): Promise<InstrumentResu
 
           // Simple index write: arr[i] = <expr>
           if (isTrackedMember(node.left)) {
-            const i = t.cloneNode(node.left.property)
+            const i = stabilizeIndex(node.left, stmtPath)
             stmtPath.insertAfter(
               t.expressionStatement(
                 t.callExpression(t.identifier("__afterWrite"), [t.identifier(paramName), i])
               )
             )
+          }
+        },
+
+        IfStatement(path: any) {
+          // A bare (unbraced) branch — `if (cond) arr[k++] = x; else arr[k++] = y;`
+          // — has nowhere local to hoist a side-effecting index into: both
+          // branches' getStatementParent() would otherwise resolve to the
+          // same shared ancestor above the whole if/else, so both hoisted
+          // `k++`s ran unconditionally every time instead of only the
+          // branch actually taken. Wrapping each branch in its own block
+          // first gives each one a real, local place to hoist into — the
+          // same reason loop bodies below get this treatment too.
+          if (path.node.consequent && !t.isBlockStatement(path.node.consequent)) {
+            path.get("consequent").replaceWith(t.blockStatement([path.node.consequent]))
+          }
+          if (path.node.alternate && !t.isBlockStatement(path.node.alternate) && !t.isIfStatement(path.node.alternate)) {
+            path.get("alternate").replaceWith(t.blockStatement([path.node.alternate]))
           }
         },
 

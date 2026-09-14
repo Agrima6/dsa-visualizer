@@ -82,8 +82,17 @@ function runInWorker(source: string): Promise<{ ok: true; results: { ok: boolean
       if (settled) return
       settled = true
       clearTimeout(timeout)
-      worker.terminate()
-      resolve(result)
+      // worker.terminate() returns a promise that resolves once the OS
+      // thread has actually torn down — not awaiting it (as this used to)
+      // let this function return, and the caller start the *next*
+      // judgeSubmission, before the previous worker's thread had finished
+      // shutting down. Under many battles' worth of back-to-back
+      // submissions with no backpressure, that let torn-down-but-not-yet-
+      // gone workers pile up, which is exactly what a real test run
+      // surfaced: an infinite-loop submission that reliably self-aborts
+      // at 5s in isolation instead intermittently took 2-9 *minutes* when
+      // run right after ~15 other judged submissions in the same process.
+      worker.terminate().finally(() => resolve(result))
     }
 
     const timeout = setTimeout(() => {
