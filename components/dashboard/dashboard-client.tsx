@@ -7,6 +7,7 @@ import { getDailyProgress, getTopicStats, getBugSpotStats, getWeakTopics } from 
 import { useUser } from "@clerk/nextjs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Navbar } from "@/components/navigation/navbar"
+import { Reveal } from "@/components/motion/reveal"
 
 const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -73,11 +74,11 @@ export default function DashboardClient() {
         <Navbar />
       </div>
         <main className="container mx-auto max-w-6xl space-y-6 px-4 py-8">
-        <section className="rounded-3xl border border-violet-500/15 bg-gradient-to-br from-violet-500/10 via-background to-blue-500/10 p-6 md:p-8">
+        <Reveal as="section" className="rounded-3xl border border-violet-500/15 bg-gradient-to-br from-violet-500/10 via-background to-blue-500/10 p-6 md:p-8">
           <p className="text-sm font-medium text-violet-500">Your learning dashboard</p>
           <h1 className="mt-1 text-3xl font-bold tracking-tight">Welcome back, {firstName}.</h1>
           <p className="mt-2 text-muted-foreground">Every number here comes from the questions you open and solve.</p>
-        </section>
+        </Reveal>
 
         {error && (
           <div className="flex items-center gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-300" role="alert">
@@ -105,24 +106,34 @@ export default function DashboardClient() {
         )}
 
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <Metric label="Topics opened" value={solved} note="Saved to your account" />
-          <Metric
-            label="Current streak"
-            value={`${progress.streak.current} day${progress.streak.current === 1 ? "" : "s"}`}
-            note={`Best: ${progress.streak.longest} days`}
-          />
-          <Metric label="Today" value={`${today} / ${progress.dailyGoal}`} note="Practice goal" />
-          <Metric label="XP" value={progress.xp} note="10 / 25 / 50 per Easy / Medium / Hard" />
-          <Metric
-            icon={<Bug className="h-3.5 w-3.5" />}
-            label="Bugs spotted"
-            value={bugStats.attempts ? `${bugStats.correct}/${bugStats.attempts}` : "—"}
-            note={bugStats.attempts ? `${bugStats.accuracy}% accuracy` : "Try it on a Sorting problem"}
-          />
+          <Reveal delay={0 * 0.05}>
+            <Metric label="Topics opened" value={solved} note="Saved to your account" />
+          </Reveal>
+          <Reveal delay={1 * 0.05}>
+            <Metric
+              label="Current streak"
+              value={`${progress.streak.current} day${progress.streak.current === 1 ? "" : "s"}`}
+              note={`Best: ${progress.streak.longest} days`}
+            />
+          </Reveal>
+          <Reveal delay={2 * 0.05}>
+            <Metric label="Today" value={`${today} / ${progress.dailyGoal}`} note="Practice goal" />
+          </Reveal>
+          <Reveal delay={3 * 0.05}>
+            <Metric label="XP" value={progress.xp} note="10 / 25 / 50 per Easy / Medium / Hard" />
+          </Reveal>
+          <Reveal delay={4 * 0.05}>
+            <Metric
+              icon={<Bug className="h-3.5 w-3.5" />}
+              label="Bugs spotted"
+              value={bugStats.attempts ? `${bugStats.correct}/${bugStats.attempts}` : "—"}
+              note={bugStats.attempts ? `${bugStats.accuracy}% accuracy` : "Try it on a Sorting problem"}
+            />
+          </Reveal>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_.8fr]">
-          <div className="rounded-3xl border bg-card p-6">
+          <Reveal className="rounded-3xl border bg-card p-6">
             <div className="flex items-baseline justify-between">
               <h2 className="font-semibold">Activity calendar</h2>
               <span className="text-xs text-muted-foreground">Monday to Sunday</span>
@@ -153,9 +164,9 @@ export default function DashboardClient() {
               })}
             </div>
             <p className="mt-3 text-sm text-muted-foreground">A green day means you opened a company practice topic.</p>
-          </div>
+          </Reveal>
 
-          <div className="rounded-3xl border bg-card p-6">
+          <Reveal className="rounded-3xl border bg-card p-6" delay={0.1}>
             <h2 className="font-semibold">Continue learning</h2>
             <p className="mt-2 text-sm text-muted-foreground">Choose a company topic to begin or continue a visualizer.</p>
             <Link
@@ -164,10 +175,10 @@ export default function DashboardClient() {
             >
               Browse company questions
             </Link>
-          </div>
+          </Reveal>
         </section>
 
-        <section className="rounded-3xl border bg-card p-6">
+        <Reveal as="section" className="rounded-3xl border bg-card p-6">
           <h2 className="font-semibold">Topic progress</h2>
           <div className="mt-5 grid gap-4 md:grid-cols-2">
             {topics.map((t) => (
@@ -187,10 +198,10 @@ export default function DashboardClient() {
               </div>
             ))}
           </div>
-        </section>
+        </Reveal>
 
         {weakTopics.length > 0 && (
-          <section className="rounded-3xl border border-amber-500/20 bg-amber-500/5 p-6">
+          <Reveal as="section" className="rounded-3xl border border-amber-500/20 bg-amber-500/5 p-6">
             <div className="flex items-center gap-2">
               <Target className="h-4 w-4 text-amber-500" />
               <h2 className="font-semibold">Recommended focus</h2>
@@ -214,10 +225,10 @@ export default function DashboardClient() {
                 </Link>
               ))}
             </div>
-          </section>
+          </Reveal>
         )}
 
-        <section className="rounded-3xl border bg-card p-6">
+        <Reveal as="section" className="rounded-3xl border bg-card p-6">
           <h2 className="font-semibold">Recent practice</h2>
           {progress.solvedProblems.length ? (
             <ul className="mt-4 space-y-2">
@@ -231,7 +242,7 @@ export default function DashboardClient() {
           ) : (
             <p className="mt-3 text-sm text-muted-foreground">No practice yet. Open a company question to start your calendar.</p>
           )}
-        </section>
+        </Reveal>
       </main>
     </div>
   )
