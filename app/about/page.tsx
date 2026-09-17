@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Navbar } from "@/components/navigation/navbar";
 import { useEffect, useState } from "react";
+import { Reveal } from "@/components/motion/reveal";
 
 const founders = [
   {
@@ -150,7 +151,7 @@ export default function AboutPage() {
         </div>
 
         {/* ── HERO ── */}
-        <section style={{ maxWidth: 1200, margin: "3rem auto 0", width: "100%" }}>
+        <Reveal as="section" style={{ maxWidth: 1200, margin: "3rem auto 0", width: "100%" }}>
           {/* Label */}
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "2rem" }}>
             <div style={{ width: 32, height: 1, background: "rgba(99,102,241,0.7)" }} />
@@ -202,13 +203,13 @@ export default function AboutPage() {
               ))}
             </div>
           </div>
-        </section>
+        </Reveal>
 
         {/* Divider */}
         <div style={{ maxWidth: 1200, margin: "5rem auto", width: "100%", height: 1, background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent)" }} />
 
         {/* ── MISSION ── */}
-        <section style={{ maxWidth: 1200, margin: "0 auto", width: "100%" }}>
+        <Reveal as="section" style={{ maxWidth: 1200, margin: "0 auto", width: "100%" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
             <div style={{ width: 32, height: 1, background: "rgba(99,102,241,0.7)" }} />
             <span style={{ fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", color: "#6366f1", fontWeight: 700 }}>Our Mission</span>
@@ -221,9 +222,10 @@ export default function AboutPage() {
           </h2>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1.25rem" }}>
-            {missionPoints.map((point) => (
-              <div
+            {missionPoints.map((point, i) => (
+              <Reveal
                 key={point.title}
+                delay={i * 0.1}
                 style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: 20, padding: "2rem", display: "flex", flexDirection: "column", gap: 14, transition: "border-color 0.2s, transform 0.2s, box-shadow 0.2s" }}
                 onMouseEnter={(e) => {
                   const el = e.currentTarget as HTMLDivElement;
@@ -241,16 +243,16 @@ export default function AboutPage() {
                 <span style={{ fontSize: 32 }}>{point.emoji}</span>
                 <h3 style={{ fontSize: "1.1rem", fontWeight: 800, letterSpacing: "-0.02em", color: t.text, margin: 0, lineHeight: 1.3 }}>{point.title}</h3>
                 <p style={{ fontSize: "0.9rem", lineHeight: 1.75, color: t.textMuted, margin: 0 }}>{point.body}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
-        </section>
+        </Reveal>
 
         {/* Divider */}
         <div style={{ maxWidth: 1200, margin: "5rem auto", width: "100%", height: 1, background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent)" }} />
 
         {/* ── TEAM ── */}
-        <section style={{ maxWidth: 1200, margin: "0 auto", width: "100%" }}>
+        <Reveal as="section" style={{ maxWidth: 1200, margin: "0 auto", width: "100%" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "3rem", flexWrap: "wrap", gap: "1.5rem" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
@@ -269,8 +271,9 @@ export default function AboutPage() {
           {/* Founder cards */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1px", background: t.border, borderRadius: 24, overflow: "hidden", border: `1px solid ${t.border}` }}>
             {founders.map((founder, i) => (
-              <div
+              <Reveal
                 key={founder.name}
+                delay={i * 0.08}
                 style={{ background: t.surface, padding: "2.5rem 2rem", display: "flex", flexDirection: "column", gap: 20, transition: "background 0.2s", cursor: "default", position: "relative", overflow: "hidden" }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = t.surfaceHover; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = t.surface; }}
@@ -303,13 +306,13 @@ export default function AboutPage() {
 
                 {/* Bottom accent line */}
                 <div style={{ height: 2, borderRadius: 2, background: `linear-gradient(90deg, ${founder.accent}70, transparent)`, marginTop: "auto" }} />
-              </div>
+              </Reveal>
             ))}
           </div>
-        </section>
+        </Reveal>
 
         {/* ── CLOSING MANIFESTO ── */}
-        <section style={{ maxWidth: 1200, margin: "5rem auto 0", width: "100%", padding: "3rem 2.5rem", borderRadius: 24, background: t.missionBg, border: `1px solid ${t.missionBorder}`, display: "flex", flexWrap: "wrap", gap: "2rem", alignItems: "center", justifyContent: "space-between" }}>
+        <Reveal as="section" style={{ maxWidth: 1200, margin: "5rem auto 0", width: "100%", padding: "3rem 2.5rem", borderRadius: 24, background: t.missionBg, border: `1px solid ${t.missionBorder}`, display: "flex", flexWrap: "wrap", gap: "2rem", alignItems: "center", justifyContent: "space-between" }}>
           <div>
             <p style={{ fontSize: "clamp(1.1rem, 2.5vw, 1.65rem)", fontWeight: 800, letterSpacing: "-0.03em", margin: 0, color: t.text, lineHeight: 1.35, maxWidth: 560 }}>
               "You don't need to be a genius.{" "}
@@ -326,7 +329,7 @@ export default function AboutPage() {
           >
             Start Learning <ArrowUpRight size={15} />
           </Link>
-        </section>
+        </Reveal>
       </div>
     </main>
   );
