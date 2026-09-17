@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
+import { Reveal } from "@/components/motion/reveal";
 
 const features = [
   {
@@ -1850,7 +1851,7 @@ export const Features = () => {
 
       <div className="container mx-auto px-4">
         <div className="flex flex-col gap-12">
-          <div className="relative overflow-hidden rounded-[34px] border border-violet-500/12 bg-white/70 px-5 py-8 shadow-[0_20px_70px_rgba(88,28,135,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.03] dark:shadow-[0_20px_80px_rgba(0,0,0,0.28)] md:px-8 md:py-10">
+          <Reveal className="relative overflow-hidden rounded-[34px] border border-violet-500/12 bg-white/70 px-5 py-8 shadow-[0_20px_70px_rgba(88,28,135,0.08)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.03] dark:shadow-[0_20px_80px_rgba(0,0,0,0.28)] md:px-8 md:py-10">
             <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(139,92,246,0.08),transparent_34%,rgba(245,158,11,0.06)_100%)]" />
             <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/40 to-transparent" />
             <div className="absolute -top-16 right-8 h-40 w-40 rounded-full bg-violet-500/10 blur-3xl" />
@@ -1872,12 +1873,13 @@ export const Features = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </Reveal>
 
           <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-3">
             {features.map((feature, index) => (
-              <div
+              <Reveal
                 key={feature.title + index}
+                delay={Math.min(index, 5) * 0.06}
                 className="group relative cursor-pointer overflow-hidden rounded-[32px] border border-violet-500/10 bg-white/80 p-4 shadow-[0_10px_35px_rgba(15,23,42,0.05)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-violet-500/20 hover:shadow-[0_24px_60px_rgba(109,40,217,0.14)] dark:bg-white/[0.03]"
                 onClick={() => setSelectedFeature(feature as SelectedFeature)}
               >
@@ -1901,7 +1903,7 @@ export const Features = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>

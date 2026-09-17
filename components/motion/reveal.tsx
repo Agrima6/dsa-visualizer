@@ -10,6 +10,7 @@ interface RevealProps {
   /** Horizontal offset instead of the default rise-from-below, for side-by-side story beats. */
   direction?: "up" | "left" | "right"
   as?: "div" | "section"
+  onClick?: () => void
 }
 
 const OFFSETS: Record<NonNullable<RevealProps["direction"]>, { x?: number; y?: number }> = {
@@ -23,7 +24,7 @@ const OFFSETS: Record<NonNullable<RevealProps["direction"]>, { x?: number; y?: n
 // of each page inventing its own reveal timing. Animates once, the first
 // time it enters the viewport — re-scrolling past it doesn't re-trigger,
 // which reads as calmer than a reveal that fires every time.
-export function Reveal({ children, className, delay = 0, direction = "up", as = "div" }: RevealProps) {
+export function Reveal({ children, className, delay = 0, direction = "up", as = "div", onClick }: RevealProps) {
   const offset = OFFSETS[direction]
   const variants: Variants = {
     hidden: { opacity: 0, ...offset },
@@ -35,6 +36,7 @@ export function Reveal({ children, className, delay = 0, direction = "up", as = 
   return (
     <Component
       className={className}
+      onClick={onClick}
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-80px" }}
