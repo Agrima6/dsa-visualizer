@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Building2, CheckCircle2, Code2, ChevronRight, Flame, Star, Zap } from "lucide-react";
 import { useProgress } from "@/hooks/use-progress";
+import { Reveal } from "@/components/motion/reveal";
 
 interface Topic {
   title: string;
@@ -162,7 +163,7 @@ export default function CompanyQuestionsPage() {
   return (
     <main className="min-h-screen bg-background">
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden pb-8 pt-0">
+      <Reveal as="section" className="relative overflow-hidden pb-8 pt-0">
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute left-1/4 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-violet-600/20 blur-[100px]" />
           <div className="absolute right-1/4 top-10 h-60 w-60 rounded-full bg-indigo-500/15 blur-[80px]" />
@@ -201,7 +202,7 @@ export default function CompanyQuestionsPage() {
             ))}
           </div>
         </div>
-      </section>
+      </Reveal>
 
       {/* ── Company Filter ── */}
       <section className="sticky top-[72px] z-30 border-b border-border/50 bg-background/80 backdrop-blur-xl">
@@ -276,10 +277,10 @@ export default function CompanyQuestionsPage() {
             const tagCfg = topic.tag ? tagConfig[topic.tag] : null;
 
             return (
-              <div
+              <Reveal
                 key={topic.title}
+                delay={Math.min(i, 8) * 0.05}
                 className="group relative flex flex-col rounded-2xl border border-border/60 bg-card/50 p-5 backdrop-blur-sm transition-all duration-300 hover:border-violet-500/40 hover:bg-card/80 hover:shadow-[0_0_30px_-8px_rgba(139,92,246,0.25)]"
-                style={{ animationDelay: `${i * 40}ms` }}
               >
                 {/* ── Top row — title + tag (no icon container) ── */}
                 <div className="mb-4 flex items-start justify-between">
@@ -351,7 +352,7 @@ export default function CompanyQuestionsPage() {
                 </div>
 
                 <div className="pointer-events-none absolute inset-0 -z-10 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(ellipse_at_top_right,rgba(139,92,246,0.08),transparent_60%)]" />
-              </div>
+              </Reveal>
             );
           })}
         </div>

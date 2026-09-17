@@ -6,6 +6,7 @@ import { Check, Clock, MapPin, Sparkles } from "lucide-react"
 import { LEARNING_PATHS, getTotalMinutes } from "@/lib/learning-paths"
 import { TOPICS } from "@/lib/visualizer-topics"
 import { useLearningPathProgress } from "@/hooks/use-learning-path-progress"
+import { Reveal } from "@/components/motion/reveal"
 
 function topicFor(slug: string) {
   return TOPICS.find((t) => t.slug === slug)
@@ -21,7 +22,7 @@ export default function LearningPathsPage() {
 
   return (
     <div className="container mx-auto space-y-8">
-      <div className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
+      <Reveal className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_24%)]" />
         <div className="absolute -top-10 left-8 h-36 w-36 rounded-full bg-violet-500/10 blur-3xl" />
         <div className="absolute bottom-0 right-8 h-32 w-32 rounded-full bg-blue-500/10 blur-3xl" />
@@ -49,7 +50,7 @@ export default function LearningPathsPage() {
             </Link>
           )}
         </div>
-      </div>
+      </Reveal>
 
       <div className="flex flex-wrap gap-2">
         {LEARNING_PATHS.map((p) => {
@@ -76,7 +77,7 @@ export default function LearningPathsPage() {
         })}
       </div>
 
-      <div className="rounded-[28px] border border-violet-500/15 bg-white/70 p-6 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]">
+      <Reveal className="rounded-[28px] border border-violet-500/15 bg-white/70 p-6 shadow-[0_10px_35px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-white/[0.04]" delay={0.1}>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-xl font-semibold">{activePath.title}</h2>
@@ -120,7 +121,7 @@ export default function LearningPathsPage() {
             )
           })}
         </ol>
-      </div>
+      </Reveal>
     </div>
   )
 }
