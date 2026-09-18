@@ -11,6 +11,9 @@ import {
   useCallback, type ReactNode,
 } from "react"
 import { useUser } from "@clerk/nextjs"
+import { usePathname, useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 import {
   type UserProgress, type ProblemEntry, type BugSpotEntry,
   EMPTY_PROGRESS,
@@ -55,6 +58,28 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const [progress, setProgress] = useState<UserProgress>(EMPTY_PROGRESS)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  // Every write action below used to just silently no-op when signed out
+  // (`if (!user) return`) — clicking "Mark solved" while logged out did
+  // nothing at all, with no feedback, which read as a broken button rather
+  // than as "you need an account for this." This surfaces that instead.
+  const requireSignIn = useCallback(() => {
+    toast({
+      title: "Sign in to save your progress",
+      description: "Your streaks, XP, and solved problems are tied to your account.",
+      action: (
+        <ToastAction
+          altText="Sign in"
+          onClick={() => router.push(`/sign-in?redirect_url=${encodeURIComponent(pathname || "/company-questions")}`)}
+        >
+          Sign in
+        </ToastAction>
+      ),
+    })
+  }, [toast, router, pathname])
 
   const refresh = useCallback(async () => {
     try {
@@ -101,53 +126,54 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   )
 
   const markSolved = useCallback(async (entry: Omit<ProblemEntry, "solvedAt">) => {
-    if (!user) return
+    if (!user) return requireSignIn()
     const previous = progress
     const optimistic = applyMarkSolved(progress, entry)
     if (optimistic === previous) return // already solved
     await mutate(optimistic, previous, { action: "markSolved", entry })
-  }, [user, progress, mutate])
+  }, [user, progress, mutate, requireSignIn])
 
   const markMultipleSolved = useCallback(async (entries: Omit<ProblemEntry, "solvedAt">[]) => {
-    if (!user || entries.length === 0) return
+    if (entries.length === 0) return
+    if (!user) return requireSignIn()
     const previous = progress
     const optimistic = applyMarkMultipleSolved(progress, entries)
     if (optimistic === previous) return
     await mutate(optimistic, previous, { action: "markMultipleSolved", entries })
-  }, [user, progress, mutate])
+  }, [user, progress, mutate, requireSignIn])
 
   const unmarkSolved = useCallback(async (slug: string) => {
-    if (!user) return
+    if (!user) return requireSignIn()
     const previous = progress
     const optimistic = applyUnmarkSolved(progress, slug)
     if (optimistic === previous) return
     await mutate(optimistic, previous, { action: "unmarkSolved", slug })
-  }, [user, progress, mutate])
+  }, [user, progress, mutate, requireSignIn])
 
   const isSolved = useCallback((slug: string) =>
     progress.solvedProblems.some((s) => s.slug === slug), [progress])
 
   const setDailyGoal = useCallback(async (n: number) => {
-    if (!user) return
+    if (!user) return requireSignIn()
     const previous = progress
     const optimistic = applySetDailyGoal(progress, n)
     await mutate(optimistic, previous, { action: "setDailyGoal", dailyGoal: n })
-  }, [user, progress, mutate])
+  }, [user, progress, mutate, requireSignIn])
 
   const updateNotes = useCallback(async (slug: string, notes: string) => {
-    if (!user) return
+    if (!user) return requireSignIn()
     const previous = progress
     const optimistic = applyUpdateNotes(progress, slug, notes)
     await mutate(optimistic, previous, { action: "updateNotes", slug, notes })
-  }, [user, progress, mutate])
+  }, [user, progress, mutate, requireSignIn])
 
   const spotBug = useCallback(async (entry: Omit<BugSpotEntry, "spottedAt">) => {
-    if (!user) return
+    if (!user) return requireSignIn()
     const previous = progress
     const optimistic = applySpotBug(progress, entry)
     if (optimistic === previous) return // already attempted
     await mutate(optimistic, previous, { action: "spotBug", entry })
-  }, [user, progress, mutate])
+  }, [user, progress, mutate, requireSignIn])
 
   const getBugSpotResult = useCallback((slug: string) =>
     progress.bugsSpotted.find((b) => b.slug === slug), [progress])

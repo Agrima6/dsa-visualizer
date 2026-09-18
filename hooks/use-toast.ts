@@ -9,7 +9,11 @@ import type {
 } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+// A toast still has its own close button regardless, but 1,000,000ms
+// (the shadcn/ui template default) means one left alone just sits there
+// for over 16 minutes — long enough that it reads as stuck rather than
+// as a toast. 5s is enough time to read a short confirmation/error.
+const TOAST_REMOVE_DELAY = 5000
 
 type ToasterToast = ToastProps & {
   id: string
