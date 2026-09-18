@@ -1,6 +1,7 @@
 import { BrainCircuit, Sparkles, ArrowUpRight } from "lucide-react"
 import Link from "next/link"
 import { TOPICS, topicsByCategory } from "@/lib/visualizer-topics"
+import { Reveal } from "@/components/motion/reveal"
 
 const sections = {
   concepts: topicsByCategory("concepts").map((t) => ({ name: t.name, description: t.description, href: t.href, icon: t.icon })),
@@ -20,31 +21,35 @@ function TopicCard({
   href,
   icon: Icon,
   accent = false,
+  delay = 0,
 }: {
   name: string
   description: string
   href: string
   icon: React.ComponentType<{ className?: string }>
   accent?: boolean
+  delay?: number
 }) {
   return (
-    <Link
-      href={href}
-      className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border p-6 transition-all duration-200 ${
-        accent
-          ? "border-violet-500/20 bg-gradient-to-br from-violet-500/8 via-background to-blue-500/8 hover:border-violet-500/40 hover:from-violet-500/12 hover:to-blue-500/12"
-          : "border-border/60 bg-card hover:border-violet-500/30 hover:bg-muted/40"
-      }`}
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-violet-500/15 bg-violet-500/10 text-violet-500 transition-colors group-hover:bg-violet-500/20">
-          <Icon className="h-5 w-5" />
+    <Reveal delay={delay} className="h-full">
+      <Link
+        href={href}
+        className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border p-6 transition-all duration-200 ${
+          accent
+            ? "border-violet-500/20 bg-gradient-to-br from-violet-500/8 via-background to-blue-500/8 hover:border-violet-500/40 hover:from-violet-500/12 hover:to-blue-500/12"
+            : "border-border/60 bg-card hover:border-violet-500/30 hover:bg-muted/40"
+        }`}
+      >
+        <div className="flex items-start justify-between">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-violet-500/15 bg-violet-500/10 text-violet-500 transition-colors group-hover:bg-violet-500/20">
+            <Icon className="h-5 w-5" />
+          </div>
+          <ArrowUpRight className="h-4 w-4 text-muted-foreground/50 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100" />
         </div>
-        <ArrowUpRight className="h-4 w-4 text-muted-foreground/50 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100" />
-      </div>
-      <h3 className="mt-4 text-base font-semibold tracking-tight">{name}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
-    </Link>
+        <h3 className="mt-4 text-base font-semibold tracking-tight">{name}</h3>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
+      </Link>
+    </Reveal>
   )
 }
 
@@ -52,7 +57,7 @@ export default function HomePage() {
   return (
     <div className="relative">
       {/* Hero */}
-      <section className="relative -mx-3 -mt-3 overflow-hidden px-3 pb-10 pt-8 sm:-mx-10 sm:-mt-10 sm:px-10 sm:pt-10">
+      <Reveal as="section" className="relative -mx-3 -mt-3 overflow-hidden px-3 pb-10 pt-8 sm:-mx-10 sm:-mt-10 sm:px-10 sm:pt-10">
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute left-1/4 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-violet-600/15 blur-[100px]" />
           <div className="absolute right-1/4 top-10 h-60 w-60 rounded-full bg-blue-500/10 blur-[80px]" />
@@ -82,7 +87,7 @@ export default function HomePage() {
             </div>
           ))}
         </div>
-      </section>
+      </Reveal>
 
       <div className="space-y-14 pb-4">
         {/* Concepts Section */}
@@ -92,8 +97,8 @@ export default function HomePage() {
             <h2 className="text-xl font-semibold tracking-tight">Concepts</h2>
           </div>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            {sections.concepts.map((c) => (
-              <TopicCard key={c.href} {...c} accent />
+            {sections.concepts.map((c, i) => (
+              <TopicCard key={c.href} {...c} accent delay={Math.min(i, 5) * 0.06} />
             ))}
           </div>
         </section>
@@ -102,8 +107,8 @@ export default function HomePage() {
         <section>
           <h2 className="mb-6 text-xl font-semibold tracking-tight">Data Structures</h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {sections.dataStructures.map((ds) => (
-              <TopicCard key={ds.href} {...ds} />
+            {sections.dataStructures.map((ds, i) => (
+              <TopicCard key={ds.href} {...ds} delay={Math.min(i, 8) * 0.05} />
             ))}
           </div>
         </section>
@@ -112,8 +117,8 @@ export default function HomePage() {
         <section>
           <h2 className="mb-6 text-xl font-semibold tracking-tight">Applications</h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {sections.applications.map((app) => (
-              <TopicCard key={app.href} {...app} />
+            {sections.applications.map((app, i) => (
+              <TopicCard key={app.href} {...app} delay={Math.min(i, 8) * 0.05} />
             ))}
           </div>
         </section>
