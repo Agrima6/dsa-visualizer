@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { AlertTriangle, Loader2, Swords, Sparkles } from "lucide-react"
 import { Reveal } from "@/components/motion/reveal"
+import { ConstellationBackground } from "@/components/visualizer/shared/constellation-background"
 
 const TOPICS = [
   "Array",
@@ -78,16 +79,17 @@ export default function BattleLobbyPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-3xl space-y-8">
+    <div className="relative z-0 container mx-auto max-w-3xl space-y-8">
+      <ConstellationBackground />
       <Reveal className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_24%)]" />
         <div className="relative">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-500/15 bg-white/75 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-violet-700 shadow-sm dark:bg-white/[0.05] dark:text-violet-300">
             <Swords className="h-3.5 w-3.5" />
-            Code Battle
+            Code Battle — Two Coders, One Universe
           </div>
           <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-gradient-to-r from-violet-700 via-fuchsia-500 to-blue-500 bg-clip-text text-transparent">
-            1v1 DSA Duel
+            Duel for the Universe
           </h1>
           <p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">
             Pick a difficulty, topic, question count, and time limit — invite someone with the link
@@ -97,7 +99,7 @@ export default function BattleLobbyPage() {
         </div>
       </Reveal>
 
-      <div className="rounded-[24px] border border-violet-500/15 bg-white/70 p-6 shadow-[0_10px_35px_rgba(139,92,246,0.06)] backdrop-blur-xl dark:bg-white/[0.04]">
+      <Reveal className="rounded-[24px] border border-violet-500/15 bg-white/70 p-6 shadow-[0_10px_35px_rgba(139,92,246,0.06)] backdrop-blur-xl dark:bg-white/[0.04]">
         <h2 className="mb-4 flex items-center gap-2 font-semibold">
           <Sparkles className="h-4 w-4 text-violet-500" /> Configure a Battle
         </h2>
@@ -191,9 +193,9 @@ export default function BattleLobbyPage() {
             {creating ? "Creating..." : "Create Battle & Get Invite Link"}
           </button>
         </div>
-      </div>
+      </Reveal>
 
-      <div className="rounded-[24px] border border-violet-500/15 bg-white/70 p-6 shadow-[0_10px_35px_rgba(139,92,246,0.06)] backdrop-blur-xl dark:bg-white/[0.04]">
+      <Reveal className="rounded-[24px] border border-violet-500/15 bg-white/70 p-6 shadow-[0_10px_35px_rgba(139,92,246,0.06)] backdrop-blur-xl dark:bg-white/[0.04]" delay={0.1}>
         <h2 className="mb-3 font-semibold">Have an invite code?</h2>
         <div className="flex gap-3">
           <input
@@ -211,7 +213,7 @@ export default function BattleLobbyPage() {
             Join
           </button>
         </div>
-      </div>
+      </Reveal>
 
       {error && (
         <div className="flex items-start gap-2 rounded-xl border border-rose-500/20 bg-rose-500/5 p-3 text-sm text-rose-700 dark:text-rose-300">

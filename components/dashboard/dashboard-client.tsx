@@ -8,6 +8,9 @@ import { useUser } from "@clerk/nextjs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Navbar } from "@/components/navigation/navbar"
 import { Reveal } from "@/components/motion/reveal"
+import { ConstellationBackground } from "@/components/visualizer/shared/constellation-background"
+import { Planet } from "@/components/visualizer/shared/planet"
+import { Compass } from "lucide-react"
 
 const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -87,7 +90,8 @@ export default function DashboardClient() {
       <div className="pt-4 sm:pt-6">
         <Navbar />
       </div>
-        <main className="container mx-auto max-w-6xl space-y-6 px-4 py-8">
+        <main className="relative z-0 container mx-auto max-w-6xl space-y-6 px-4 py-8">
+        <ConstellationBackground />
         <Reveal as="section" className="relative overflow-hidden rounded-3xl border border-violet-500/15 bg-gradient-to-br from-violet-500/10 via-background to-blue-500/10 p-6 md:p-8">
           <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-violet-500/20 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-10 left-1/3 h-36 w-36 rounded-full bg-fuchsia-500/10 blur-3xl" />
@@ -126,7 +130,7 @@ export default function DashboardClient() {
 
         {isFirstVisit && (
           <section className="flex items-center gap-4 rounded-3xl border border-violet-500/20 bg-violet-500/5 p-6">
-            <Sparkles className="h-8 w-8 shrink-0 text-violet-500" />
+            <Planet theme="violet"><Sparkles className="h-4 w-4" /></Planet>
             <div>
               <h2 className="font-semibold">Nothing here yet — let's fix that.</h2>
               <p className="mt-1 text-sm text-muted-foreground">
@@ -250,7 +254,10 @@ export default function DashboardClient() {
           </Reveal>
 
           <Reveal className="rounded-3xl border bg-card p-6" delay={0.1}>
-            <h2 className="font-semibold">Continue learning</h2>
+            <div className="flex items-center gap-3">
+              <Planet theme="violet" size="sm"><Compass className="h-3.5 w-3.5" /></Planet>
+              <h2 className="font-semibold">Continue exploring</h2>
+            </div>
             <p className="mt-2 text-sm text-muted-foreground">Choose a company topic to begin or continue a visualizer.</p>
             <Link
               href="/company-questions"
