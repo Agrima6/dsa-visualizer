@@ -8,6 +8,9 @@ import { LinkedListChainDisplay } from "@/components/code-playground/linked-list
 import { ShareButton } from "@/components/visualizer/shared/share-button"
 import { decodeState } from "@/lib/share-state"
 import { Reveal } from "@/components/motion/reveal"
+import { ConstellationBackground } from "@/components/visualizer/shared/constellation-background"
+import { Planet } from "@/components/visualizer/shared/planet"
+import { Rows3, GitBranch, Boxes } from "lucide-react"
 
 interface SharedLinkedListPlaygroundState {
   code: string
@@ -113,16 +116,17 @@ export default function LinkedListCodePlaygroundPage() {
   }
 
   return (
-    <div className="container mx-auto space-y-8">
+    <div className="relative z-0 container mx-auto space-y-8">
+      <ConstellationBackground />
       <Reveal className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_24%)]" />
         <div className="relative">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-500/15 bg-white/75 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-violet-700 shadow-sm dark:bg-white/[0.05] dark:text-violet-300">
             <Sparkles className="h-3.5 w-3.5" />
-            Code Playground — Linked Lists
+            Code Playground — The Linked List Chain
           </div>
           <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-gradient-to-r from-violet-700 via-fuchsia-500 to-blue-500 bg-clip-text text-transparent">
-            Visualize Your Own Linked List Code
+            Forge Your Own Chain of Nodes
           </h1>
           <p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">
             Write your own singly-linked list function — insert, search, or anything else that walks a
@@ -138,24 +142,18 @@ export default function LinkedListCodePlaygroundPage() {
             an operation like reversing the whole list will still return the right answer, but its
             in-progress animation frames may look incomplete until the final step.
           </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <a
-              href="/visualizer/code-playground"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-violet-500/20 bg-white/60 px-3 py-1.5 text-xs font-semibold text-violet-600 transition hover:border-violet-500/40 dark:bg-white/[0.04] dark:text-violet-300"
-            >
-              ← Array & Sorting Playground
+          <div className="mt-5 flex flex-wrap gap-4">
+            <a href="/visualizer/code-playground" className="group flex items-center gap-2.5">
+              <Planet theme="amber" size="sm"><Rows3 className="h-3.5 w-3.5" /></Planet>
+              <span className="text-xs font-semibold text-violet-600 group-hover:underline dark:text-violet-300">← Array & Sorting Playground</span>
             </a>
-            <a
-              href="/visualizer/code-playground/tree"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-violet-500/20 bg-white/60 px-3 py-1.5 text-xs font-semibold text-violet-600 transition hover:border-violet-500/40 dark:bg-white/[0.04] dark:text-violet-300"
-            >
-              Binary Tree Playground
+            <a href="/visualizer/code-playground/tree" className="group flex items-center gap-2.5">
+              <Planet theme="blue" size="sm"><GitBranch className="h-3.5 w-3.5" /></Planet>
+              <span className="text-xs font-semibold text-violet-600 group-hover:underline dark:text-violet-300">Binary Tree Playground</span>
             </a>
-            <a
-              href="/visualizer/code-playground/stack-queue"
-              className="inline-flex items-center gap-1.5 rounded-xl border border-violet-500/20 bg-white/60 px-3 py-1.5 text-xs font-semibold text-violet-600 transition hover:border-violet-500/40 dark:bg-white/[0.04] dark:text-violet-300"
-            >
-              Stack & Queue Playground →
+            <a href="/visualizer/code-playground/stack-queue" className="group flex items-center gap-2.5">
+              <Planet theme="violet" size="sm"><Boxes className="h-3.5 w-3.5" /></Planet>
+              <span className="text-xs font-semibold text-violet-600 group-hover:underline dark:text-violet-300">Stack & Queue Playground →</span>
             </a>
           </div>
         </div>
