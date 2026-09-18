@@ -8,6 +8,7 @@ import { TOPICS } from "@/lib/visualizer-topics"
 import { useLearningPathProgress } from "@/hooks/use-learning-path-progress"
 import { Reveal } from "@/components/motion/reveal"
 import { Planet, type PlanetTheme } from "@/components/visualizer/shared/planet"
+import { ConstellationBackground } from "@/components/visualizer/shared/constellation-background"
 
 const STEP_THEMES: PlanetTheme[] = ["violet", "blue", "amber"]
 
@@ -24,7 +25,8 @@ export default function LearningPathsPage() {
   const continueTopic = continueStepData ? topicFor(continueStepData.topicSlug) : null
 
   return (
-    <div className="container mx-auto space-y-8">
+    <div className="relative z-0 container mx-auto space-y-8">
+      <ConstellationBackground />
       <Reveal className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_24%)]" />
         <div className="absolute -top-10 left-8 h-36 w-36 rounded-full bg-violet-500/10 blur-3xl" />
@@ -33,13 +35,13 @@ export default function LearningPathsPage() {
         <div className="relative">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-500/15 bg-white/75 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-violet-700 shadow-sm dark:bg-white/[0.05] dark:text-violet-300">
             <Sparkles className="h-3.5 w-3.5" />
-            Guided Learning
+            Guided Learning — Charted Routes Through the Universe
           </div>
           <h1 className="text-3xl md:text-4xl font-semibold tracking-tight bg-gradient-to-r from-violet-700 via-fuchsia-500 to-blue-500 bg-clip-text text-transparent">
-            Learning Paths
+            Your Path Through the Stars
           </h1>
           <p className="mt-2 max-w-2xl text-muted-foreground leading-relaxed">
-            Ordered routes through the topics that build on each other, each with an estimated time
+            Ordered routes through the worlds that build on each other, each with an estimated time
             and a "continue where you left off" — instead of guessing what to open next.
           </p>
 
