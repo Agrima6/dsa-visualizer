@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { AlertTriangle, Sparkles, Bug, Target } from "lucide-react"
+import { AlertTriangle, Sparkles, Bug, Target, Flame, BookOpen, Zap, Crosshair } from "lucide-react"
 import { useProgress } from "@/hooks/use-progress"
 import { getDailyProgress, getTopicStats, getBugSpotStats, getWeakTopics } from "@/lib/user-progress"
 import { useUser } from "@clerk/nextjs"
@@ -10,6 +10,10 @@ import { Navbar } from "@/components/navigation/navbar"
 import { Reveal } from "@/components/motion/reveal"
 
 const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+// Level is purely cosmetic — a Gen-Z-friendly reframing of the same XP
+// number the rest of the dashboard already shows, not a new mechanic.
+const XP_PER_LEVEL = 100
 
 function formatDate(date: Date) {
   return date.toISOString().slice(0, 10)
@@ -23,7 +27,13 @@ function getCalendarDays() {
   return Array.from({ length: 35 }, (_, index) => {
     const date = new Date(start)
     date.setDate(start.getDate() + index)
-    return { date: formatDate(date), label: date.getDate(), isToday: formatDate(date) === formatDate(today) }
+    const dateStr = formatDate(date)
+    return {
+      date: dateStr,
+      label: date.getDate(),
+      isToday: dateStr === formatDate(today),
+      isFuture: dateStr > formatDate(today),
+    }
   })
 }
 
@@ -68,16 +78,43 @@ export default function DashboardClient() {
     activityByDate.set(date, (activityByDate.get(date) ?? 0) + 1)
   }
 
+  const level = Math.floor(progress.xp / XP_PER_LEVEL) + 1
+  const xpIntoLevel = progress.xp % XP_PER_LEVEL
+  const streakOnFire = progress.streak.current >= 3
+
   return (
     <div className="min-h-screen">
       <div className="pt-4 sm:pt-6">
         <Navbar />
       </div>
         <main className="container mx-auto max-w-6xl space-y-6 px-4 py-8">
-        <Reveal as="section" className="rounded-3xl border border-violet-500/15 bg-gradient-to-br from-violet-500/10 via-background to-blue-500/10 p-6 md:p-8">
-          <p className="text-sm font-medium text-violet-500">Your learning dashboard</p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">Welcome back, {firstName}.</h1>
-          <p className="mt-2 text-muted-foreground">Every number here comes from the questions you open and solve.</p>
+        <Reveal as="section" className="relative overflow-hidden rounded-3xl border border-violet-500/15 bg-gradient-to-br from-violet-500/10 via-background to-blue-500/10 p-6 md:p-8">
+          <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-violet-500/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-10 left-1/3 h-36 w-36 rounded-full bg-fuchsia-500/10 blur-3xl" />
+          <div className="relative flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-violet-500">Your DSA journey</p>
+              <h1 className="mt-1 text-3xl font-bold tracking-tight">
+                Welcome back, {firstName}{" "}
+                <span aria-hidden>{streakOnFire ? "🔥" : "👋"}</span>
+              </h1>
+              <p className="mt-2 text-muted-foreground">
+                {isFirstVisit
+                  ? "Your world map is empty — go solve something and watch it fill in."
+                  : "Every number here comes from the questions you actually open and solve."}
+              </p>
+            </div>
+            <div className="flex shrink-0 flex-col items-end gap-1.5 rounded-2xl border border-violet-500/20 bg-background/70 px-4 py-3 backdrop-blur-sm">
+              <span className="text-xs font-semibold uppercase tracking-wider text-violet-500">Level {level}</span>
+              <div className="h-1.5 w-28 overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 transition-[width]"
+                  style={{ width: `${xpIntoLevel}%` }}
+                />
+              </div>
+              <span className="text-[11px] text-muted-foreground">{xpIntoLevel}/{XP_PER_LEVEL} XP to next level</span>
+            </div>
+          </div>
         </Reveal>
 
         {error && (
@@ -107,24 +144,45 @@ export default function DashboardClient() {
 
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           <Reveal delay={0 * 0.05}>
-            <Metric label="Topics opened" value={solved} note="Saved to your account" />
+            <Metric
+              icon={<BookOpen className="h-3.5 w-3.5" />}
+              accent="violet"
+              label="Topics opened"
+              value={solved}
+              note="Saved to your account"
+            />
           </Reveal>
           <Reveal delay={1 * 0.05}>
             <Metric
+              icon={<Flame className="h-3.5 w-3.5" />}
+              accent="orange"
               label="Current streak"
               value={`${progress.streak.current} day${progress.streak.current === 1 ? "" : "s"}`}
               note={`Best: ${progress.streak.longest} days`}
             />
           </Reveal>
           <Reveal delay={2 * 0.05}>
-            <Metric label="Today" value={`${today} / ${progress.dailyGoal}`} note="Practice goal" />
+            <Metric
+              icon={<Crosshair className="h-3.5 w-3.5" />}
+              accent="blue"
+              label="Today"
+              value={`${today} / ${progress.dailyGoal}`}
+              note="Practice goal"
+            />
           </Reveal>
           <Reveal delay={3 * 0.05}>
-            <Metric label="XP" value={progress.xp} note="10 / 25 / 50 per Easy / Medium / Hard" />
+            <Metric
+              icon={<Zap className="h-3.5 w-3.5" />}
+              accent="amber"
+              label="XP"
+              value={progress.xp}
+              note="10 / 25 / 50 per Easy / Medium / Hard"
+            />
           </Reveal>
           <Reveal delay={4 * 0.05}>
             <Metric
               icon={<Bug className="h-3.5 w-3.5" />}
+              accent="emerald"
               label="Bugs spotted"
               value={bugStats.attempts ? `${bugStats.correct}/${bugStats.attempts}` : "—"}
               note={bugStats.attempts ? `${bugStats.accuracy}% accuracy` : "Try it on a Sorting problem"}
@@ -135,7 +193,7 @@ export default function DashboardClient() {
         <section className="grid gap-6 lg:grid-cols-[1.2fr_.8fr]">
           <Reveal className="rounded-3xl border bg-card p-6">
             <div className="flex items-baseline justify-between">
-              <h2 className="font-semibold">Activity calendar</h2>
+              <h2 className="font-semibold">Your learning streak map 🗺️</h2>
               <span className="text-xs text-muted-foreground">Monday to Sunday</span>
             </div>
             <div className="mt-5 grid grid-cols-7 gap-2 text-center text-xs font-medium text-muted-foreground">
@@ -146,24 +204,49 @@ export default function DashboardClient() {
             <div className="mt-2 grid grid-cols-7 gap-2">
               {calendarDays.map((day) => {
                 const count = activityByDate.get(day.date) ?? 0
+                const won = count > 0
+                // Future days can't have been "missed" yet, so they stay
+                // neutral instead of guilt-tripping the user in advance.
+                // Today only turns sad once the day is actually over — while
+                // it's still in progress it just carries the usual ring.
+                const state: "won" | "lost" | "neutral" = day.isFuture ? "neutral" : won ? "won" : "lost"
+                const emoji = state === "won" ? "😄" : state === "lost" ? "😢" : ""
+                const label =
+                  state === "won"
+                    ? `${day.date}: ${count} topic${count === 1 ? "" : "s"} opened — nice!`
+                    : state === "lost"
+                      ? `${day.date}: nothing opened`
+                      : `${day.date}: upcoming`
                 return (
                   <div
                     key={day.date}
                     role="img"
-                    aria-label={`${day.date}: ${count} topic${count === 1 ? "" : "s"} opened`}
-                    title={`${day.date}: ${count} topics`}
-                    className={`relative aspect-square rounded-md border ${
-                      count ? "border-emerald-500/40 bg-emerald-500" : "border-border bg-muted/40"
+                    aria-label={label}
+                    title={label}
+                    className={`relative flex aspect-square flex-col items-center justify-center gap-0.5 rounded-xl border transition-colors ${
+                      state === "won"
+                        ? "border-emerald-500/40 bg-emerald-500/15 dark:bg-emerald-500/20"
+                        : state === "lost"
+                          ? "border-rose-400/40 bg-rose-500/10 dark:bg-rose-500/15"
+                          : "border-border bg-muted/30"
                     } ${day.isToday ? "ring-2 ring-violet-500 ring-offset-2 ring-offset-background" : ""}`}
                   >
-                    <span className="absolute inset-0 grid place-items-center text-[10px] font-medium text-muted-foreground/80">
+                    {emoji && <span className="text-sm leading-none" aria-hidden>{emoji}</span>}
+                    <span
+                      className={`text-[10px] font-medium leading-none ${
+                        state === "neutral" ? "text-muted-foreground/60" : "text-muted-foreground/90"
+                      }`}
+                    >
                       {day.label}
                     </span>
                   </div>
                 )
               })}
             </div>
-            <p className="mt-3 text-sm text-muted-foreground">A green day means you opened a company practice topic.</p>
+            <p className="mt-3 flex items-center gap-3 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1">😄 a day you showed up</span>
+              <span className="flex items-center gap-1">😢 a day you didn't</span>
+            </p>
           </Reveal>
 
           <Reveal className="rounded-3xl border bg-card p-6" delay={0.1}>
@@ -248,24 +331,34 @@ export default function DashboardClient() {
   )
 }
 
+const ACCENTS = {
+  violet: "border-violet-500/20 bg-violet-500/10 text-violet-600 dark:text-violet-300",
+  orange: "border-orange-500/20 bg-orange-500/10 text-orange-600 dark:text-orange-300",
+  blue: "border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-300",
+  amber: "border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300",
+  emerald: "border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300",
+} as const
+
 function Metric({
   label,
   value,
   note,
   icon,
+  accent = "violet",
 }: {
   label: string
   value: string | number
   note: string
   icon?: React.ReactNode
+  accent?: keyof typeof ACCENTS
 }) {
   return (
     <div className="rounded-3xl border bg-card p-5">
-      <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+      <div className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${ACCENTS[accent]}`}>
         {icon}
         {label}
-      </p>
-      <p className="mt-2 text-3xl font-bold">{value}</p>
+      </div>
+      <p className="mt-3 text-3xl font-bold">{value}</p>
       <p className="mt-1 text-xs text-muted-foreground">{note}</p>
     </div>
   )
