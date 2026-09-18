@@ -28,6 +28,9 @@ import {
 import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
+import { Planet, type PlanetTheme } from "@/components/visualizer/shared/planet";
+
+const PLANET_THEMES: PlanetTheme[] = ["violet", "blue", "amber"];
 
 const features = [
   {
@@ -1892,9 +1895,9 @@ export const Features = () => {
                   <div className="mt-5 space-y-3">
                     <div className="flex items-start justify-between gap-3">
                       <h3 className="text-xl font-semibold tracking-tight">{feature.title}</h3>
-                      <div className="rounded-full border border-violet-500/10 bg-violet-500/5 p-2 text-violet-600 shadow-sm dark:text-violet-300">
-                        <Boxes className="h-4 w-4" />
-                      </div>
+                      <Planet theme={PLANET_THEMES[index % PLANET_THEMES.length]} size="sm">
+                        <Boxes className="h-3 w-3" />
+                      </Planet>
                     </div>
                     <p className="text-sm leading-6 text-muted-foreground md:text-[15px]">{feature.description}</p>
                     <div className="flex items-center gap-2 pt-1 text-sm font-medium text-violet-700 dark:text-violet-300">

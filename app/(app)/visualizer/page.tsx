@@ -2,6 +2,7 @@ import { BrainCircuit, Sparkles, ArrowUpRight } from "lucide-react"
 import Link from "next/link"
 import { TOPICS, topicsByCategory } from "@/lib/visualizer-topics"
 import { Reveal } from "@/components/motion/reveal"
+import { Planet, type PlanetTheme } from "@/components/visualizer/shared/planet"
 
 const sections = {
   concepts: topicsByCategory("concepts").map((t) => ({ name: t.name, description: t.description, href: t.href, icon: t.icon })),
@@ -20,14 +21,14 @@ function TopicCard({
   description,
   href,
   icon: Icon,
-  accent = false,
+  theme,
   delay = 0,
 }: {
   name: string
   description: string
   href: string
   icon: React.ComponentType<{ className?: string }>
-  accent?: boolean
+  theme: PlanetTheme
   delay?: number
 }) {
   return (
@@ -35,18 +36,18 @@ function TopicCard({
       <Link
         href={href}
         className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border p-6 transition-all duration-200 ${
-          accent
+          theme === "violet"
             ? "border-violet-500/20 bg-gradient-to-br from-violet-500/8 via-background to-blue-500/8 hover:border-violet-500/40 hover:from-violet-500/12 hover:to-blue-500/12"
             : "border-border/60 bg-card hover:border-violet-500/30 hover:bg-muted/40"
         }`}
       >
         <div className="flex items-start justify-between">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-violet-500/15 bg-violet-500/10 text-violet-500 transition-colors group-hover:bg-violet-500/20">
+          <Planet theme={theme}>
             <Icon className="h-5 w-5" />
-          </div>
+          </Planet>
           <ArrowUpRight className="h-4 w-4 text-muted-foreground/50 opacity-0 transition-all duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100" />
         </div>
-        <h3 className="mt-4 text-base font-semibold tracking-tight">{name}</h3>
+        <h3 className="mt-5 text-base font-semibold tracking-tight">{name}</h3>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{description}</p>
       </Link>
     </Reveal>
@@ -100,29 +101,29 @@ export default function HomePage() {
           <h2 className="mb-6 text-xl font-semibold tracking-tight">Concepts — the rules of this universe</h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {sections.concepts.map((c, i) => (
-              <TopicCard key={c.href} {...c} accent delay={Math.min(i, 5) * 0.06} />
+              <TopicCard key={c.href} {...c} theme="violet" delay={Math.min(i, 5) * 0.06} />
             ))}
           </div>
         </section>
 
         {/* Data Structures Section */}
         <section>
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.18em] text-violet-500">Chapter II</span>
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.18em] text-blue-500">Chapter II</span>
           <h2 className="mb-6 text-xl font-semibold tracking-tight">Data Structures — the worlds you'll visit</h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {sections.dataStructures.map((ds, i) => (
-              <TopicCard key={ds.href} {...ds} delay={Math.min(i, 8) * 0.05} />
+              <TopicCard key={ds.href} {...ds} theme="blue" delay={Math.min(i, 8) * 0.05} />
             ))}
           </div>
         </section>
 
         {/* Applications Section */}
         <section>
-          <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.18em] text-violet-500">Chapter III</span>
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.18em] text-amber-500">Chapter III</span>
           <h2 className="mb-6 text-xl font-semibold tracking-tight">Applications — where it all pays off</h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {sections.applications.map((app, i) => (
-              <TopicCard key={app.href} {...app} delay={Math.min(i, 8) * 0.05} />
+              <TopicCard key={app.href} {...app} theme="amber" delay={Math.min(i, 8) * 0.05} />
             ))}
           </div>
         </section>
