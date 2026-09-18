@@ -7,6 +7,9 @@ import { LEARNING_PATHS, getTotalMinutes } from "@/lib/learning-paths"
 import { TOPICS } from "@/lib/visualizer-topics"
 import { useLearningPathProgress } from "@/hooks/use-learning-path-progress"
 import { Reveal } from "@/components/motion/reveal"
+import { Planet, type PlanetTheme } from "@/components/visualizer/shared/planet"
+
+const STEP_THEMES: PlanetTheme[] = ["violet", "blue", "amber"]
 
 function topicFor(slug: string) {
   return TOPICS.find((t) => t.slug === slug)
@@ -90,7 +93,7 @@ export default function LearningPathsPage() {
         </div>
 
         <ol className="relative mt-8 space-y-1">
-          <span className="absolute left-[15px] top-2 bottom-2 w-px bg-violet-500/20" aria-hidden />
+          <span className="absolute left-4 top-2 bottom-2 w-px bg-violet-500/20" aria-hidden />
           {activePath.steps.map((step, i) => {
             const topic = topicFor(step.topicSlug)
             const done = hydrated && isComplete(activePath.id, step.topicSlug)
@@ -100,13 +103,11 @@ export default function LearningPathsPage() {
                 <button
                   onClick={() => toggleComplete(activePath.id, step.topicSlug)}
                   aria-label={done ? `Mark ${topic.name} as not complete` : `Mark ${topic.name} as complete`}
-                  className={`relative z-10 flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border font-mono text-[11px] font-semibold transition-colors ${
-                    done
-                      ? "border-emerald-500 bg-emerald-500 text-white"
-                      : "border-violet-500/25 bg-background text-violet-500 hover:border-violet-500"
-                  }`}
+                  className={`group relative z-10 shrink-0 rounded-full transition-transform ${done ? "ring-2 ring-emerald-500 ring-offset-2 ring-offset-background" : ""}`}
                 >
-                  {done ? <Check className="h-4 w-4" /> : i + 1}
+                  <Planet theme={STEP_THEMES[i % STEP_THEMES.length]} size="sm">
+                    {done ? <Check className="h-3.5 w-3.5" /> : <span className="text-[10px] font-mono font-semibold">{i + 1}</span>}
+                  </Planet>
                 </button>
                 <div className="min-w-0 flex-1 pt-0.5">
                   <div className="flex flex-wrap items-center gap-2">

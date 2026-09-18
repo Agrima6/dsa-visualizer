@@ -3,6 +3,7 @@ import Link from "next/link"
 import { TOPICS, topicsByCategory } from "@/lib/visualizer-topics"
 import { Reveal } from "@/components/motion/reveal"
 import { Planet, type PlanetTheme } from "@/components/visualizer/shared/planet"
+import { ConstellationBackground } from "@/components/visualizer/shared/constellation-background"
 
 const sections = {
   concepts: topicsByCategory("concepts").map((t) => ({ name: t.name, description: t.description, href: t.href, icon: t.icon })),
@@ -91,7 +92,8 @@ export default function HomePage() {
         </div>
       </Reveal>
 
-      <div className="space-y-14 pb-4">
+      <div className="relative z-0 space-y-14 pb-4">
+        <ConstellationBackground />
         {/* Concepts Section */}
         <section>
           <div className="mb-1 flex items-center gap-2">
