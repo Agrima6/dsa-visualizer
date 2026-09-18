@@ -107,7 +107,7 @@ export const Hero = () => {
           <div className="flex gap-5 flex-col">
             <div ref={badgeRef} className="hero-badge w-fit">
               <Sparkles className="h-4 w-4" />
-              <span>Interactive DSA Learning Platform</span>
+              <span>Welcome to the DSA Universe</span>
             </div>
 
             <div className="flex gap-4 flex-col">
@@ -124,14 +124,15 @@ export const Hero = () => {
                 ref={descRef}
                 className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-xl text-left"
               >
-                Master DSA problems asked at Google, Amazon, Microsoft & more - through visual, step-by-step animations.
+                Step into a universe where arrays, trees, and graphs come alive. Master DSA
+                problems asked at Google, Amazon, Microsoft & more — one world at a time.
               </p>
             </div>
 
             <div ref={buttonRef} className="flex flex-row gap-4 pt-1">
               <Link href="/visualizer">
                 <RainbowButton className="min-w-[170px] rounded-2xl px-6 py-6 text-base shadow-[0_10px_30px_rgba(139,92,246,0.18)]">
-                  Get Started <MoveRight className="ml-1 hidden sm:block w-4 h-4" />
+                  Enter the Universe <MoveRight className="ml-1 hidden sm:block w-4 h-4" />
                 </RainbowButton>
               </Link>
             </div>
@@ -160,7 +161,7 @@ export const Hero = () => {
             className="mb-3 flex items-center gap-4"
           >
             <div className="topics-label">
-              Topics we cover
+              Worlds to explore
             </div>
             <div className="topics-simple-line" />
           </div>

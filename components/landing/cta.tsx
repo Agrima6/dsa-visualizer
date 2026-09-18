@@ -11,15 +11,15 @@ export const CTA = () => (
 
         <div className="relative flex flex-col items-center text-center gap-8">
           <h2 className="text-3xl md:text-5xl font-bold tracking-tighter">
-            Ready to Start Learning?
+            Your universe is waiting.
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl">
-            Explore data structures through interactive visualizations and hands-on examples.
+            Every topic is a world, every algorithm a story. Pick one and watch it come alive.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/visualizer">
               <RainbowButton className="gap-4">
-                Start Exploring <MoveRight className="w-4 h-4 ml-2" />
+                Enter the Universe <MoveRight className="w-4 h-4 ml-2" />
               </RainbowButton>
             </Link>
           </div>

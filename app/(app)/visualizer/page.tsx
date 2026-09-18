@@ -65,18 +65,19 @@ export default function HomePage() {
 
         <span className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-violet-500">
           <BrainCircuit className="h-3.5 w-3.5" />
-          Interactive DSA Visualizer
+          The DSA Universe — World Map
         </span>
 
         <h1 className="mt-5 max-w-2xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-          <span className="hero-gradient-text">Pick a topic,</span>
+          <span className="hero-gradient-text">Pick a world,</span>
           <br />
-          <span className="text-foreground">watch it run.</span>
+          <span className="text-foreground">step inside.</span>
         </h1>
 
         <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
           Every data structure and algorithm here is a real, step-by-step animation —
-          not a diagram. Explore concepts, core data structures, and classic applications.
+          not a diagram. This is the map of the universe: concepts, core structures,
+          and classic applications, each one its own world to explore.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-6">
@@ -92,10 +93,11 @@ export default function HomePage() {
       <div className="space-y-14 pb-4">
         {/* Concepts Section */}
         <section>
-          <div className="mb-6 flex items-center gap-2">
+          <div className="mb-1 flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-violet-500" />
-            <h2 className="text-xl font-semibold tracking-tight">Concepts</h2>
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-violet-500">Chapter I</span>
           </div>
+          <h2 className="mb-6 text-xl font-semibold tracking-tight">Concepts — the rules of this universe</h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {sections.concepts.map((c, i) => (
               <TopicCard key={c.href} {...c} accent delay={Math.min(i, 5) * 0.06} />
@@ -105,7 +107,8 @@ export default function HomePage() {
 
         {/* Data Structures Section */}
         <section>
-          <h2 className="mb-6 text-xl font-semibold tracking-tight">Data Structures</h2>
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.18em] text-violet-500">Chapter II</span>
+          <h2 className="mb-6 text-xl font-semibold tracking-tight">Data Structures — the worlds you'll visit</h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {sections.dataStructures.map((ds, i) => (
               <TopicCard key={ds.href} {...ds} delay={Math.min(i, 8) * 0.05} />
@@ -115,7 +118,8 @@ export default function HomePage() {
 
         {/* Applications Section */}
         <section>
-          <h2 className="mb-6 text-xl font-semibold tracking-tight">Applications</h2>
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.18em] text-violet-500">Chapter III</span>
+          <h2 className="mb-6 text-xl font-semibold tracking-tight">Applications — where it all pays off</h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {sections.applications.map((app, i) => (
               <TopicCard key={app.href} {...app} delay={Math.min(i, 8) * 0.05} />

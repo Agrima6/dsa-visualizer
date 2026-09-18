@@ -1860,15 +1860,15 @@ export const Features = () => {
               <div className="flex gap-4 flex-col items-start">
                 <div>
                   <Badge className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-1.5 text-violet-700 shadow-sm dark:text-violet-300">
-                    Features
+                    Explore the Universe
                   </Badge>
                 </div>
                 <div className="flex gap-2 flex-col">
                   <h2 className="text-3xl md:text-5xl tracking-tighter max-w-xl font-regular text-left">
-                    Interactive Learning Tools
+                    Every card below is a world of its own
                   </h2>
                   <p className="text-lg max-w-xl lg:max-w-lg leading-relaxed tracking-tight text-muted-foreground text-left">
-                    Learn data structures and their applications through hands-on visualizations and real-world examples.
+                    Pick a data structure and step inside — hands-on visualizations and real-world examples, not static diagrams.
                   </p>
                 </div>
               </div>
