@@ -251,22 +251,22 @@ export const Navbar = () => {
                 // `display: inline-flex` (in globals.css, compiled after
                 // Tailwind's utilities) beats a `hidden`/`2xl:inline-flex`
                 // utility placed on that same element at equal specificity.
-                <>
-                  <NavigationMenuItem key={`${href}-icon`} className="2xl:hidden">
+                <React.Fragment key={href}>
+                  <NavigationMenuItem className="2xl:hidden">
                     <NavigationMenuLink asChild>
                       <Link href={href} aria-label={label} title={label} className="nav-link-pill">
                         <Info className="h-4 w-4" />
                       </Link>
                     </NavigationMenuLink>
                   </NavigationMenuItem>
-                  <NavigationMenuItem key={`${href}-text`} className="hidden 2xl:block">
+                  <NavigationMenuItem className="hidden 2xl:block">
                     <NavigationMenuLink asChild>
                       <Link href={href} className="nav-link-pill whitespace-nowrap">
                         {label}
                       </Link>
                     </NavigationMenuLink>
                   </NavigationMenuItem>
-                </>
+                </React.Fragment>
               ) : (
                 <NavigationMenuItem key={href}>
                   <NavigationMenuLink asChild>

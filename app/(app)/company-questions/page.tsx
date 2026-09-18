@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, Building2, CheckCircle2, Code2, ChevronRight, Flame, Star, Zap } from "lucide-react";
 import { useProgress } from "@/hooks/use-progress";
 import { Reveal } from "@/components/motion/reveal";
+import { ConstellationBackground } from "@/components/visualizer/shared/constellation-background";
 
 interface Topic {
   title: string;
@@ -163,17 +164,18 @@ export default function CompanyQuestionsPage() {
   return (
     <main className="min-h-screen bg-background">
       {/* ── Hero ── */}
-      <Reveal as="section" className="relative overflow-hidden pb-8 pt-0">
+      <Reveal as="section" className="relative z-0 overflow-hidden pb-8 pt-0">
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute left-1/4 top-0 h-72 w-72 -translate-x-1/2 rounded-full bg-violet-600/20 blur-[100px]" />
           <div className="absolute right-1/4 top-10 h-60 w-60 rounded-full bg-indigo-500/15 blur-[80px]" />
+          <ConstellationBackground />
         </div>
 
         <div className="mx-auto max-w-screen-xl px-6">
           <div className="mb-6 flex items-center gap-2">
             <span className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">
               <Building2 className="h-3.5 w-3.5" />
-              Most asked DSA Questions
+              Most Asked DSA Questions — Across the Universe
             </span>
           </div>
 

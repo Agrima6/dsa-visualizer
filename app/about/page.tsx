@@ -5,6 +5,10 @@ import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import { Navbar } from "@/components/navigation/navbar";
 import { useEffect, useState } from "react";
 import { Reveal } from "@/components/motion/reveal";
+import { ConstellationBackground } from "@/components/visualizer/shared/constellation-background";
+import { Planet, type PlanetTheme } from "@/components/visualizer/shared/planet";
+
+const PLANET_THEMES: PlanetTheme[] = ["violet", "blue", "amber"];
 
 const founders = [
   {
@@ -134,6 +138,13 @@ export default function AboutPage() {
       {/* Glow orbs */}
       <div style={{ position: "fixed", top: "-8%", left: "-4%", width: 500, height: 500, borderRadius: "50%", background: `radial-gradient(circle, ${t.glow1} 0%, transparent 70%)`, pointerEvents: "none", zIndex: 0 }} />
       <div style={{ position: "fixed", bottom: "10%", right: "-4%", width: 400, height: 400, borderRadius: "50%", background: `radial-gradient(circle, ${t.glow2} 0%, transparent 70%)`, pointerEvents: "none", zIndex: 0 }} />
+      {/* Starfield — a fixed full-viewport layer, matching the grid/glow
+          orbs above (position:fixed + explicit zIndex) rather than the
+          Tailwind absolute/-z-10 pattern used on other pages, since this
+          page is built with inline styles throughout. */}
+      <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+        <ConstellationBackground />
+      </div>
 
       <div className="relative z-10 flex min-h-screen flex-col" style={{ padding: "1.5rem 1.5rem 5rem" }}>
         <Navbar />
@@ -240,7 +251,9 @@ export default function AboutPage() {
                   el.style.boxShadow = "none";
                 }}
               >
-                <span style={{ fontSize: 32 }}>{point.emoji}</span>
+                <Planet theme={PLANET_THEMES[i % PLANET_THEMES.length]}>
+                  <span style={{ fontSize: 16 }}>{point.emoji}</span>
+                </Planet>
                 <h3 style={{ fontSize: "1.1rem", fontWeight: 800, letterSpacing: "-0.02em", color: t.text, margin: 0, lineHeight: 1.3 }}>{point.title}</h3>
                 <p style={{ fontSize: "0.9rem", lineHeight: 1.75, color: t.textMuted, margin: 0 }}>{point.body}</p>
               </Reveal>
@@ -284,9 +297,9 @@ export default function AboutPage() {
                 </span>
 
                 {/* Initials badge */}
-                <div style={{ width: 56, height: 56, borderRadius: 14, background: `linear-gradient(135deg, ${founder.accent}25, ${founder.accent}45)`, border: `1.5px solid ${founder.accent}60`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, fontWeight: 900, color: founder.accent, letterSpacing: "-0.02em", flexShrink: 0 }}>
-                  {founder.initials}
-                </div>
+                <Planet theme={PLANET_THEMES[i % PLANET_THEMES.length]}>
+                  <span style={{ fontSize: 12, fontWeight: 900, letterSpacing: "-0.02em" }}>{founder.initials}</span>
+                </Planet>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
                   <span style={{ fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: founder.accent, fontWeight: 700 }}>
