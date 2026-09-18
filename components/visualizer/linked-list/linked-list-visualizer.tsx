@@ -10,6 +10,7 @@ import { LinkedListOperations } from "@/components/visualizer/linked-list/linked
 import { useLinkedList } from "@/hooks/use-linked-list"
 import { ListType } from "./types"
 import LinkedListCodeView from "./linked-list-code-view"
+import { Reveal } from "@/components/motion/reveal"
 
 const MAX_SIZE = 5
 
@@ -36,7 +37,7 @@ function LinkedListVisualizerInner({ content }: LinkedListVisualizerProps) {
     <div className="container mx-auto space-y-8">
 
       {/* HERO TITLE CONTAINER */}
-      <div className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
+      <Reveal className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
 
         {/* Glow effects */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_24%)]" />
@@ -60,7 +61,7 @@ function LinkedListVisualizerInner({ content }: LinkedListVisualizerProps) {
             Code Playground — write your own linked list algorithm →
           </a>
         </div>
-      </div>
+      </Reveal>
 
       {/* TABS */}
       <Tabs defaultValue="SLL" className="w-full space-y-6">

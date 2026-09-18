@@ -9,6 +9,7 @@ import { AnalogyCards } from "./analogy-cards"
 import { ComplexityQuiz } from "./complexity-quiz"
 import { BestAvgWorst } from "./best-avg-worst"
 import { cn } from "@/lib/utils"
+import { Reveal } from "@/components/motion/reveal"
 
 const SECTIONS = [
   { id: "why", label: "Why it matters", icon: Sparkles },
@@ -42,7 +43,7 @@ export function TimeComplexityVisualizer() {
   return (
     <div className="container mx-auto space-y-10 pb-16">
       {/* Hero header — matches the rest of the visualizer suite */}
-      <div className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
+      <Reveal className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_24%)]" />
         <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/40 to-transparent" />
         <div className="absolute -top-10 left-8 h-36 w-36 rounded-full bg-violet-500/10 blur-3xl" />
@@ -61,7 +62,7 @@ export function TimeComplexityVisualizer() {
             and build an intuition for why some algorithms fall apart as input grows — and others barely notice.
           </p>
         </div>
-      </div>
+      </Reveal>
 
       {/* Section nav */}
       <div className="sticky top-[72px] z-30 -mx-1 overflow-x-auto px-1 py-1">

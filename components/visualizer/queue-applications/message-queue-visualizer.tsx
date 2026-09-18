@@ -7,6 +7,7 @@ import { MessageQueueDisplay } from "@/components/visualizer/queue-applications/
 import { ProducerControls } from "@/components/visualizer/queue-applications/producer-controls"
 import { ConsumerControls } from "@/components/visualizer/queue-applications/consumer-controls"
 import { Sparkles } from "lucide-react"
+import { Reveal } from "@/components/motion/reveal"
 
 export function MessageQueueVisualizer({ content }: { content: React.ReactNode }) {
   const {
@@ -23,7 +24,7 @@ export function MessageQueueVisualizer({ content }: { content: React.ReactNode }
 
   return (
     <div className="container mx-auto space-y-8">
-      <div className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
+      <Reveal className="relative overflow-hidden rounded-[32px] border border-violet-500/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.96),rgba(245,243,255,0.94)_34%,rgba(255,248,235,0.92)_100%)] p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] backdrop-blur-xl dark:bg-[linear-gradient(145deg,rgba(20,18,30,0.96),rgba(17,14,27,0.98)_34%,rgba(34,24,10,0.72)_100%)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.28)] md:p-8">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.16),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(245,158,11,0.10),transparent_24%)]" />
         <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-violet-400/40 to-transparent" />
         <div className="absolute -top-10 left-8 h-36 w-36 rounded-full bg-violet-500/10 blur-3xl" />
@@ -44,7 +45,7 @@ export function MessageQueueVisualizer({ content }: { content: React.ReactNode }
             between producers and consumers.
           </p>
         </div>
-      </div>
+      </Reveal>
 
       <Tabs defaultValue="visualization" className="w-full space-y-6">
         <TabsList className="grid w-full grid-cols-2 rounded-2xl border border-violet-500/12 bg-white/65 p-1 backdrop-blur-lg dark:bg-white/[0.04]">

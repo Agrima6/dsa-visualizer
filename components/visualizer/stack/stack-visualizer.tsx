@@ -12,6 +12,7 @@ import { MarkdownContent } from "@/components/shared/markdown-content"
 import { useStack } from "@/hooks/use-stack"
 import { StackAnalogy } from "./stack-analogy"
 import StackCodeView from "./stack-code-view"
+import { Reveal } from "@/components/motion/reveal"
 
 interface StackVisualizerProps {
   content: React.ReactNode
@@ -49,7 +50,7 @@ function StackVisualizerOriginal({ content }: StackVisualizerProps) {
     <div className="container mx-auto space-y-8">
 
       {/* HEADER */}
-      <div className="relative overflow-hidden rounded-3xl border border-violet-500/15 bg-white/70 backdrop-blur-xl p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] dark:bg-white/[0.04]">
+      <Reveal className="relative overflow-hidden rounded-3xl border border-violet-500/15 bg-white/70 backdrop-blur-xl p-6 shadow-[0_10px_40px_rgba(139,92,246,0.08)] dark:bg-white/[0.04]">
         <div className="absolute -top-10 left-10 h-40 w-40 bg-violet-500/10 blur-3xl rounded-full" />
         <div className="absolute bottom-0 right-10 h-40 w-40 bg-blue-500/10 blur-3xl rounded-full" />
 
@@ -65,7 +66,7 @@ function StackVisualizerOriginal({ content }: StackVisualizerProps) {
         >
           Code Playground — write your own stack algorithm →
         </a>
-      </div>
+      </Reveal>
 
       {/* TABS */}
       <Tabs defaultValue="understand" className="w-full space-y-6">
