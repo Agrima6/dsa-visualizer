@@ -29,6 +29,7 @@ import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
 import { Planet, type PlanetTheme } from "@/components/visualizer/shared/planet";
+import { ConstellationBackground } from "@/components/visualizer/shared/constellation-background";
 
 const PLANET_THEMES: PlanetTheme[] = ["violet", "blue", "amber"];
 
@@ -1845,9 +1846,10 @@ export const Features = () => {
   };
 
   return (
-    <section id="features" className="relative w-full overflow-hidden py-16 lg:py-24">
+    <section id="features" className="relative z-0 w-full overflow-hidden py-16 lg:py-24">
       <div className="absolute inset-0 -z-20 bg-[linear-gradient(180deg,#ffffff_0%,#faf7ff_36%,#fffdf8_100%)] dark:bg-[linear-gradient(180deg,#09090b_0%,#0d0916_38%,#130e08_100%)]" />
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(139,92,246,0.15),transparent_26%),radial-gradient(circle_at_top_right,rgba(245,158,11,0.10),transparent_20%),radial-gradient(circle_at_bottom,rgba(59,130,246,0.08),transparent_28%)]" />
+      <ConstellationBackground />
       <div className="absolute left-[-8%] top-20 -z-10 h-72 w-72 rounded-full bg-violet-500/10 blur-3xl" />
       <div className="absolute right-[-6%] top-32 -z-10 h-72 w-72 rounded-full bg-amber-400/10 blur-3xl" />
       <div className="absolute bottom-0 left-1/3 -z-10 h-72 w-72 rounded-full bg-fuchsia-500/5 blur-3xl" />
