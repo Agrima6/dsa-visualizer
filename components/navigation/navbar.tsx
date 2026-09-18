@@ -88,7 +88,7 @@ export const Navbar = () => {
           </div>
         </Link>
 
-        <div className="flex items-center lg:hidden gap-2">
+        <div className="flex items-center xl:hidden gap-2">
           <ModeToggle />
 
           {isSignedIn ? (
@@ -192,8 +192,8 @@ export const Navbar = () => {
           </Sheet>
         </div>
 
-        <NavigationMenu className="hidden lg:flex mx-auto">
-          <NavigationMenuList className="gap-2">
+        <NavigationMenu className="hidden xl:flex mx-auto">
+          <NavigationMenuList className="gap-0.5">
             <NavigationMenuItem>
               <NavigationMenuTrigger className="nav-menu-trigger">
                 What You Can Learn
@@ -240,7 +240,15 @@ export const Navbar = () => {
             </NavigationMenuItem>
 
             {routeList.map(({ href, label }) => (
-              <NavigationMenuItem key={href}>
+              <NavigationMenuItem
+                key={href}
+                // "About Us" is the least essential item in a very tight row
+                // (logo + dropdown + 5 pills + search/accessibility/theme/
+                // sign-in all competing for space before wrapping is even an
+                // option) — held back until there's room for it, rather than
+                // spilling the row past its own pill container below that.
+                className={href === "/about" ? "hidden 2xl:block" : undefined}
+              >
                 <NavigationMenuLink asChild>
                   <Link href={href} className="nav-link-pill whitespace-nowrap">
                     {label}
@@ -251,7 +259,7 @@ export const Navbar = () => {
           </NavigationMenuList>
         </NavigationMenu>
 
-        <div className="hidden lg:flex items-center gap-3">
+        <div className="hidden xl:flex items-center gap-3">
           <CommandPalette />
           <AccessibilityMenu />
           <ModeToggle />
