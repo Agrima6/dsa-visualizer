@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ChevronRight, Menu, Sparkles } from "lucide-react";
+import { ChevronRight, Info, Menu, Sparkles } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -239,27 +239,48 @@ export const Navbar = () => {
               </NavigationMenuContent>
             </NavigationMenuItem>
 
-            {routeList.map(({ href, label }) => (
-              <NavigationMenuItem
-                key={href}
-                // "About Us" is the least essential item in a very tight row
-                // (logo + dropdown + 5 pills + search/accessibility/theme/
-                // sign-in all competing for space before wrapping is even an
-                // option) — held back until there's room for it, rather than
-                // spilling the row past its own pill container below that.
-                className={href === "/about" ? "hidden 2xl:block" : undefined}
-              >
-                <NavigationMenuLink asChild>
-                  <Link href={href} className="nav-link-pill whitespace-nowrap">
-                    {label}
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            ))}
+            {routeList.map(({ href, label }) =>
+              href === "/about" ? (
+                // The full "About Us" text pill only fits once the row has
+                // real breathing room (2xl+) — below that it collapses to
+                // an icon-only link rather than disappearing outright, so
+                // there's always a visible way to reach it, not just the
+                // mobile menu or command palette. The responsive on/off
+                // toggle has to live on these wrapper `<li>`s, not on the
+                // `<Link>` itself — nav-link-pill's own unconditional
+                // `display: inline-flex` (in globals.css, compiled after
+                // Tailwind's utilities) beats a `hidden`/`2xl:inline-flex`
+                // utility placed on that same element at equal specificity.
+                <>
+                  <NavigationMenuItem key={`${href}-icon`} className="2xl:hidden">
+                    <NavigationMenuLink asChild>
+                      <Link href={href} aria-label={label} title={label} className="nav-link-pill">
+                        <Info className="h-4 w-4" />
+                      </Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem key={`${href}-text`} className="hidden 2xl:block">
+                    <NavigationMenuLink asChild>
+                      <Link href={href} className="nav-link-pill whitespace-nowrap">
+                        {label}
+                      </Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                </>
+              ) : (
+                <NavigationMenuItem key={href}>
+                  <NavigationMenuLink asChild>
+                    <Link href={href} className="nav-link-pill whitespace-nowrap">
+                      {label}
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              )
+            )}
           </NavigationMenuList>
         </NavigationMenu>
 
-        <div className="hidden xl:flex items-center gap-3">
+        <div className="hidden xl:flex items-center gap-2">
           <CommandPalette />
           <AccessibilityMenu />
           <ModeToggle />
