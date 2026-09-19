@@ -12,6 +12,8 @@ import { Reveal } from "@/components/motion/reveal"
 import { ConstellationBackground } from "@/components/visualizer/shared/constellation-background"
 import { Planet } from "@/components/visualizer/shared/planet"
 import { GitBranch, ListTree, Swords } from "lucide-react"
+import { CodeEditor } from "@/components/visualizer/shared/code-editor"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 
 interface SharedPlaygroundState {
   code: string
@@ -103,8 +105,9 @@ export default function CodePlaygroundPage() {
   const [analyzing, setAnalyzing] = useState(false)
   const [analyzeProgress, setAnalyzeProgress] = useState(0)
   const [complexity, setComplexity] = useState<ComplexityResult | null>(null)
+  const [speed, setSpeed] = useState(1)
 
-  const player = useTracePlayer(result?.steps ?? [], EMPTY_SORT_STEP)
+  const player = useTracePlayer(result?.steps ?? [], EMPTY_SORT_STEP, 500 / speed)
 
   // Ground truth for debug mode: what the array *should* look like once
   // sorted, computed from whatever array this run was actually given
@@ -238,12 +241,7 @@ export default function CodePlaygroundPage() {
               {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
             </select>
           </div>
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            spellCheck={false}
-            className="h-72 w-full resize-none rounded-xl border border-violet-500/15 bg-neutral-950 p-4 font-mono text-[13px] leading-relaxed text-emerald-300 outline-none focus:border-violet-500/40"
-          />
+          <CodeEditor value={code} onChange={setCode} className="h-72" />
 
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
             <input
@@ -328,6 +326,8 @@ export default function CodePlaygroundPage() {
                   Step {player.currentStep + 1}/{player.totalSteps}
                 </span>
               </div>
+
+              <SpeedControl speed={speed} onSetSpeed={setSpeed} className="mb-3" />
 
               {mutated && sortsArray && (
                 <label className="mb-2 flex items-center gap-1.5 text-xs text-muted-foreground">

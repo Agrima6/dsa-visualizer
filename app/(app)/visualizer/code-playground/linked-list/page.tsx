@@ -11,6 +11,8 @@ import { Reveal } from "@/components/motion/reveal"
 import { ConstellationBackground } from "@/components/visualizer/shared/constellation-background"
 import { Planet } from "@/components/visualizer/shared/planet"
 import { Rows3, GitBranch, Boxes } from "lucide-react"
+import { CodeEditor } from "@/components/visualizer/shared/code-editor"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 
 interface SharedLinkedListPlaygroundState {
   code: string
@@ -72,8 +74,9 @@ export default function LinkedListCodePlaygroundPage() {
   const [running, setRunning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<LinkedListRunResult | null>(null)
+  const [speed, setSpeed] = useState(1)
 
-  const player = useTracePlayer(result?.steps ?? [], EMPTY_STEP)
+  const player = useTracePlayer(result?.steps ?? [], EMPTY_STEP, 500 / speed)
 
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("p")
@@ -178,12 +181,7 @@ export default function LinkedListCodePlaygroundPage() {
               {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
             </select>
           </div>
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            spellCheck={false}
-            className="h-64 w-full resize-none rounded-xl border border-violet-500/15 bg-neutral-950 p-4 font-mono text-[13px] leading-relaxed text-emerald-300 outline-none focus:border-violet-500/40"
-          />
+          <CodeEditor value={code} onChange={setCode} className="h-64" />
 
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
             <input
@@ -239,6 +237,8 @@ export default function LinkedListCodePlaygroundPage() {
                   Step {player.currentStep + 1}/{player.totalSteps}
                 </span>
               </div>
+
+              <SpeedControl speed={speed} onSetSpeed={setSpeed} className="mb-3" />
 
               <div className="min-h-[180px] overflow-hidden rounded-xl border border-violet-500/10">
                 <LinkedListChainDisplay list={player.current.list} highlightedNodes={player.current.highlightedNodes} />

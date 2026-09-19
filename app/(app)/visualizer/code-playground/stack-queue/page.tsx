@@ -16,6 +16,8 @@ import { Reveal } from "@/components/motion/reveal"
 import { ConstellationBackground } from "@/components/visualizer/shared/constellation-background"
 import { Planet } from "@/components/visualizer/shared/planet"
 import { Rows3, GitBranch, ListTree } from "lucide-react"
+import { CodeEditor } from "@/components/visualizer/shared/code-editor"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 
 interface SharedStackQueuePlaygroundState {
   code: string
@@ -116,8 +118,9 @@ export default function StackQueueCodePlaygroundPage() {
   const [running, setRunning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<StackQueueRunResult | null>(null)
+  const [speed, setSpeed] = useState(1)
 
-  const player = useTracePlayer(result?.steps ?? [], EMPTY_STEP)
+  const player = useTracePlayer(result?.steps ?? [], EMPTY_STEP, 500 / speed)
 
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("p")
@@ -222,12 +225,7 @@ export default function StackQueueCodePlaygroundPage() {
               ))}
             </select>
           </div>
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            spellCheck={false}
-            className="h-64 w-full resize-none rounded-xl border border-violet-500/15 bg-neutral-950 p-4 font-mono text-[13px] leading-relaxed text-emerald-300 outline-none focus:border-violet-500/40"
-          />
+          <CodeEditor value={code} onChange={setCode} className="h-64" />
 
           <input
             value={input}
@@ -270,6 +268,8 @@ export default function StackQueueCodePlaygroundPage() {
                   Step {player.currentStep + 1}/{player.totalSteps}
                 </span>
               </div>
+
+              <SpeedControl speed={speed} onSetSpeed={setSpeed} className="mb-3" />
 
               <div className="min-h-[220px] overflow-hidden rounded-xl border border-violet-500/10">
                 <StackQueueDisplay kind={player.current.kind} items={player.current.items} highlightedIds={player.current.highlightedIds} />

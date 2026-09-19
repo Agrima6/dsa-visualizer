@@ -53,7 +53,7 @@ export default function RootLayout({
           <ProgressProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >

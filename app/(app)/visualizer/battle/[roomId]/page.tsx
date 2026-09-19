@@ -4,6 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { AlertTriangle, Check, ChevronDown, Clock, Copy, Loader2, Swords, Trophy } from "lucide-react"
 import { runReplay, type OpCounts } from "@/lib/battle/replay-runner"
+import { Planet } from "@/components/visualizer/shared/planet"
+
+function initials(name: string) {
+  return name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("") || "?"
+}
 
 interface PublicQuestion {
   slug: string
@@ -260,12 +265,22 @@ export default function BattleRoomPage() {
 
           <div className="mt-6 grid grid-cols-2 gap-4 text-left">
             <div className="rounded-xl border border-violet-500/15 p-4">
-              <p className="text-xs font-semibold uppercase text-muted-foreground">{room.me?.name} (you)</p>
+              <div className="mb-2 flex items-center gap-2">
+                <Planet theme="violet" size="sm">
+                  <span className="text-[10px] font-bold">{initials(room.me?.name ?? "You")}</span>
+                </Planet>
+                <p className="text-xs font-semibold uppercase text-muted-foreground">{room.me?.name} (you)</p>
+              </div>
               <p className="mt-1 text-2xl font-bold">{room.me?.solvedCount}/{room.totalQuestions}</p>
               <p className="text-xs text-muted-foreground">solved in {formatDuration(room.me?.totalTimeMs ?? 0)}</p>
             </div>
             <div className="rounded-xl border border-violet-500/15 p-4">
-              <p className="text-xs font-semibold uppercase text-muted-foreground">{room.opponent?.name ?? "Opponent"}</p>
+              <div className="mb-2 flex items-center gap-2">
+                <Planet theme="amber" size="sm">
+                  <span className="text-[10px] font-bold">{initials(room.opponent?.name ?? "Opponent")}</span>
+                </Planet>
+                <p className="text-xs font-semibold uppercase text-muted-foreground">{room.opponent?.name ?? "Opponent"}</p>
+              </div>
               <p className="mt-1 text-2xl font-bold">{room.opponent?.solvedCount ?? 0}/{room.totalQuestions}</p>
               <p className="text-xs text-muted-foreground">solved in {formatDuration(room.opponent?.totalTimeMs ?? 0)}</p>
             </div>
@@ -289,6 +304,10 @@ export default function BattleRoomPage() {
 
   return (
     <div className="container mx-auto max-w-5xl space-y-6">
+      <div className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-violet-600 dark:text-violet-300">
+        <Swords className="h-3.5 w-3.5" />
+        Face of Challenge
+      </div>
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-violet-500/15 bg-violet-500/5 px-4 py-3">
         <span className="flex items-center gap-2 text-sm font-medium">
           <Swords className="h-4 w-4 text-violet-500" />
@@ -371,25 +390,37 @@ export default function BattleRoomPage() {
 
         <div className="space-y-4">
           <div className="rounded-[24px] border border-violet-500/15 bg-white/70 p-5 shadow-[0_10px_35px_rgba(139,92,246,0.06)] backdrop-blur-xl dark:bg-white/[0.04]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">You</p>
-            <p className="mt-1 text-lg font-semibold">{room.me?.name}</p>
-            <p className="text-sm text-muted-foreground">Solved {room.me?.solvedCount}/{room.totalQuestions}</p>
+            <div className="flex items-center gap-3">
+              <Planet theme="violet" size="sm">
+                <span className="text-[10px] font-bold">{initials(room.me?.name ?? "You")}</span>
+              </Planet>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">You</p>
+                <p className="text-lg font-semibold">{room.me?.name}</p>
+              </div>
+            </div>
+            <p className="mt-2 text-sm text-muted-foreground">Solved {room.me?.solvedCount}/{room.totalQuestions}</p>
           </div>
 
           <div className="rounded-[24px] border border-violet-500/15 bg-white/70 p-5 shadow-[0_10px_35px_rgba(139,92,246,0.06)] backdrop-blur-xl dark:bg-white/[0.04]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Opponent</p>
-            {room.opponent ? (
+            <div className="flex items-center gap-3">
+              <Planet theme="amber" size="sm">
+                <span className="text-[10px] font-bold">{initials(room.opponent?.name ?? "Opponent")}</span>
+              </Planet>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Opponent</p>
+                <p className="text-lg font-semibold">{room.opponent?.name ?? "Waiting..."}</p>
+              </div>
+            </div>
+            {room.opponent && (
               <>
-                <p className="mt-1 text-lg font-semibold">{room.opponent.name}</p>
-                <p className="text-sm text-muted-foreground">Solved {room.opponent.solvedCount}/{room.totalQuestions}</p>
+                <p className="mt-2 text-sm text-muted-foreground">Solved {room.opponent.solvedCount}/{room.totalQuestions}</p>
                 {room.opponent.lastTestsTotal !== null && (
                   <p className="mt-1 text-xs text-muted-foreground">
                     Last attempt: {room.opponent.lastTestsPassed}/{room.opponent.lastTestsTotal} tests passed
                   </p>
                 )}
               </>
-            ) : (
-              <p className="mt-1 text-sm text-muted-foreground">Waiting...</p>
             )}
           </div>
         </div>

@@ -11,6 +11,8 @@ import { Reveal } from "@/components/motion/reveal"
 import { ConstellationBackground } from "@/components/visualizer/shared/constellation-background"
 import { Planet } from "@/components/visualizer/shared/planet"
 import { Rows3 } from "lucide-react"
+import { CodeEditor } from "@/components/visualizer/shared/code-editor"
+import { SpeedControl } from "@/components/visualizer/shared/speed-control"
 
 interface SharedTreePlaygroundState {
   code: string
@@ -37,8 +39,9 @@ export default function TreeCodePlaygroundPage() {
   const [running, setRunning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<TreeRunResult | null>(null)
+  const [speed, setSpeed] = useState(1)
 
-  const player = useTracePlayer(result?.steps ?? [], EMPTY_TREE_STEP)
+  const player = useTracePlayer(result?.steps ?? [], EMPTY_TREE_STEP, 500 / speed)
 
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("p")
@@ -111,12 +114,7 @@ export default function TreeCodePlaygroundPage() {
           <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Your insert function
           </label>
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            spellCheck={false}
-            className="h-72 w-full resize-none rounded-xl border border-violet-500/15 bg-neutral-950 p-4 font-mono text-[13px] leading-relaxed text-emerald-300 outline-none focus:border-violet-500/40"
-          />
+          <CodeEditor value={code} onChange={setCode} className="h-72" />
 
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
             <input
@@ -163,6 +161,8 @@ export default function TreeCodePlaygroundPage() {
                   Step {player.currentStep + 1}/{player.totalSteps}
                 </span>
               </div>
+
+              <SpeedControl speed={speed} onSetSpeed={setSpeed} className="mb-3" />
 
               <div className="h-[360px] overflow-hidden rounded-xl border border-violet-500/10">
                 <BinaryTreeDisplay tree={player.current.tree} highlightedNodes={player.current.highlightedNodes} />
