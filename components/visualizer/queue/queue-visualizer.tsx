@@ -82,7 +82,7 @@ function QueueVisualizerOriginal({ content }: QueueVisualizerProps) {
             and Double-Ended (Deque) queues side by side in the Visualization tab.
           </p>
           <a
-            href="/visualizer/code-playground/stack-queue"
+            href="/visualizer/code-playground?tab=stack-queue"
             className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-violet-500/20 bg-white/60 px-3 py-1.5 text-xs font-semibold text-violet-600 transition hover:border-violet-500/40 dark:bg-white/[0.04] dark:text-violet-300"
           >
             Code Playground — write your own queue algorithm →

@@ -96,7 +96,7 @@ function BinaryTreeVisualizerOriginal({ content, heapContent }: BinaryTreeVisual
               side by side.
             </p>
             <a
-              href="/visualizer/code-playground/tree"
+              href="/visualizer/code-playground?tab=tree"
               className="mt-4 inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/20 bg-white/60 px-3 py-1.5 text-xs font-semibold text-emerald-600 transition hover:border-emerald-500/40 dark:bg-white/[0.04] dark:text-emerald-300"
             >
               Code Playground — write your own BST insert →
