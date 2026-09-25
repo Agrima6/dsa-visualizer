@@ -254,7 +254,7 @@ export default function CompanyQuestionsPage() {
           </div>
         )}
 
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
+        <div className="mt-4 grid gap-4 xl:grid-cols-3">
           {LADDER.map((step, idx) => {
             const inTier = topics.filter((t) => t.difficulty === step.level);
             const done = inTier.filter((t) => isSolved(getTopicSlug(t))).length;
@@ -293,7 +293,7 @@ export default function CompanyQuestionsPage() {
       </section>
 
       {/* ── Company Filter ── */}
-      <section className="sticky top-[72px] z-30 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <section className="sticky top-[72px] z-30 min-w-0 max-w-full overflow-hidden border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto max-w-screen-xl px-6 py-3">
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-0.5">
             {companies.map(({ name, logo, src }) => (
@@ -376,7 +376,7 @@ export default function CompanyQuestionsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((topic, i) => {
             const diff   = difficultyConfig[topic.difficulty];
             const tagCfg = topic.tag ? tagConfig[topic.tag] : null;
@@ -430,7 +430,7 @@ export default function CompanyQuestionsPage() {
                 </div>
 
                 {/* Try with Code button */}
-                <div className="mt-4 grid gap-3 border-t border-border/30 pt-4 sm:grid-cols-[1.6fr_1fr]">
+                <div className="mt-4 grid gap-3 border-t border-border/30 pt-4">
                   <button
                     type="button"
                     onClick={() => void handleOpenTopic(topic)}

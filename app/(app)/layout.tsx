@@ -11,9 +11,9 @@ export default function AppLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="min-w-0">
         <Breadcrumbs />
-        <main className="flex-1 p-3 sm:p-10">
+        <main className="min-w-0 flex-1 p-3 sm:p-10">
           <AppContentTransition>{children}</AppContentTransition>
         </main>
       </SidebarInset>
