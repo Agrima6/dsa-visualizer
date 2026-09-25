@@ -10,6 +10,8 @@ import { ShareButton } from "@/components/visualizer/shared/share-button"
 import { decodeState } from "@/lib/share-state"
 import { CodeEditor } from "@/components/visualizer/shared/code-editor"
 import { SpeedControl } from "@/components/visualizer/shared/speed-control"
+import { HintPanel } from "@/components/code-playground/hint-panel"
+import { BLANKS_MESSAGE, hasBlanks } from "@/lib/code-playground/blanks"
 
 interface SharedPlaygroundState {
   code: string
@@ -18,11 +20,96 @@ interface SharedPlaygroundState {
 
 const EMPTY_SORT_STEP = { array: [], compared: [], swapped: [], sorted: [], message: "" }
 
-const TEMPLATES: { id: string; label: string; code: string; input: string; sortsArray: boolean }[] = [
+interface Template {
+  id: string
+  label: string
+  code: string
+  input: string
+  sortsArray: boolean
+  hints: string[]
+  solution?: string
+}
+
+const TEMPLATES: Template[] = [
+  {
+    id: "guided-bubble",
+    label: "Guided: Bubble Sort (fill in the blanks)",
+    sortsArray: true,
+    input: "38, 27, 43, 3, 9, 82, 10",
+    hints: [
+      "Bubble sort repeatedly compares each pair of neighbours and swaps them if they are in the wrong order.",
+      "To sort smallest to largest, swap when the left value is bigger than the right one. Which comparison operator means \"bigger than\"?",
+      "A swap trades the two values: arr[j] receives the old arr[j + 1], and arr[j + 1] receives the old arr[j].",
+    ],
+    solution: "if (arr[j] > arr[j + 1]) {\n  [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];\n}",
+    code: `function solve(arr) {
+  for (let i = 0; i < arr.length - 1; i++) {
+    for (let j = 0; j < arr.length - 1 - i; j++) {
+      // Is the left neighbour bigger than the right one?
+      if (arr[j] ___ arr[j + 1]) {
+        // Swap the two neighbours
+        [arr[j], arr[j + 1]] = [arr[j + 1], ___];
+      }
+    }
+  }
+  return arr;
+}`,
+  },
+  {
+    id: "guided-reverse",
+    label: "Guided: Reverse Array (fill in the blanks)",
+    sortsArray: false,
+    input: "5, 12, 8, 1, 27, 9",
+    hints: [
+      "Use two pointers: one at the start, one at the end. Swap what they point at, then move them toward each other.",
+      "The last valid index of an array is its length minus 1.",
+      "After each swap, the right pointer must move one step left.",
+    ],
+    solution: "let right = arr.length - 1;\n...\nright = right - 1;",
+    code: `function solve(arr) {
+  let left = 0;
+  // Start the right pointer at the LAST element
+  let right = ___;
+  while (left < right) {
+    [arr[left], arr[right]] = [arr[right], arr[left]];
+    left = left + 1;
+    // Move the right pointer one step toward the middle
+    right = ___;
+  }
+  return arr;
+}`,
+  },
+  {
+    id: "guided-linear-search",
+    label: "Guided: Linear Search (fill in the blanks)",
+    sortsArray: false,
+    input: "12, 5, 8, 19, 3, 27, 14",
+    hints: [
+      "Linear search looks at each element in turn until it finds the target.",
+      "To check whether two values are equal, use three equals signs: ===.",
+      "When you find it, return the position where you found it — that's the loop variable i.",
+    ],
+    solution: "if (arr[i] === target) {\n  return i;\n}",
+    code: `function solve(arr) {
+  var target = 19;
+  for (let i = 0; i < arr.length; i++) {
+    // Is this element the one we're looking for?
+    if (arr[i] ___ target) {
+      // Return the position where we found it
+      return ___;
+    }
+  }
+  return -1;
+}`,
+  },
   {
     id: "bubble-sort",
     label: "Bubble Sort",
     sortsArray: true,
+    hints: [
+      "Each pass of the inner loop pushes the largest remaining value to the end, like a bubble rising.",
+      "The inner loop stops at arr.length - 1 - i because the last i values are already in their final place.",
+    ],
     input: "38, 27, 43, 3, 9, 82, 10",
     code: `function solve(arr) {
   for (let i = 0; i < arr.length - 1; i++) {
@@ -39,6 +126,10 @@ const TEMPLATES: { id: string; label: string; code: string; input: string; sorts
     id: "linear-search",
     label: "Linear Search",
     sortsArray: false,
+    hints: [
+      "It checks every element one by one, so the work grows with the array's length: O(n).",
+      "Change the value of target to search for something else, then re-run and watch where it stops.",
+    ],
     input: "12, 5, 8, 19, 3, 27, 14",
     code: `function solve(arr) {
   var target = 19;
@@ -54,6 +145,10 @@ const TEMPLATES: { id: string; label: string; code: string; input: string; sorts
     id: "reverse-array",
     label: "Reverse Array",
     sortsArray: false,
+    hints: [
+      "Two pointers start at opposite ends and meet in the middle, swapping as they go.",
+      "It only needs to loop while left < right — once they meet, everything is already swapped.",
+    ],
     input: "5, 12, 8, 1, 27, 9",
     code: `function solve(arr) {
   let left = 0;
@@ -70,6 +165,10 @@ const TEMPLATES: { id: string; label: string; code: string; input: string; sorts
     id: "remove-duplicates",
     label: "Remove Duplicates (sorted input)",
     sortsArray: false,
+    hints: [
+      "Because the input is sorted, duplicates sit next to each other, so you only compare with the previous element.",
+      "writeIndex marks where the next unique value should be written. Everything before it is already de-duplicated.",
+    ],
     input: "1, 1, 2, 3, 3, 3, 4, 5, 5",
     code: `function solve(arr) {
   let writeIndex = 0;
@@ -84,19 +183,22 @@ const TEMPLATES: { id: string; label: string; code: string; input: string; sorts
   },
 ]
 
+const DEFAULT_TEMPLATE = TEMPLATES.find((t) => t.id === "bubble-sort")!
+
 export function ArraySortPanel() {
-  const [code, setCode] = useState(TEMPLATES[0].code)
-  const [input, setInput] = useState(TEMPLATES[0].input)
+  const [code, setCode] = useState(DEFAULT_TEMPLATE.code)
+  const [input, setInput] = useState(DEFAULT_TEMPLATE.input)
   const [running, setRunning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<RunResult | null>(null)
   const [runArray, setRunArray] = useState<number[]>([])
   const [debugMode, setDebugMode] = useState(true)
-  const [sortsArray, setSortsArray] = useState(TEMPLATES[0].sortsArray)
+  const [sortsArray, setSortsArray] = useState(DEFAULT_TEMPLATE.sortsArray)
   const [analyzing, setAnalyzing] = useState(false)
   const [analyzeProgress, setAnalyzeProgress] = useState(0)
   const [complexity, setComplexity] = useState<ComplexityResult | null>(null)
   const [speed, setSpeed] = useState(1)
+  const [templateId, setTemplateId] = useState("bubble-sort")
 
   const player = useTracePlayer(result?.steps ?? [], EMPTY_SORT_STEP, 500 / speed)
 
@@ -123,6 +225,10 @@ export function ArraySortPanel() {
   }, [])
 
   const run = async () => {
+    if (hasBlanks(code)) {
+      setError(BLANKS_MESSAGE)
+      return
+    }
     const array = input.split(",").map((v) => parseInt(v.trim(), 10)).filter((v) => !isNaN(v))
     if (array.length === 0) {
       setError("Enter a comma-separated array first.")
@@ -176,16 +282,20 @@ export function ArraySortPanel() {
           <select
             onChange={(e) => {
               const t = TEMPLATES.find((tpl) => tpl.id === e.target.value)
-              if (t) { setCode(t.code); setInput(t.input); setSortsArray(t.sortsArray); setResult(null); setError(null); setComplexity(null) }
+              if (t) { setTemplateId(t.id); setCode(t.code); setInput(t.input); setSortsArray(t.sortsArray); setResult(null); setError(null); setComplexity(null) }
             }}
-            defaultValue=""
+            value={templateId}
             className="rounded-lg border border-border bg-background px-2 py-1 text-xs"
           >
-            <option value="" disabled>Load a starter...</option>
             {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
           </select>
         </div>
         <CodeEditor value={code} onChange={setCode} className="h-72" />
+        <HintPanel
+          hints={TEMPLATES.find((t) => t.id === templateId)?.hints ?? []}
+          solution={TEMPLATES.find((t) => t.id === templateId)?.solution}
+          resetKey={templateId}
+        />
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
           <input

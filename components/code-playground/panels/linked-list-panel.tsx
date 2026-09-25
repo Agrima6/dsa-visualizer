@@ -9,6 +9,8 @@ import { ShareButton } from "@/components/visualizer/shared/share-button"
 import { decodeState } from "@/lib/share-state"
 import { CodeEditor } from "@/components/visualizer/shared/code-editor"
 import { SpeedControl } from "@/components/visualizer/shared/speed-control"
+import { HintPanel } from "@/components/code-playground/hint-panel"
+import { BLANKS_MESSAGE, hasBlanks } from "@/lib/code-playground/blanks"
 
 interface SharedLinkedListPlaygroundState {
   code: string
@@ -19,11 +21,48 @@ interface SharedLinkedListPlaygroundState {
 
 const EMPTY_STEP: LinkedListStep = { list: [], highlightedNodes: [], message: "" }
 
-const TEMPLATES: { id: string; label: string; code: string; mode: LinkedListRunMode }[] = [
+interface Template {
+  id: string
+  label: string
+  code: string
+  mode: LinkedListRunMode
+  hints: string[]
+  solution?: string
+}
+
+const TEMPLATES: Template[] = [
+  {
+    id: "guided-insert-at-end",
+    label: "Guided: Insert at End (fill in the blanks)",
+    mode: "build",
+    hints: [
+      "If the list is empty, the new node simply becomes the whole list — return it.",
+      "Walk forward until you reach the last node: the one whose next is null.",
+      "Link the last node's next to the new node, then return head so the list still starts where it did.",
+    ],
+    solution: "if (head === null) return node;\nwhile (current.next !== null) { ... }\ncurrent.next = node;",
+    code: `function insertAtEnd(head, value) {
+  const node = makeNode(value);
+  // Empty list: the new node IS the list
+  if (head === null) return ___;
+  let current = head;
+  // Keep walking until there is no next node
+  while (current.next !== ___) {
+    current = current.next;
+  }
+  // Attach the new node to the end
+  current.next = ___;
+  return head;
+}`,
+  },
   {
     id: "insert-at-end",
     label: "Insert at End",
     mode: "build",
+    hints: [
+      "The while loop moves current along the chain until it sits on the last node.",
+      "Only one pointer changes: the old last node's next now points at the new node.",
+    ],
     code: `function insertAtEnd(head, value) {
   const node = makeNode(value);
   if (head === null) return node;
@@ -39,6 +78,10 @@ const TEMPLATES: { id: string; label: string; code: string; mode: LinkedListRunM
     id: "insert-at-front",
     label: "Insert at Front",
     mode: "build",
+    hints: [
+      "No walking is needed: the new node just points at the old head.",
+      "It returns the new node, because the new node is now the head of the list.",
+    ],
     code: `function insertAtFront(head, value) {
   const node = makeNode(value);
   node.next = head;
@@ -49,6 +92,10 @@ const TEMPLATES: { id: string; label: string; code: string; mode: LinkedListRunM
     id: "search",
     label: "Search",
     mode: "query",
+    hints: [
+      "Start at the head and follow next pointers, checking each node's value.",
+      "If current becomes null you've walked off the end without finding it, so return false.",
+    ],
     code: `function search(head, target) {
   let current = head;
   while (current !== null) {
@@ -62,15 +109,18 @@ const TEMPLATES: { id: string; label: string; code: string; mode: LinkedListRunM
   },
 ]
 
+const DEFAULT_TEMPLATE = TEMPLATES.find((t) => t.id === "insert-at-end")!
+
 export function LinkedListPanel() {
-  const [code, setCode] = useState(TEMPLATES[0].code)
+  const [code, setCode] = useState(DEFAULT_TEMPLATE.code)
   const [input, setInput] = useState("10, 20, 30")
   const [queryTarget, setQueryTarget] = useState("20")
-  const [mode, setMode] = useState<LinkedListRunMode>(TEMPLATES[0].mode)
+  const [mode, setMode] = useState<LinkedListRunMode>(DEFAULT_TEMPLATE.mode)
   const [running, setRunning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<LinkedListRunResult | null>(null)
   const [speed, setSpeed] = useState(1)
+  const [templateId, setTemplateId] = useState("insert-at-end")
 
   const player = useTracePlayer(result?.steps ?? [], EMPTY_STEP, 500 / speed)
 
@@ -86,6 +136,10 @@ export function LinkedListPanel() {
   }, [])
 
   const run = async () => {
+    if (hasBlanks(code)) {
+      setError(BLANKS_MESSAGE)
+      return
+    }
     const values = input.split(",").map((v) => parseInt(v.trim(), 10)).filter((v) => !isNaN(v))
     if (values.length === 0) {
       setError(mode === "build" ? "Enter comma-separated values first." : "Enter the list's starting values first.")
@@ -125,16 +179,20 @@ export function LinkedListPanel() {
           <select
             onChange={(e) => {
               const t = TEMPLATES.find((tpl) => tpl.id === e.target.value)
-              if (t) { setCode(t.code); setMode(t.mode); setResult(null); setError(null) }
+              if (t) { setTemplateId(t.id); setCode(t.code); setMode(t.mode); setResult(null); setError(null) }
             }}
-            defaultValue=""
+            value={templateId}
             className="rounded-lg border border-border bg-background px-2 py-1 text-xs"
           >
-            <option value="" disabled>Load a starter...</option>
             {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
           </select>
         </div>
         <CodeEditor value={code} onChange={setCode} className="h-64" />
+        <HintPanel
+          hints={TEMPLATES.find((t) => t.id === templateId)?.hints ?? []}
+          solution={TEMPLATES.find((t) => t.id === templateId)?.solution}
+          resetKey={templateId}
+        />
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
           <input

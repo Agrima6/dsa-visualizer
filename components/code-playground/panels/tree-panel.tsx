@@ -9,6 +9,8 @@ import { ShareButton } from "@/components/visualizer/shared/share-button"
 import { decodeState } from "@/lib/share-state"
 import { CodeEditor } from "@/components/visualizer/shared/code-editor"
 import { SpeedControl } from "@/components/visualizer/shared/speed-control"
+import { HintPanel } from "@/components/code-playground/hint-panel"
+import { BLANKS_MESSAGE, hasBlanks } from "@/lib/code-playground/blanks"
 
 interface SharedTreePlaygroundState {
   code: string
@@ -29,6 +31,49 @@ const STARTER_CODE = `function insert(root, value) {
   return root;
 }`
 
+interface Template {
+  id: string
+  label: string
+  code: string
+  hints: string[]
+  solution?: string
+}
+
+const TEMPLATES: Template[] = [
+  {
+    id: "bst-insert",
+    label: "BST Insert",
+    code: STARTER_CODE,
+    hints: [
+      "If the current spot is empty (null), that's where the new node belongs — create it with makeNode.",
+      "Smaller values go into the left subtree, bigger or equal values go into the right subtree.",
+      "The function calls itself on the child it chose, and returns root so the parent keeps its link.",
+    ],
+  },
+  {
+    id: "guided-bst-insert",
+    label: "Guided: BST Insert (fill in the blanks)",
+    hints: [
+      "When you reach an empty spot, create a node holding the value being inserted.",
+      "The recursive call for a value that is NOT smaller mirrors the left case, but on the other side.",
+    ],
+    solution: "return makeNode(value);\n...\nroot.right = insert(root.right, value);",
+    code: `function insert(root, value) {
+  if (root === null) {
+    // Empty spot: create the new node here
+    return makeNode(___);
+  }
+  if (value < root.value) {
+    root.left = insert(root.left, value);
+  } else {
+    // Bigger values go down the other side
+    root.right = insert(root.___, value);
+  }
+  return root;
+}`,
+  },
+]
+
 export function TreePanel() {
   const [code, setCode] = useState(STARTER_CODE)
   const [input, setInput] = useState("50, 30, 70, 20, 40, 60, 80")
@@ -36,6 +81,7 @@ export function TreePanel() {
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<TreeRunResult | null>(null)
   const [speed, setSpeed] = useState(1)
+  const [templateId, setTemplateId] = useState("bst-insert")
 
   const player = useTracePlayer(result?.steps ?? [], EMPTY_TREE_STEP, 500 / speed)
 
@@ -49,6 +95,10 @@ export function TreePanel() {
   }, [])
 
   const run = async () => {
+    if (hasBlanks(code)) {
+      setError(BLANKS_MESSAGE)
+      return
+    }
     const values = input.split(",").map((v) => parseInt(v.trim(), 10)).filter((v) => !isNaN(v))
     if (values.length === 0) {
       setError("Enter comma-separated values to insert first.")
@@ -77,10 +127,27 @@ export function TreePanel() {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       {/* Editor */}
       <div className="rounded-2xl border border-border bg-card p-5">
-        <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          Your insert function
-        </label>
+        <div className="mb-2 flex items-center justify-between">
+          <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Your insert function
+          </label>
+          <select
+            value={templateId}
+            onChange={(e) => {
+              const t = TEMPLATES.find((tpl) => tpl.id === e.target.value)
+              if (t) { setTemplateId(t.id); setCode(t.code); setResult(null); setError(null) }
+            }}
+            className="rounded-lg border border-border bg-background px-2 py-1 text-xs"
+          >
+            {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}
+          </select>
+        </div>
         <CodeEditor value={code} onChange={setCode} className="h-72" />
+        <HintPanel
+          hints={TEMPLATES.find((t) => t.id === templateId)?.hints ?? []}
+          solution={TEMPLATES.find((t) => t.id === templateId)?.solution}
+          resetKey={templateId}
+        />
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto]">
           <input

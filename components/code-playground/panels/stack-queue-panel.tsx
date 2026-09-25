@@ -14,6 +14,8 @@ import { ShareButton } from "@/components/visualizer/shared/share-button"
 import { decodeState } from "@/lib/share-state"
 import { CodeEditor } from "@/components/visualizer/shared/code-editor"
 import { SpeedControl } from "@/components/visualizer/shared/speed-control"
+import { HintPanel } from "@/components/code-playground/hint-panel"
+import { BLANKS_MESSAGE, hasBlanks } from "@/lib/code-playground/blanks"
 
 interface SharedStackQueuePlaygroundState {
   code: string
@@ -31,12 +33,47 @@ interface Template {
   inputLabel: string
   defaultInput: string
   code: string
+  hints: string[]
+  solution?: string
 }
 
 const TEMPLATES: Template[] = [
   {
+    id: "guided-valid-parentheses",
+    label: "Guided: Valid Parentheses (fill in the blanks)",
+    kind: "stack",
+    inputType: "string",
+    inputLabel: "Brackets to check",
+    defaultInput: "([{}])",
+    hints: [
+      "Every opening bracket must wait for its partner, so opening brackets go ON the stack.",
+      "The name of the array method that adds an item to the end is push.",
+      "A closing bracket must match the MOST RECENT opening one — that's the top of the stack, removed with pop.",
+    ],
+    solution: "stack.push(c);\n...\nstack.pop() !== pairs[c]",
+    code: `function isValid(s) {
+  const stack = [];
+  const pairs = { ")": "(", "]": "[", "}": "{" };
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (c === "(" || c === "[" || c === "{") {
+      // Opening bracket: put it on the stack
+      stack.___(c);
+    } else {
+      // Closing bracket: take the top off and check it matches
+      if (stack.length === 0 || stack.___() !== pairs[c]) return false;
+    }
+  }
+  return stack.length === 0;
+}`,
+  },
+  {
     id: "valid-parentheses",
     label: "Valid Parentheses (Stack)",
+    hints: [
+      "Opening brackets are pushed; each closing bracket must match whatever is on top.",
+      "If the stack is empty at the end, every bracket was matched.",
+    ],
     kind: "stack",
     inputType: "string",
     inputLabel: "Brackets to check",
@@ -58,6 +95,10 @@ const TEMPLATES: Template[] = [
   {
     id: "next-greater-element",
     label: "Next Greater Element (Stack)",
+    hints: [
+      "The stack holds indexes of numbers still waiting to find a bigger number to their right.",
+      "When a new number is bigger than the one on top, pop it and record the new number as its answer.",
+    ],
     kind: "stack",
     inputType: "numberArray",
     inputLabel: "Comma-separated numbers",
@@ -78,6 +119,10 @@ const TEMPLATES: Template[] = [
   {
     id: "generate-binary-numbers",
     label: "Generate Binary Numbers (Queue)",
+    hints: [
+      "shift() takes from the FRONT of the array — that's a queue's dequeue.",
+      "Each number produces two new ones by appending 0 and 1, which go to the back of the line.",
+    ],
     kind: "queue",
     inputType: "number",
     inputLabel: "How many numbers (N)",
@@ -107,10 +152,12 @@ function parseInput(raw: string, type: StackQueueInputType): string | number[] |
   return nums.length > 0 ? nums : null
 }
 
+const DEFAULT_TEMPLATE = TEMPLATES.find((t) => t.id === "valid-parentheses")!
+
 export function StackQueuePanel() {
-  const [template, setTemplate] = useState<Template>(TEMPLATES[0])
-  const [code, setCode] = useState(TEMPLATES[0].code)
-  const [input, setInput] = useState(TEMPLATES[0].defaultInput)
+  const [template, setTemplate] = useState<Template>(DEFAULT_TEMPLATE)
+  const [code, setCode] = useState(DEFAULT_TEMPLATE.code)
+  const [input, setInput] = useState(DEFAULT_TEMPLATE.defaultInput)
   const [running, setRunning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<StackQueueRunResult | null>(null)
@@ -130,6 +177,10 @@ export function StackQueuePanel() {
   }, [])
 
   const run = async () => {
+    if (hasBlanks(code)) {
+      setError(BLANKS_MESSAGE)
+      return
+    }
     const parsed = parseInput(input, template.inputType)
     if (parsed === null) {
       setError(
@@ -182,6 +233,7 @@ export function StackQueuePanel() {
           </select>
         </div>
         <CodeEditor value={code} onChange={setCode} className="h-64" />
+        <HintPanel hints={template.hints} solution={template.solution} resetKey={template.id} />
 
         <input
           value={input}
