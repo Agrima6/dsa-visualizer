@@ -1,6 +1,7 @@
 "use client"
 // components/visualizer/queue/queue-code-view.tsx
 
+import { byDifficulty } from "@/lib/difficulty"
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -435,7 +436,7 @@ export default function QueueCodeView() {
   const [filterDiff, setFilterDiff] = useState<Difficulty | "All">("All")
   const [search, setSearch] = useState("")
 
-  const filtered = QUEUE_PROBLEMS.filter((p) => {
+  const filtered = [...QUEUE_PROBLEMS].sort(byDifficulty).filter((p) => {
     const matchDiff = filterDiff === "All" || p.difficulty === filterDiff
     const q = search.toLowerCase()
     const matchSearch =

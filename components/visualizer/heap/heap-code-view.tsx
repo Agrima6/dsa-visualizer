@@ -1,6 +1,7 @@
 "use client"
 // components/visualizer/heap/heap-code-view.tsx
 
+import { byDifficulty } from "@/lib/difficulty"
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -414,7 +415,7 @@ export default function HeapCodeView() {
     fetchUnlocked()
   }, [isSignedIn])
 
-  const filtered = HEAP_PROBLEMS.filter((p) => {
+  const filtered = [...HEAP_PROBLEMS].sort(byDifficulty).filter((p) => {
     const matchDiff = filterDiff === "All" || p.difficulty === filterDiff
     const q = search.toLowerCase()
     const matchSearch =

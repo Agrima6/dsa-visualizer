@@ -1,6 +1,7 @@
 "use client"
 // components/visualizer/binary-tree/binary-tree-code-view.tsx
 
+import { byDifficulty } from "@/lib/difficulty"
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -305,7 +306,7 @@ export default function BinaryTreeCodeView() {
       .catch(() => setUnlockedTopics([]))
   }, [isSignedIn])
 
-  const filtered = BINARY_TREE_PROBLEMS.filter(p => {
+  const filtered = [...BINARY_TREE_PROBLEMS].sort(byDifficulty).filter(p => {
     const matchDiff = filterDiff === "All" || p.difficulty === filterDiff
     const q = search.toLowerCase()
     return matchDiff && (p.title.toLowerCase().includes(q) || p.tags.some(t => t.toLowerCase().includes(q)) || p.companies.some(c => c.toLowerCase().includes(q)))

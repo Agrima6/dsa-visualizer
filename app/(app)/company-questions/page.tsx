@@ -8,6 +8,7 @@ import { ArrowRight, Building2, CheckCircle2, Code2, ChevronRight, Flame, Star, 
 import { useProgress } from "@/hooks/use-progress";
 import { Reveal } from "@/components/motion/reveal";
 import { ConstellationBackground } from "@/components/visualizer/shared/constellation-background";
+import { byDifficulty } from "@/lib/difficulty";
 
 interface Topic {
   title: string;
@@ -34,7 +35,7 @@ const companies: Company[] = [
   { name: "Adobe", logo: "Ai",src: "/company-logos/adobe.svg" },
 ];
 
-const topics: Topic[] = [
+const topics: Topic[] = ([
   {
     title: "Arrays",
     questions: 45,
@@ -104,6 +105,24 @@ const topics: Topic[] = [
     url: "/visualizer/recursion?mode=code",
     tag: "Must Do",
   },
+] as Topic[]).sort(byDifficulty);
+
+const LADDER = [
+  {
+    level: "Easy" as const,
+    name: "Warm up",
+    text: "Start here. Short problems that build the core moves you'll reuse everywhere.",
+  },
+  {
+    level: "Medium" as const,
+    name: "Build up",
+    text: "Combine the basics. Expect to think about an approach before you code.",
+  },
+  {
+    level: "Hard" as const,
+    name: "Challenge",
+    text: "Interview-level. Come here once the earlier steps feel comfortable.",
+  },
 ];
 
 const difficultyConfig = {
@@ -120,13 +139,15 @@ const tagConfig = {
 
 export default function CompanyQuestionsPage() {
   const [activeCompany, setActiveCompany] = useState("All");
+  const [activeDifficulty, setActiveDifficulty] = useState<"All" | "Easy" | "Medium" | "Hard">("All");
   const { markSolved, markMultipleSolved, unmarkSolved, isSolved } = useProgress();
   const router = useRouter();
 
-  const filtered =
-    activeCompany === "All"
-      ? topics
-      : topics.filter((t) => t.companies.includes(activeCompany));
+  const filtered = topics.filter(
+    (t) =>
+      (activeCompany === "All" || t.companies.includes(activeCompany)) &&
+      (activeDifficulty === "All" || t.difficulty === activeDifficulty)
+  );
 
   const getTopicSlug = (topic: Topic) =>
     `company-${topic.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
@@ -160,6 +181,8 @@ export default function CompanyQuestionsPage() {
     await markSolved(buildEntry(topic));
     router.push(topic.url);
   };
+
+  const nextUp = topics.find((t) => !isSolved(getTopicSlug(t)));
 
   return (
     <main className="min-h-screen bg-background">
@@ -206,6 +229,69 @@ export default function CompanyQuestionsPage() {
         </div>
       </Reveal>
 
+      {/* ── Difficulty ladder ── */}
+      <section className="mx-auto max-w-screen-xl px-6 pt-10">
+        <h2 className="text-xl font-semibold">Not sure where to start? Follow the ladder</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Work through the steps in order. Each one prepares you for the next.
+        </p>
+
+        {nextUp && (
+          <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-violet-500/30 bg-violet-500/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-violet-300">Next up for you</p>
+              <p className="mt-0.5 font-semibold">
+                {nextUp.title} <span className="text-sm font-normal text-muted-foreground">· {nextUp.difficulty}</span>
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void handleOpenTopic(nextUp)}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-500"
+            >
+              Start this topic <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          {LADDER.map((step, idx) => {
+            const inTier = topics.filter((t) => t.difficulty === step.level);
+            const done = inTier.filter((t) => isSolved(getTopicSlug(t))).length;
+            const cfg = difficultyConfig[step.level];
+            return (
+              <div key={step.level} className="rounded-2xl border border-border/60 bg-card/50 p-4">
+                <div className="flex items-center justify-between">
+                  <span className={`inline-flex items-center rounded-lg border px-2.5 py-1 text-xs font-medium ${cfg.color} ${cfg.bg} ${cfg.border}`}>
+                    Step {idx + 1} · {step.level}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {done}/{inTier.length} done
+                  </span>
+                </div>
+                <p className="mt-3 font-semibold">{step.name}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{step.text}</p>
+                <ul className="mt-3 space-y-1.5">
+                  {inTier.map((t) => (
+                    <li key={t.title} className="flex items-center gap-2 text-sm">
+                      <CheckCircle2
+                        className={`h-4 w-4 shrink-0 ${isSolved(getTopicSlug(t)) ? "text-emerald-400" : "text-muted-foreground/40"}`}
+                      />
+                      <button type="button" onClick={() => void handleOpenTopic(t)} className="text-left hover:text-violet-300">
+                        {t.title}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Inside every topic, problems are listed Easy first, so working top to bottom is also a ladder.
+        </p>
+      </section>
+
       {/* ── Company Filter ── */}
       <section className="sticky top-[72px] z-30 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="mx-auto max-w-screen-xl px-6 py-3">
@@ -250,6 +336,23 @@ export default function CompanyQuestionsPage() {
               <> for <span className="font-semibold text-violet-400">{activeCompany}</span></>
             )}
           </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Level</span>
+            {(["All", "Easy", "Medium", "Hard"] as const).map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => setActiveDifficulty(d)}
+                className={`rounded-lg border px-3 py-1 text-xs font-medium transition ${
+                  activeDifficulty === d
+                    ? "border-violet-500/50 bg-violet-500/15 text-violet-300"
+                    : "border-border/60 text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {d}
+              </button>
+            ))}
+          </div>
           <div className="flex flex-col gap-3 rounded-3xl border border-violet-500/10 bg-violet-500/5 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-semibold text-foreground">Topic progress</p>

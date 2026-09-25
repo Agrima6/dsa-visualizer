@@ -1,6 +1,7 @@
 "use client"
 // components/visualizer/stack/stack-code-view.tsx
 
+import { byDifficulty } from "@/lib/difficulty"
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -426,7 +427,7 @@ export default function StackCodeView() {
   const [filterDiff, setFilterDiff] = useState<Difficulty | "All">("All")
   const [search, setSearch] = useState("")
 
-  const filtered = STACK_PROBLEMS.filter((p) => {
+  const filtered = [...STACK_PROBLEMS].sort(byDifficulty).filter((p) => {
     const matchDiff = filterDiff === "All" || p.difficulty === filterDiff
     const q = search.toLowerCase()
     const matchSearch =

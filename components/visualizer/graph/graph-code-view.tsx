@@ -1,6 +1,7 @@
 "use client"
 // components/visualizer/graph/graph-code-view.tsx
 
+import { byDifficulty } from "@/lib/difficulty"
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useUser, SignInButton } from "@clerk/nextjs"
@@ -225,7 +226,7 @@ export default function GraphCodeView({ onBack }: { onBack: () => void }) {
     fetch("/api/payment/unlocked",{method:"GET",cache:"no-store"}).then(r=>r.json()).then(d=>setUnlocked(Array.isArray(d.unlockedTopics)?d.unlockedTopics:[])).catch(()=>setUnlocked([]))
   },[isSignedIn])
 
-  const filtered=GRAPH_PROBLEMS.filter(p=>{
+  const filtered=[...GRAPH_PROBLEMS].sort(byDifficulty).filter(p=>{
     const md=diff==="All"||p.difficulty===diff
     const q=search.toLowerCase()
     return md&&(p.title.toLowerCase().includes(q)||p.tags.some(t=>t.toLowerCase().includes(q))||p.companies.some(c=>c.toLowerCase().includes(q)))

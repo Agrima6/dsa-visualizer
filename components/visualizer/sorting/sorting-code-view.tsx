@@ -1,5 +1,6 @@
 "use client"
 
+import { byDifficulty } from "@/lib/difficulty"
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -367,7 +368,7 @@ export default function SortingCodeView() {
     fetchUnlocked()
   }, [isSignedIn])
 
-  const filtered = SORTING_PROBLEMS.filter((p) => {
+  const filtered = [...SORTING_PROBLEMS].sort(byDifficulty).filter((p) => {
     const matchDiff = filterDiff === "All" || p.difficulty === filterDiff
     const q = search.toLowerCase()
     const matchSearch =

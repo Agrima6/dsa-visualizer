@@ -1,6 +1,7 @@
 "use client"
 // components/visualizer/linked-list/linked-list-code-view.tsx
 
+import { byDifficulty } from "@/lib/difficulty"
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -311,7 +312,7 @@ export default function LinkedListCodeView() {
       .catch(() => setUnlockedTopics([]))
   }, [isSignedIn])
 
-  const filtered = LINKED_LIST_PROBLEMS.filter(p => {
+  const filtered = [...LINKED_LIST_PROBLEMS].sort(byDifficulty).filter(p => {
     const matchDiff   = filterDiff === "All" || p.difficulty === filterDiff
     const q           = search.toLowerCase()
     const matchSearch = p.title.toLowerCase().includes(q) || p.tags.some(t => t.toLowerCase().includes(q)) || p.companies.some(c => c.toLowerCase().includes(q))

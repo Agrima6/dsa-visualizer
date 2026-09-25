@@ -1,6 +1,7 @@
 "use client"
 // components/visualizer/array/array-code-view.tsx
 
+import { byDifficulty } from "@/lib/difficulty"
 import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -518,7 +519,7 @@ export default function ArrayCodeView() {
     fetchUnlocked()
   }, [isSignedIn])
 
-  const filtered = ARRAY_PROBLEMS.filter(p => {
+  const filtered = [...ARRAY_PROBLEMS].sort(byDifficulty).filter(p => {
     const matchDiff = filterDiff === "All" || p.difficulty === filterDiff
     const q = search.toLowerCase()
     return (
