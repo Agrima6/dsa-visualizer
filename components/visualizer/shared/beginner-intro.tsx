@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 import { BookOpen, ChevronDown, Lightbulb, MousePointerClick, Target } from "lucide-react"
 import { BEGINNER_INTROS } from "@/lib/beginner-intros"
+import { GlossaryText } from "@/components/shared/glossary-text"
 import { TOPICS } from "@/lib/visualizer-topics"
 
 const storageKey = (slug: string) => `beginner-intro-collapsed:${slug}`
@@ -51,14 +52,14 @@ export function BeginnerIntro() {
 
       {open && (
         <div className="space-y-5 border-t border-border px-5 py-5">
-          <p className="text-base leading-relaxed">{intro.oneLine}</p>
+          <p className="text-base leading-relaxed"><GlossaryText>{intro.oneLine}</GlossaryText></p>
 
           <div className="rounded-xl bg-muted/50 p-4">
             <p className="flex items-center gap-2 text-sm font-semibold">
               <Lightbulb className="h-4 w-4 text-amber-500" />
               {intro.analogy.title}
             </p>
-            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{intro.analogy.text}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground"><GlossaryText>{intro.analogy.text}</GlossaryText></p>
           </div>
 
           <div>
@@ -78,13 +79,13 @@ export function BeginnerIntro() {
               <p className="mb-1 flex items-center gap-1.5 font-semibold">
                 <Target className="h-4 w-4 text-violet-500" /> When would I use this?
               </p>
-              <p className="text-muted-foreground">{intro.useWhen}</p>
+              <p className="text-muted-foreground"><GlossaryText>{intro.useWhen}</GlossaryText></p>
             </div>
             <div className="text-sm">
               <p className="mb-1 flex items-center gap-1.5 font-semibold">
                 <MousePointerClick className="h-4 w-4 text-violet-500" /> Try this first
               </p>
-              <p className="text-muted-foreground">{intro.tryThis}</p>
+              <p className="text-muted-foreground"><GlossaryText>{intro.tryThis}</GlossaryText></p>
             </div>
           </div>
         </div>

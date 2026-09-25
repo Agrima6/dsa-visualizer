@@ -2,6 +2,7 @@
 
 import ReactMarkdown, { type Components } from "react-markdown"
 import { MDXProvider } from "@mdx-js/react"
+import { GlossaryText } from "@/components/shared/glossary-text"
 
 interface MarkdownContentProps {
   content: React.ReactNode | string
@@ -126,7 +127,7 @@ const components: Components = {
   ),
   p: ({ children }) => (
     <p className="mb-4 text-sm leading-7 text-muted-foreground sm:text-[15px]">
-      {children}
+      <GlossaryText>{children}</GlossaryText>
     </p>
   ),
   ul: ({ children }) => (
@@ -139,7 +140,7 @@ const components: Components = {
       {children}
     </ol>
   ),
-  li: ({ children }) => <li className="leading-7">{children}</li>,
+  li: ({ children }) => <li className="leading-7"><GlossaryText>{children}</GlossaryText></li>,
   strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
   em: ({ children }) => <em className="italic text-foreground/90">{children}</em>,
   blockquote: ({ children }) => (
